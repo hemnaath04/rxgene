@@ -74,7 +74,7 @@ function flowStateAndInhibitor(a: DrugAssessment): { flowState: FlowState; inhib
 function scorePair(a: DrugAssessment): { scoreBefore: string | null; scoreAfter: string | null; scoreNote: string | null } {
   if (a.adjustedPhenotype === ATOMOXETINE_LABEL_ADJUSTED_PHENOTYPE) {
     return {
-      scoreBefore: formatScore(a.genotypeActivityScore),
+      scoreBefore: null,
       scoreAfter: null,
       scoreNote: ATOMOXETINE_LABEL_ADJUSTED_PHENOTYPE,
     };
@@ -103,6 +103,10 @@ function outputLabelFor(a: DrugAssessment, flowState: FlowState): string {
 
 /** One explanatory sentence centered under the scene. */
 function captionFor(a: DrugAssessment, patientName: string): string {
+  const alreadySlow = alreadySlowInhibitor(a);
+  if (alreadySlow) {
+    return `${capitalize(alreadySlow)} adds no further effect: ${patientName} was already slow by genes.`;
+  }
   if (a.inhibitor && a.phenoconverted) {
     return `${capitalize(a.inhibitor.drug)} reduces ${a.gene} activity. ${patientName}\u2019s genes are unchanged.`;
   }
@@ -128,7 +132,7 @@ function headlineFor(a: DrugAssessment): string {
     case 'YELLOW':
       return a.drug === 'atomoxetine' ? 'Adjust atomoxetine dosing.' : `Review ${a.drug} dosing.`;
     case 'GREEN':
-      return GREEN_ALERT_TEXT;
+      return GREEN_ALERT_TEXT.replace(/\s*\(not the same as safe\)$/, '');
     case 'GREY':
     default:
       if (a.genotypePhenotype.startsWith('Indeterminate')) return 'Indeterminate: ask a pharmacist';
@@ -207,7 +211,7 @@ function sourceLinksFor(a: DrugAssessment): SourceLink[] {
 export function toRxGeneResult(
   assessments: DrugAssessment[],
   patient: Patient,
-  addedDrug: string,
+  _addedDrug: string,
   allMeds: string[] = patient.meds
 ): RxGeneResult | undefined {
   const primary = primaryAssessment(assessments);
@@ -234,7 +238,7 @@ export function toRxGeneResult(
     diplotype: primary.genotype ?? '\u2014',
     baselineLabel: baselineLabelFor(primary),
     baselineSpeed,
-    drugLabel: capitalize(addedDrug || primary.drug),
+    drugLabel: capitalize(primary.drug),
     currentSpeed,
     currentLabel,
     scoreBefore,

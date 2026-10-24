@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { findPatient } from '@/data/patients';
 import { checkOrder } from '@/engine';
+import { ATOMOXETINE_LABEL_ADJUSTED_PHENOTYPE } from '@/engine/fixedTexts';
 import { primaryAssessment, toRxGeneResult } from './mapAssessment';
 
 function run(patientId: string, addedDrug: string) {
@@ -66,6 +67,30 @@ describe('toRxGeneResult — preset cases', () => {
   it('Ana (ANA) + clopidogrel: the clopidogrel label note is present', () => {
     const { result } = run('ANA', 'clopidogrel');
     expect(result.clinicalNotes?.some(n => n.toLowerCase().includes('omeprazole'))).toBe(true);
+  });
+
+  it('Marcus (P02) + codeine: caption names the inhibitor and "adds no further effect"', () => {
+    const { result } = run('P02', 'codeine');
+    expect(result.caption).toContain('adds no further effect');
+    expect(result.caption).toContain('Fluoxetine');
+  });
+
+  it('Lena (P12) reverse case: drugLabel is the primary assessment drug (Codeine), not the added drug', () => {
+    const { result } = run('P12', 'fluoxetine');
+    expect(result.drugLabel).toBe('Codeine');
+  });
+
+  it('Jordan (P13) + atomoxetine: label phenotype shows null score before/after and the label text as the note', () => {
+    const { result } = run('P13', 'atomoxetine');
+    expect(result.scoreBefore).toBeNull();
+    expect(result.scoreAfter).toBeNull();
+    expect(result.scoreNote).toBe(ATOMOXETINE_LABEL_ADJUSTED_PHENOTYPE);
+  });
+
+  it('Priya (P03) + codeine: GREEN headline has no "safe", qualifier carries it once', () => {
+    const { result } = run('P03', 'codeine');
+    expect(result.verdict.headline).not.toContain('safe');
+    expect(result.verdict.qualifier).toBe('(not the same as safe)');
   });
 });
 

@@ -5,8 +5,9 @@ date we checked the source. Quotes are under 15 words. Drafted 2026-10-24; not y
 off by Ananya.
 
 **How to read the "Verified by" column**
-- **Ananya (human)**: a person looked at the source and confirmed it. Only the FDA
-  inhibitor row has this.
+- **Ananya (human)**: a person looked at the source and confirmed it. Only six FDA
+  inhibitor rows have this (fluoxetine, paroxetine, bupropion, duloxetine, sertraline,
+  omeprazole); the other inhibitors in that table are source-matched only.
 - **Source-matched**: a subagent or Claude opened the source and string-matched the quote.
   This is NOT human verification. Treat it as "the quote exists", not "a clinician signed
   off".
@@ -15,7 +16,8 @@ off by Ananya.
 
 | Claim used in app | Source | Short exact quote | Verified by | Date |
 |---|---|---|---|---|
-| CYP2D6 inhibitor classes: strong (bupropion, fluoxetine, paroxetine, quinidine, terbinafine), moderate (abiraterone, cinacalcet, duloxetine, lorcaserin, mirabegron, rolapitant), weak (10 drugs, incl. sertraline) | FDA table of CYP enzyme interactions. https://www.fda.gov/drugs/drug-interactions-labeling/healthcare-professionals-fdas-examples-drugs-interact-cyp-enzymes-and-transporter-systems | fluoxetine: "2C19; 2D6 strong inhibitor" | **Ananya (human, screenshot)**, plus Claude compared the full list | 2026-10-24 |
+| **HUMAN-VERIFIED.** CYP2D6 strong inhibitors: fluoxetine, paroxetine, bupropion. Moderate: duloxetine. Weak: sertraline. Also omeprazole = CYP2C19 weak inhibitor (the clopidogrel label note, not a computed phenoconversion). Fluoxetine is also a strong CYP2C19 inhibitor. | FDA table of CYP enzyme interactions, page content current as of 2026-05-29. https://www.fda.gov/drugs/drug-interactions-labeling/healthcare-professionals-fdas-examples-drugs-interact-cyp-enzymes-and-transporter-systems | fluoxetine: "2C19; 2D6 strong inhibitor" | **Ananya (human, personally checked all six rows)** | 2026-10-24 |
+| CYP2D6 inhibitor classes for the other drugs: strong (quinidine, terbinafine), moderate (abiraterone, cinacalcet, lorcaserin, mirabegron, rolapitant), weak (amiodarone, celecoxib, cimetidine, clobazam, cobicistat, escitalopram, fluvoxamine, labetalol, vemurafenib) | Same FDA table, same page date | e.g. abiraterone, CYP Mod INH column: "2D6 moderate inhibitor" | Source-matched (Claude parsed the page and compared it with `data/inhibitors.json`); NOT human-verified | 2026-10-24 |
 | CYP2D6 activity-score thresholds: poor = 0, intermediate 0 < x < 1.25, normal 1.25–2.25, ultrarapid > 2.25 | CPIC opioid guideline 2021 (Crews et al.), Table 1. https://pmc.ncbi.nlm.nih.gov/articles/PMC8249478/ | "0<x<1.25" (intermediate row) | Source-matched | 2026-10-24 |
 | A strong CYP2D6 inhibitor sets the activity score to 0 (codeine, tramadol only) | Same guideline, drug-drug interaction section | "activity score is adjusted to 0" | Source-matched | 2026-10-24 |
 | A moderate CYP2D6 inhibitor multiplies the activity score by 0.5 (codeine, tramadol only) | Same guideline | "multiplied by 0.5" | Source-matched | 2026-10-24 |

@@ -1,0 +1,1046 @@
+{
+ "source": "https://api.cpicpgx.org/v1/allele?genesymbol=eq.CYP2D6&select=name,activityvalue,clinicalfunctionalstatus&order=name",
+ "fetched": "2026-10-24",
+ "rows": [
+  {
+   "name": "*1",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*10",
+   "activityvalue": "0.25",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*100",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*101",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*102",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*103",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*104",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*105",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*106",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*107",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*108",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*109",
+   "activityvalue": "0.25",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*10x2",
+   "activityvalue": "0.5",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*11",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*110",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*111",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*112",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*113",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*114",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*115",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*116",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*117",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*118",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*119",
+   "activityvalue": "0.25",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*12",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*120",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*121",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*122",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*123",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*124",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*125",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*126",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*127",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*128",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*129",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*13",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*130",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*13+*1",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*131",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*13+*1x2",
+   "activityvalue": "2.0",
+   "clinicalfunctionalstatus": "Increased function"
+  },
+  {
+   "name": "*13+*2",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*132",
+   "activityvalue": "0.25",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*133",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*134",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*135",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*136",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*13+*68x2+*4",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*137",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*138",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*139",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*14",
+   "activityvalue": "0.5",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*140",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*141",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*142",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*143",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*144",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*145",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*146",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*146x2",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*147",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*148",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*149",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*15",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*150",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*151",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*152",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*153",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*154",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*155",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*156",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*157",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*158",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*159",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*160",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*161",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*162",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*163",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*164",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*165",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*166",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*167",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*168",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*169",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*17",
+   "activityvalue": "0.5",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*170",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*171",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*172",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*173",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*174",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*175",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*176",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*177",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*178",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*179",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*17x2",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*18",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*180",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*181",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*182",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*183",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*184",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*185",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*186",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*19",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*1x2",
+   "activityvalue": "2.0",
+   "clinicalfunctionalstatus": "Increased function"
+  },
+  {
+   "name": "*1x≥3",
+   "activityvalue": "≥3.0",
+   "clinicalfunctionalstatus": "Increased function"
+  },
+  {
+   "name": "*2",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*20",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*21",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*22",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*23",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*24",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*25",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*26",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*27",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*27x2",
+   "activityvalue": "2.0",
+   "clinicalfunctionalstatus": "Increased function"
+  },
+  {
+   "name": "*28",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*28x2",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*29",
+   "activityvalue": "0.5",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*29x2",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*2x2",
+   "activityvalue": "2.0",
+   "clinicalfunctionalstatus": "Increased function"
+  },
+  {
+   "name": "*2x≥3",
+   "activityvalue": "≥3.0",
+   "clinicalfunctionalstatus": "Increased function"
+  },
+  {
+   "name": "*3",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*30",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*31",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*32",
+   "activityvalue": "0.25",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*33",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*34",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*35",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*35x2",
+   "activityvalue": "2.0",
+   "clinicalfunctionalstatus": "Increased function"
+  },
+  {
+   "name": "*36",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*36+*10",
+   "activityvalue": "0.25",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*36+*10x2",
+   "activityvalue": "0.5",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*36x2",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*36x2+*10",
+   "activityvalue": "0.25",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*36x2+*10x2",
+   "activityvalue": "0.5",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*37",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*38",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*39",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*3x2",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*4",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*40",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*41",
+   "activityvalue": "0.25",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*41x2",
+   "activityvalue": "0.5",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*41x3",
+   "activityvalue": "0.75",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*42",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*43",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*43x2",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*44",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*45",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*45x2",
+   "activityvalue": "2.0",
+   "clinicalfunctionalstatus": "Increased function"
+  },
+  {
+   "name": "*46",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*47",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*48",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*49",
+   "activityvalue": "0.5",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*4x2",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*4x≥3",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*5",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*50",
+   "activityvalue": "0.5",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*51",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*52",
+   "activityvalue": "0.25",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*53",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*54",
+   "activityvalue": "0.5",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*55",
+   "activityvalue": "0.5",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*56",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*58",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*59",
+   "activityvalue": "0.5",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*6",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*60",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*61",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*62",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*63",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*64",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*65",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*68",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*68+*2",
+   "activityvalue": "1.0",
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*68+*4",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*69",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*6x2",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*7",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*70",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*71",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*72",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*73",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*74",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*75",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*8",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*81",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*82",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*83",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*84",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*85",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*86",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Unknown function"
+  },
+  {
+   "name": "*87",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*88",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*89",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*9",
+   "activityvalue": "0.25",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*90",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*91",
+   "activityvalue": "0.25",
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*92",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*93",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*94",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*95",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*96",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*97",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*98",
+   "activityvalue": "n/a",
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*99",
+   "activityvalue": "0.0",
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*9x2",
+   "activityvalue": "0.5",
+   "clinicalfunctionalstatus": "Decreased function"
+  }
+ ]
+}

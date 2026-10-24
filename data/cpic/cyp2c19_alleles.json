@@ -1,0 +1,251 @@
+{
+ "source": "https://api.cpicpgx.org/v1/allele?genesymbol=eq.CYP2C19&select=name,activityvalue,clinicalfunctionalstatus&order=name",
+ "fetched": "2026-10-24",
+ "rows": [
+  {
+   "name": "*1",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*10",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*11",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*12",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*13",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*14",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*15",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*16",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*17",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Increased function"
+  },
+  {
+   "name": "*18",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*19",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*2",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*22",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*23",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*24",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*25",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*26",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Decreased function"
+  },
+  {
+   "name": "*28",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*29",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*3",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*30",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*31",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*32",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*33",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*34",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*35",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*36",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*37",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*38",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Normal function"
+  },
+  {
+   "name": "*39",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Uncertain function"
+  },
+  {
+   "name": "*4",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*40",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*41",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*42",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*43",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*44",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*45",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*46",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*47",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*48",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*49",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*5",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*50",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*51",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*52",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": null
+  },
+  {
+   "name": "*6",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*7",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*8",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "No function"
+  },
+  {
+   "name": "*9",
+   "activityvalue": null,
+   "clinicalfunctionalstatus": "Decreased function"
+  }
+ ]
+}

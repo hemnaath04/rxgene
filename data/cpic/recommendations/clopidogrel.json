@@ -1,0 +1,390 @@
+{
+ "source": "https://api.cpicpgx.org/v1/recommendation_view?drugname=eq.clopidogrel&select=drugname,population,phenotypes,activityscore,lookupkey,drugrecommendation,classification,implications",
+ "fetched": "2026-10-24",
+ "rows": [
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI ACS PCI ",
+   "phenotypes": {
+    "CYP2C19": "Indeterminate"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Indeterminate"
+   },
+   "drugrecommendation": "No recommendation",
+   "classification": "No Recommendation",
+   "implications": {
+    "CYP2C19": "n/a"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI ACS PCI ",
+   "phenotypes": {
+    "CYP2C19": "Intermediate Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Intermediate Metabolizer"
+   },
+   "drugrecommendation": "Avoid standard dose (75 mg) clopidogrel if possible. Use prasugrel or ticagrelor at standard dose if no contraindication.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2C19": "Reduced clopidogrel active metabolite formation; increased on-treatment platelet reactivity; increased risk for adverse cardiac and cerebrovascular events"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI ACS PCI ",
+   "phenotypes": {
+    "CYP2C19": "Likely Intermediate Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Likely Intermediate Metabolizer"
+   },
+   "drugrecommendation": "Avoid standard dose clopidogrel (75 mg) if possible. Use prasugrel or ticagrelor at standard dose if no contraindication.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2C19": "Reduced clopidogrel active metabolite formation; increased on-treatment platelet reactivity; increased risk for adverse cardiac and cerebrovascular events"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI ACS PCI ",
+   "phenotypes": {
+    "CYP2C19": "Likely Poor Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Likely Poor Metabolizer"
+   },
+   "drugrecommendation": "Avoid clopidogrel if possible. Use prasugrel or ticagrelor at standard dose if no contraindication.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2C19": "Significantly reduced clopidogrel active metabolite formation; increased on-treatment platelet reactivity; increased risk for adverse cardiac and cerebrovascular events"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI ACS PCI ",
+   "phenotypes": {
+    "CYP2C19": "Normal Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Normal Metabolizer"
+   },
+   "drugrecommendation": "If considering clopidogrel, use at standard dose (75 mg/day)",
+   "classification": "Strong",
+   "implications": {
+    "CYP2C19": "Normal clopidogrel active metabolite formation; normal on-treatment platelet reactivity"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI ACS PCI ",
+   "phenotypes": {
+    "CYP2C19": "Poor Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Poor Metabolizer"
+   },
+   "drugrecommendation": "Avoid clopidogrel if possible. Use prasugrel or ticagrelor at standard dose if no contraindication.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2C19": "Significantly reduced clopidogrel active metabolite formation; increased on-treatment platelet reactivity; increased risk for adverse cardiac and cerebrovascular events"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI ACS PCI ",
+   "phenotypes": {
+    "CYP2C19": "Rapid Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Rapid Metabolizer"
+   },
+   "drugrecommendation": "If considering clopidogrel, use at standard dose (75 mg/day)",
+   "classification": "Strong",
+   "implications": {
+    "CYP2C19": "Normal or increased clopidogrel active metabolite formation; normal or lower on-treatment platelet reactivity; no association with higher bleeding risk"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI ACS PCI ",
+   "phenotypes": {
+    "CYP2C19": "Ultrarapid Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Ultrarapid Metabolizer"
+   },
+   "drugrecommendation": "If considering clopidogrel, use at standard dose (75 mg/day)",
+   "classification": "Strong",
+   "implications": {
+    "CYP2C19": "Increased clopidogrel active metabolite formation; lower on-treatment platelet reactivity; no association with higher bleeding risk"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI non-ACS non-PCI",
+   "phenotypes": {
+    "CYP2C19": "Indeterminate"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Indeterminate"
+   },
+   "drugrecommendation": "No recommendation",
+   "classification": "No Recommendation",
+   "implications": {
+    "CYP2C19": "n/a"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI non-ACS non-PCI",
+   "phenotypes": {
+    "CYP2C19": "Intermediate Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Intermediate Metabolizer"
+   },
+   "drugrecommendation": "No recommendation",
+   "classification": "No Recommendation",
+   "implications": {
+    "CYP2C19": "Reduced clopidogrel active metabolite formation; increased on-treatment platelet reactivity; increased risk for adverse cardiac and cerebrovascular events"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI non-ACS non-PCI",
+   "phenotypes": {
+    "CYP2C19": "Likely Intermediate Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Likely Intermediate Metabolizer"
+   },
+   "drugrecommendation": "No recommendation",
+   "classification": "No Recommendation",
+   "implications": {
+    "CYP2C19": "Reduced clopidogrel active metabolite formation; increased on-treatment platelet reactivity; increased risk for adverse cardiac and cerebrovascular events"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI non-ACS non-PCI",
+   "phenotypes": {
+    "CYP2C19": "Likely Poor Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Likely Poor Metabolizer"
+   },
+   "drugrecommendation": "Avoid clopidogrel if possible. Use prasugrel or ticagrelor at standard dose if no contraindication.",
+   "classification": "Moderate",
+   "implications": {
+    "CYP2C19": "Significantly reduced clopidogrel active metabolite formation; increased on-treatment platelet reactivity; increased risk for adverse cardiac and cerebrovascular events"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI non-ACS non-PCI",
+   "phenotypes": {
+    "CYP2C19": "Normal Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Normal Metabolizer"
+   },
+   "drugrecommendation": "If considering clopidogrel, use at standard dose (75 mg/day)",
+   "classification": "Strong",
+   "implications": {
+    "CYP2C19": "Normal clopidogrel active metabolite formation; normal on-treatment platelet reactivity"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI non-ACS non-PCI",
+   "phenotypes": {
+    "CYP2C19": "Poor Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Poor Metabolizer"
+   },
+   "drugrecommendation": "Avoid clopidogrel if possible. Use prasugrel or ticagrelor at standard dose if no contraindication.",
+   "classification": "Moderate",
+   "implications": {
+    "CYP2C19": "Significantly reduced clopidogrel active metabolite formation; increased on-treatment platelet reactivity; increased risk for adverse cardiac and cerebrovascular events"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI non-ACS non-PCI",
+   "phenotypes": {
+    "CYP2C19": "Rapid Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Rapid Metabolizer"
+   },
+   "drugrecommendation": "No recommendation",
+   "classification": "No Recommendation",
+   "implications": {
+    "CYP2C19": "Normal or increased clopidogrel active metabolite formation; normal or lower on-treatment platelet reactivity; no association with higher bleeding risk"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "CVI non-ACS non-PCI",
+   "phenotypes": {
+    "CYP2C19": "Ultrarapid Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Ultrarapid Metabolizer"
+   },
+   "drugrecommendation": "No recommendation",
+   "classification": "No Recommendation",
+   "implications": {
+    "CYP2C19": "Increased clopidogrel active metabolite formation; lower on-treatment platelet reactivity; no association with higher bleeding risk"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "NVI",
+   "phenotypes": {
+    "CYP2C19": "Indeterminate"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Indeterminate"
+   },
+   "drugrecommendation": "No recommendation",
+   "classification": "No Recommendation",
+   "implications": {
+    "CYP2C19": "n/a"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "NVI",
+   "phenotypes": {
+    "CYP2C19": "Intermediate Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Intermediate Metabolizer"
+   },
+   "drugrecommendation": "Consider an alternative P2Y12 inhibitor at standard dose if clinically indicated and no contraindication.",
+   "classification": "Moderate",
+   "implications": {
+    "CYP2C19": "Reduced clopidogrel active metabolite formation; increased on-treatment platelet reactivity; increased risk for adverse cardiac and cerebrovascular events"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "NVI",
+   "phenotypes": {
+    "CYP2C19": "Likely Intermediate Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Likely Intermediate Metabolizer"
+   },
+   "drugrecommendation": "Consider an alternative P2Y12 inhibitor at standard dose if clinically indicated and no contraindication.",
+   "classification": "Moderate",
+   "implications": {
+    "CYP2C19": "Reduced clopidogrel active metabolite formation; increased on-treatment platelet reactivity; increased risk for adverse cardiac and cerebrovascular events"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "NVI",
+   "phenotypes": {
+    "CYP2C19": "Likely Poor Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Likely Poor Metabolizer"
+   },
+   "drugrecommendation": "Avoid clopidogrel if possible. Consider an alternative P2Y12 inhibitor at standard dose if clinically indicated and no contraindication.",
+   "classification": "Moderate",
+   "implications": {
+    "CYP2C19": "Significantly reduced clopidogrel active metabolite formation; increased on-treatment platelet reactivity; increased risk for adverse cardiac and cerebrovascular events"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "NVI",
+   "phenotypes": {
+    "CYP2C19": "Normal Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Normal Metabolizer"
+   },
+   "drugrecommendation": "If considering clopidogrel, use at standard dose (75 mg/day)",
+   "classification": "Strong",
+   "implications": {
+    "CYP2C19": "Normal clopidogrel active metabolite formation; normal on-treatment platelet reactivity"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "NVI",
+   "phenotypes": {
+    "CYP2C19": "Poor Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Poor Metabolizer"
+   },
+   "drugrecommendation": "Avoid clopidogrel if possible. Consider an alternative P2Y12 inhibitor at standard dose if clinically indicated and no contraindication.",
+   "classification": "Moderate",
+   "implications": {
+    "CYP2C19": "Significantly reduced clopidogrel active metabolite formation; increased on-treatment platelet reactivity; increased risk for adverse cardiac and cerebrovascular events"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "NVI",
+   "phenotypes": {
+    "CYP2C19": "Rapid Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Rapid Metabolizer"
+   },
+   "drugrecommendation": "No recommendation",
+   "classification": "No Recommendation",
+   "implications": {
+    "CYP2C19": "Normal or increased clopidogrel active metabolite formation; normal or lower on-treatment platelet reactivity"
+   }
+  },
+  {
+   "drugname": "clopidogrel",
+   "population": "NVI",
+   "phenotypes": {
+    "CYP2C19": "Ultrarapid Metabolizer"
+   },
+   "activityscore": {},
+   "lookupkey": {
+    "CYP2C19": "Ultrarapid Metabolizer"
+   },
+   "drugrecommendation": "No recommendation",
+   "classification": "No Recommendation",
+   "implications": {
+    "CYP2C19": "Increased clopidogrel active metabolite formation; lower on-treatment platelet reactivity"
+   }
+  }
+ ]
+}

@@ -1,0 +1,17 @@
+*** SYNTHETIC TEST REPORT. NOT A REAL PATIENT. FOR DEMO ONLY. ***
+
+Example Genomics Laboratory (fictional)
+Pharmacogenomic Panel - Final Report
+
+Patient: Jordan Rivera (synthetic)     DOB: 1988-03-14     MRN: SYN-0001
+Specimen: Buccal swab     Collected: 2026-09-02     Reported: 2026-09-09
+
+GENE      GENOTYPE    PREDICTED PHENOTYPE
+CYP2D6    *1/*1       Normal Metabolizer (activity score 2.0)
+CYP2C19   *1/*17      Rapid Metabolizer
+CYP2C9    *1/*1       Normal Metabolizer
+
+Copy number: CYP2D6 2 copies detected.
+Method: targeted genotyping. Rare variants not tested may be present.
+
+Current medications on file: fluoxetine 20 mg daily (started 2026-06-10)

@@ -1,0 +1,402 @@
+{
+ "source": "https://api.cpicpgx.org/v1/recommendation_view?drugname=eq.tramadol&select=drugname,population,phenotypes,activityscore,lookupkey,drugrecommendation,classification,implications",
+ "fetched": "2026-10-24",
+ "rows": [
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Poor Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "0.0"
+   },
+   "lookupkey": {
+    "CYP2D6": "0.0"
+   },
+   "drugrecommendation": "Avoid tramadol use because of possibility of diminished analgesia. If opioid use is warranted, consider a non-codeine opioid.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Greatly reduced O-desmethyltramadol (active metabolite) formation leading to diminished analgesia."
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Intermediate Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "0.25"
+   },
+   "lookupkey": {
+    "CYP2D6": "0.25"
+   },
+   "drugrecommendation": "Use tramadol label recommended age- or weight-specific dosing. If no response and opioid use is warranted, consider non-codeine opioid.",
+   "classification": "Optional",
+   "implications": {
+    "CYP2D6": "Reduced O-desmethyltramadol (active metabolite) formation"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Intermediate Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "0.5"
+   },
+   "lookupkey": {
+    "CYP2D6": "0.5"
+   },
+   "drugrecommendation": "Use tramadol label recommended age- or weight-specific dosing. If no response and opioid use is warranted, consider non-codeine opioid.",
+   "classification": "Optional",
+   "implications": {
+    "CYP2D6": "Reduced O-desmethyltramadol (active metabolite) formation"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Intermediate Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "0.75"
+   },
+   "lookupkey": {
+    "CYP2D6": "0.75"
+   },
+   "drugrecommendation": "Use tramadol label recommended age- or weight-specific dosing. If no response and opioid use is warranted, consider non-codeine opioid.",
+   "classification": "Optional",
+   "implications": {
+    "CYP2D6": "Reduced O-desmethyltramadol (active metabolite) formation"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Intermediate Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "1.0"
+   },
+   "lookupkey": {
+    "CYP2D6": "1.0"
+   },
+   "drugrecommendation": "Use tramadol label recommended age- or weight-specific dosing. If no response and opioid use is warranted, consider non-codeine opioid.",
+   "classification": "Optional",
+   "implications": {
+    "CYP2D6": "Reduced O-desmethyltramadol (active metabolite) formation"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Normal Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "1.25"
+   },
+   "lookupkey": {
+    "CYP2D6": "1.25"
+   },
+   "drugrecommendation": "Use tramadol label recommended age- or weight-specific dosing.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Expected O-desmethyltramadol (active metabolite) formation"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Normal Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "1.5"
+   },
+   "lookupkey": {
+    "CYP2D6": "1.5"
+   },
+   "drugrecommendation": "Use tramadol label recommended age- or weight-specific dosing.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Expected O-desmethyltramadol (active metabolite) formation"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Normal Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "1.75"
+   },
+   "lookupkey": {
+    "CYP2D6": "1.75"
+   },
+   "drugrecommendation": "Use tramadol label recommended age- or weight-specific dosing.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Expected O-desmethyltramadol (active metabolite) formation"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Normal Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "2.0"
+   },
+   "lookupkey": {
+    "CYP2D6": "2.0"
+   },
+   "drugrecommendation": "Use tramadol label recommended age- or weight-specific dosing.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Expected O-desmethyltramadol (active metabolite) formation"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Normal Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "2.25"
+   },
+   "lookupkey": {
+    "CYP2D6": "2.25"
+   },
+   "drugrecommendation": "Use tramadol label recommended age- or weight-specific dosing.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Expected O-desmethyltramadol (active metabolite) formation"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Ultrarapid Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "2.5"
+   },
+   "lookupkey": {
+    "CYP2D6": "2.5"
+   },
+   "drugrecommendation": "Avoid tramadol use because of potential for toxicity. If opioid use is warranted, consider a non-codeine opioid.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Increased formation of O-desmethyltramadol (active metabolite) leading to higher risk of toxicity"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Ultrarapid Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "2.75"
+   },
+   "lookupkey": {
+    "CYP2D6": "2.75"
+   },
+   "drugrecommendation": "Avoid tramadol use because of potential for toxicity. If opioid use is warranted, consider a non-codeine opioid.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Increased formation of O-desmethyltramadol (active metabolite) leading to higher risk of toxicity"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Ultrarapid Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "≥3.0"
+   },
+   "lookupkey": {
+    "CYP2D6": "≥3.0"
+   },
+   "drugrecommendation": "Avoid tramadol use because of potential for toxicity. If opioid use is warranted, consider a non-codeine opioid.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Increased formation of O-desmethyltramadol (active metabolite) leading to higher risk of toxicity"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Ultrarapid Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "3.0"
+   },
+   "lookupkey": {
+    "CYP2D6": "3.0"
+   },
+   "drugrecommendation": "Avoid tramadol use because of potential for toxicity. If opioid use is warranted, consider a non-codeine opioid.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Increased formation of O-desmethyltramadol (active metabolite) leading to higher risk of toxicity"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Ultrarapid Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "≥3.25"
+   },
+   "lookupkey": {
+    "CYP2D6": "≥3.25"
+   },
+   "drugrecommendation": "Avoid tramadol use because of potential for toxicity. If opioid use is warranted, consider a non-codeine opioid.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Increased formation of O-desmethyltramadol (active metabolite) leading to higher risk of toxicity"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Ultrarapid Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "≥3.5"
+   },
+   "lookupkey": {
+    "CYP2D6": "≥3.5"
+   },
+   "drugrecommendation": "Avoid tramadol use because of potential for toxicity. If opioid use is warranted, consider a non-codeine opioid.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Increased formation of O-desmethyltramadol (active metabolite) leading to higher risk of toxicity"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Ultrarapid Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "≥3.75"
+   },
+   "lookupkey": {
+    "CYP2D6": "≥3.75"
+   },
+   "drugrecommendation": "Avoid tramadol use because of potential for toxicity. If opioid use is warranted, consider a non-codeine opioid.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Increased formation of O-desmethyltramadol (active metabolite) leading to higher risk of toxicity"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Ultrarapid Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "≥4.0"
+   },
+   "lookupkey": {
+    "CYP2D6": "≥4.0"
+   },
+   "drugrecommendation": "Avoid tramadol use because of potential for toxicity. If opioid use is warranted, consider a non-codeine opioid.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Increased formation of O-desmethyltramadol (active metabolite) leading to higher risk of toxicity"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Ultrarapid Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "4.0"
+   },
+   "lookupkey": {
+    "CYP2D6": "4.0"
+   },
+   "drugrecommendation": "Avoid tramadol use because of potential for toxicity. If opioid use is warranted, consider a non-codeine opioid.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Increased formation of O-desmethyltramadol (active metabolite) leading to higher risk of toxicity"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Ultrarapid Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "≥5.0"
+   },
+   "lookupkey": {
+    "CYP2D6": "≥5.0"
+   },
+   "drugrecommendation": "Avoid tramadol use because of potential for toxicity. If opioid use is warranted, consider a non-codeine opioid.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Increased formation of O-desmethyltramadol (active metabolite) leading to higher risk of toxicity"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Ultrarapid Metabolizer"
+   },
+   "activityscore": {
+    "CYP2D6": "≥6.0"
+   },
+   "lookupkey": {
+    "CYP2D6": "≥6.0"
+   },
+   "drugrecommendation": "Avoid tramadol use because of potential for toxicity. If opioid use is warranted, consider a non-codeine opioid.",
+   "classification": "Strong",
+   "implications": {
+    "CYP2D6": "Increased formation of O-desmethyltramadol (active metabolite) leading to higher risk of toxicity"
+   }
+  },
+  {
+   "drugname": "tramadol",
+   "population": "general",
+   "phenotypes": {
+    "CYP2D6": "Indeterminate"
+   },
+   "activityscore": {
+    "CYP2D6": "n/a"
+   },
+   "lookupkey": {
+    "CYP2D6": "n/a"
+   },
+   "drugrecommendation": "No recommendation",
+   "classification": "No Recommendation",
+   "implications": {
+    "CYP2D6": "n/a"
+   }
+  }
+ ]
+}

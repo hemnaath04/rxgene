@@ -1,0 +1,122 @@
+{
+ "source": "https://api.cpicpgx.org/v1/guideline?select=name,url&order=name",
+ "fetched": "2026-10-24",
+ "rows": [
+  {
+   "name": "CFTR and Ivacaftor",
+   "url": "https://www.clinpgx.org/guideline/PA166251449"
+  },
+  {
+   "name": "CYP2B6 and efavirenz",
+   "url": "https://www.clinpgx.org/guideline/PA166251463"
+  },
+  {
+   "name": "CYP2B6 and methadone",
+   "url": "https://www.clinpgx.org/guideline/PA166411641"
+  },
+  {
+   "name": "CYP2C19 and Clopidogrel",
+   "url": "https://www.clinpgx.org/guideline/PA166251443"
+  },
+  {
+   "name": "CYP2C19 and Proton Pump Inhibitors",
+   "url": "https://www.clinpgx.org/guideline/PA166251441"
+  },
+  {
+   "name": "CYP2C19 and Voriconazole",
+   "url": "https://www.clinpgx.org/guideline/PA166251456"
+  },
+  {
+   "name": "CYP2C9 and NSAIDs",
+   "url": "https://www.clinpgx.org/guideline/PA166251464"
+  },
+  {
+   "name": "CYP2C9, HLA-B and Phenytoin",
+   "url": "https://www.clinpgx.org/guideline/PA166251461"
+  },
+  {
+   "name": "CYP2C9, VKORC1, CYP4F2 and Warfarin",
+   "url": "https://www.clinpgx.org/guideline/PA166251465"
+  },
+  {
+   "name": "CYP2D6, ADRB1, ADRB2, ADRA2C, GRK4, and GRK5 and Beta-Blockers",
+   "url": "https://www.clinpgx.org/guideline/PA166343383"
+  },
+  {
+   "name": "CYP2D6 and Atomoxetine",
+   "url": "https://www.clinpgx.org/guideline/PA166251459"
+  },
+  {
+   "name": "CYP2D6 and Ondansetron and Tropisetron",
+   "url": "https://www.clinpgx.org/guideline/PA166251457"
+  },
+  {
+   "name": "CYP2D6 and Tamoxifen",
+   "url": "https://www.clinpgx.org/guideline/PA166251458"
+  },
+  {
+   "name": "CYP2D6, CYP2C19 and Tricyclic Antidepressants",
+   "url": "https://www.clinpgx.org/guideline/PA166251445"
+  },
+  {
+   "name": "CYP2D6, CYP2C19, CYP2B6, SLC6A4, HTR2A and Serotonin Reuptake Inhibitor Antidepressants",
+   "url": "https://www.clinpgx.org/guideline/PA166251452"
+  },
+  {
+   "name": "CYP2D6, OPRM1, COMT, and Opioids",
+   "url": "https://www.clinpgx.org/guideline/PA166251454"
+  },
+  {
+   "name": "CYP3A5 and Tacrolimus",
+   "url": "https://www.clinpgx.org/guideline/PA166251451"
+  },
+  {
+   "name": "DPYD and Fluoropyrimidines",
+   "url": "https://www.clinpgx.org/guideline/PA166251462"
+  },
+  {
+   "name": "G6PD",
+   "url": "https://www.clinpgx.org/guideline/PA166251450"
+  },
+  {
+   "name": "HLA-A, HLA-B and Carbamazepine and Oxcarbazepine",
+   "url": "https://www.clinpgx.org/guideline/PA166251448"
+  },
+  {
+   "name": "HLA-B and Abacavir",
+   "url": "https://www.clinpgx.org/guideline/PA166251444"
+  },
+  {
+   "name": "HLA-B and Allopurinol",
+   "url": "https://www.clinpgx.org/guideline/PA166251446"
+  },
+  {
+   "name": "IFNL3 and Peginterferon-alpha-based Regimens",
+   "url": "https://www.clinpgx.org/guideline/PA166251455"
+  },
+  {
+   "name": "MT-RNR1 and Aminoglycosides",
+   "url": "https://www.clinpgx.org/guideline/PA166251466"
+  },
+  {
+   "name": "NAT2 and Hydralazine",
+   "url": "https://www.clinpgx.org/guideline/PA166416361"
+  },
+  {
+   "name": "RYR1, CACNA1S and Volatile anesthetic agents and Succinylcholine",
+   "url": "https://www.clinpgx.org/guideline/PA166251460"
+  },
+  {
+   "name": "SLCO1B1, ABCG2, CYP2C9, and Statins",
+   "url": "https://www.clinpgx.org/guideline/PA166264281"
+  },
+  {
+   "name": "TPMT, NUDT15 and Thiopurines",
+   "url": "https://www.clinpgx.org/guideline/PA166251442"
+  },
+  {
+   "name": "UGT1A1 and Atazanavir",
+   "url": "https://www.clinpgx.org/guideline/PA166251453"
+  }
+ ]
+}

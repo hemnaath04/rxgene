@@ -25,6 +25,7 @@ const SEGMENT = '[A-Za-z0-9][A-Za-z0-9_-]*';
 // browser imports as an ES module via cdsClient.ts) goes to Vite.
 const API_ROUTES: RegExp[] = [
   /^\/api\/summary$/,
+  /^\/api\/consult$/,
   new RegExp(`^/api/cds-services(?:/${SEGMENT})?$`),
   new RegExp(`^/cds-services(?:/${SEGMENT})?$`)
 ];

@@ -38,7 +38,7 @@ export function llmConfig(): LlmConfig | null {
  * The gateway (Manifest) answers some failures with HTTP 200 and the error as the content,
  * e.g. "[🦚 Manifest M102] anthropic subscription credentials could not be refreshed…".
  */
-function isGatewayError(content: string): boolean {
+export function isGatewayError(content: string): boolean {
   return content.trimStart().startsWith('[🦚 Manifest') || content.includes('Manifest M1');
 }
 

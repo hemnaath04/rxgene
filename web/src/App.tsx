@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, LoaderCircle, RotateCcw } from 'lucide-react';
 import { ComparisonStrip } from '@/components/ComparisonStrip';
+import { ConsultSheet } from '@/components/ConsultSheet';
 import { EvidenceSheet } from '@/components/EvidenceSheet';
 import { Gauge } from '@/components/Gauge';
 import { MedList } from '@/components/MedList';
@@ -21,6 +22,21 @@ import { readUrlState, resolveUrlState, toUrlState, writeUrlState, type Mode } f
 import { entryAlert, genotypePhenotypeFor, geneFor, sortBySeverity, speedOf, toVerdict } from '@/lib/verdict';
 
 type Exchange = { request: OrderSelectRequest; result: CdsExchange | null };
+
+// Agent result type (browser can't import from api/ directly).
+type AgentResult = {
+  note: {
+    sections: Array<{
+      heading: string;
+      sentences: Array<{ text: string; cites: string[] }>;
+    }>;
+  };
+  source: 'ai' | 'template';
+  reason?: string;
+  trace: Array<{ id: string; tool: string; args: Record<string, unknown>; summary: string; ms: number }>;
+  model?: string;
+  ms: number;
+};
 
 function Divider() {
   return <span aria-hidden="true" className="hidden h-7 w-px bg-ink/20 sm:block" />;
@@ -43,6 +59,9 @@ function App() {
   const [evidenceOpen, setEvidenceOpen] = useState(false);
   const [explainOpen, setExplainOpen] = useState(false);
   const [evidenceKey, setEvidenceKey] = useState<string | null>(null);
+  const [consultOpen, setConsultOpen] = useState(false);
+  const [consultResult, setConsultResult] = useState<AgentResult | null>(null);
+  const [consultLoading, setConsultLoading] = useState(false);
 
   // Results that arrive after a patient/mode change, or after their drug was removed, are dropped.
   const epochRef = useRef(0);
@@ -202,9 +221,44 @@ function App() {
     setEvidenceOpen(true);
   };
 
+  const runConsult = async () => {
+    setConsultOpen(true);
+    setConsultLoading(true);
+    setConsultResult(null);
+
+    try {
+      const response = await fetch('/api/consult', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          patient: {
+            id: patient.id,
+            name: patient.name,
+            cyp2d6: patient.cyp2d6,
+            cyp2c19: patient.cyp2c19,
+            meds: currentMeds
+          },
+          addedDrug: added ?? undefined
+        })
+      });
+
+      if (!response.ok) {
+        console.error('[consult] HTTP', response.status);
+        return;
+      }
+
+      const result = (await response.json()) as AgentResult;
+      setConsultResult(result);
+    } catch (err) {
+      console.error('[consult] error:', err);
+    } finally {
+      setConsultLoading(false);
+    }
+  };
+
   return (
     <MotionConfig reducedMotion="user">
-      {/* overflow-x-clip is a guard only (it keeps position: sticky working); the layout itself fits 390px. */}
+      {/* overflow-x-clip is a horizontal guard only; the layout itself fits 390px. */}
       <div className="app-bg overflow-x-clip text-ink">
         <header className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 pt-5 pb-3 sm:px-6">
           <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
@@ -296,7 +350,9 @@ function App() {
             </AnimatePresence>
           </div>
 
-          <div className="sticky bottom-4 z-20">
+          {/* In normal flow after the gauge and comparison strip (not sticky), so it never
+              covers the story's "Slow" result or the gauge on first load. */}
+          <div className="relative">
             <AnimatePresence mode="popLayout" initial={false}>
               {topVerdict ? (
                 <motion.div
@@ -310,6 +366,7 @@ function App() {
                     onMore={() => openEvidence()}
                     onExplain={() => setExplainOpen(true)}
                     explainDisabled={!explainAssessment}
+                    onReviewMeds={() => void runConsult()}
                   />
                 </motion.div>
               ) : (
@@ -336,6 +393,16 @@ function App() {
           onOpenChange={setExplainOpen}
           assessment={explainAssessment}
           initialLang={lang}
+        />
+        <ConsultSheet
+          open={consultOpen}
+          onOpenChange={setConsultOpen}
+          note={consultResult?.note ?? null}
+          source={consultResult?.source ?? null}
+          model={consultResult?.model}
+          trace={consultResult?.trace ?? []}
+          loading={consultLoading}
+          reviewingCount={added ? meds.length : meds.length - (added ? 1 : 0)}
         />
       </div>
     </MotionConfig>

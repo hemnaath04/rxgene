@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "id": "guard-clinical-data",
+      "trigger": "PreToolUse",
+      "toolCategories": ["write"],
+      "action": {
+        "type": "command",
+        "command": "node scripts/kiro-guard-clinical-data.mjs",
+        "input": "json"
+      }
+    }
+  ]
+}

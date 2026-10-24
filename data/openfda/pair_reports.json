@@ -1,0 +1,107 @@
+{
+ "source": "openFDA drug adverse event API (FAERS), https://open.fda.gov/apis/drug/event/",
+ "fetched": "2026-10-24",
+ "caveat": "Reports submitted to FDA (FAERS) that list both medicines. A report does not establish that either medicine caused an event, and FAERS is not a complete record of adverse events.",
+ "pairs": [
+  {
+   "drug": "codeine",
+   "coMedication": "fluoxetine",
+   "totalReports": 609,
+   "reactionReports": {
+    "DRUG INTERACTION": 92,
+    "DRUG INEFFECTIVE": 55
+   },
+   "query": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.generic_name:\"CODEINE\"+AND+patient.drug.openfda.generic_name:\"FLUOXETINE\"&limit=1"
+  },
+  {
+   "drug": "codeine",
+   "coMedication": "paroxetine",
+   "totalReports": 142,
+   "reactionReports": {
+    "DRUG INTERACTION": 4,
+    "DRUG INEFFECTIVE": 45
+   },
+   "query": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.generic_name:\"CODEINE\"+AND+patient.drug.openfda.generic_name:\"PAROXETINE\"&limit=1"
+  },
+  {
+   "drug": "codeine",
+   "coMedication": "bupropion",
+   "totalReports": 456,
+   "reactionReports": {
+    "DRUG INTERACTION": 4,
+    "DRUG INEFFECTIVE": 114
+   },
+   "query": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.generic_name:\"CODEINE\"+AND+patient.drug.openfda.generic_name:\"BUPROPION\"&limit=1"
+  },
+  {
+   "drug": "codeine",
+   "coMedication": "duloxetine",
+   "totalReports": 365,
+   "reactionReports": {
+    "DRUG INTERACTION": 5,
+    "DRUG INEFFECTIVE": 123
+   },
+   "query": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.generic_name:\"CODEINE\"+AND+patient.drug.openfda.generic_name:\"DULOXETINE\"&limit=1"
+  },
+  {
+   "drug": "codeine",
+   "coMedication": "sertraline",
+   "totalReports": 649,
+   "reactionReports": {
+    "DRUG INTERACTION": 94,
+    "DRUG INEFFECTIVE": 64
+   },
+   "query": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.generic_name:\"CODEINE\"+AND+patient.drug.openfda.generic_name:\"SERTRALINE\"&limit=1"
+  },
+  {
+   "drug": "tramadol",
+   "coMedication": "fluoxetine",
+   "totalReports": 1188,
+   "reactionReports": {
+    "DRUG INTERACTION": 320,
+    "DRUG INEFFECTIVE": 117
+   },
+   "query": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.generic_name:\"TRAMADOL\"+AND+patient.drug.openfda.generic_name:\"FLUOXETINE\"&limit=1"
+  },
+  {
+   "drug": "tramadol",
+   "coMedication": "bupropion",
+   "totalReports": 534,
+   "reactionReports": {
+    "DRUG INTERACTION": 18,
+    "DRUG INEFFECTIVE": 40
+   },
+   "query": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.generic_name:\"TRAMADOL\"+AND+patient.drug.openfda.generic_name:\"BUPROPION\"&limit=1"
+  },
+  {
+   "drug": "atomoxetine",
+   "coMedication": "fluoxetine",
+   "totalReports": 1000,
+   "reactionReports": {
+    "DRUG INTERACTION": 60,
+    "DRUG INEFFECTIVE": 112
+   },
+   "query": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.generic_name:\"ATOMOXETINE\"+AND+patient.drug.openfda.generic_name:\"FLUOXETINE\"&limit=1"
+  },
+  {
+   "drug": "atomoxetine",
+   "coMedication": "duloxetine",
+   "totalReports": 194,
+   "reactionReports": {
+    "DRUG INTERACTION": 5,
+    "DRUG INEFFECTIVE": 29
+   },
+   "query": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.generic_name:\"ATOMOXETINE\"+AND+patient.drug.openfda.generic_name:\"DULOXETINE\"&limit=1"
+  },
+  {
+   "drug": "clopidogrel",
+   "coMedication": "omeprazole",
+   "totalReports": 17816,
+   "reactionReports": {
+    "DRUG INTERACTION": 587,
+    "DRUG INEFFECTIVE": 701
+   },
+   "query": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.generic_name:\"CLOPIDOGREL\"+AND+patient.drug.openfda.generic_name:\"OMEPRAZOLE\"&limit=1"
+  }
+ ]
+}

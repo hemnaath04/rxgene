@@ -95,8 +95,24 @@ export function applyPhenoconversion(
     return defaultResult;
   }
 
-  // Atomoxetine special case: moderate inhibitor = not computed
-  // (R18 vs R21 precedence for AS 0 is an open clinical question; behavior unchanged)
+  // R21: already PM by genotype (AS = 0) + ANY inhibitor (strong, moderate or weak).
+  // The drug-level alert still fires because the lookup uses AS 0.
+  // This is checked BEFORE R18 and R17, so a genotype-PM patient always gets the drug-level
+  // alert with the R21 note, regardless of inhibitor strength.
+  if (genotypeAS === 0) {
+    return {
+      // Weak inhibitors don't populate the main inhibitor field (same convention as below)
+      inhibitor: inhibitor.strength === 'weak' ? null : inhibitor,
+      adjustedActivityScore: 0,
+      adjustedPhenotype: 'Poor Metabolizer',
+      phenoconverted: false,
+      confidence: 'standard',
+      inhibitorNote: `${inhibitor.drug} adds no further effect: already a poor metabolizer by genotype. The drug-level alert still applies.`
+    };
+  }
+
+  // Atomoxetine special case: moderate inhibitor = not computed (R18)
+  // Only applies when the genotype is NOT already a poor metabolizer (R21 handled above)
   if (drug === 'atomoxetine' && inhibitor.strength === 'moderate') {
     return {
       inhibitor,
@@ -110,7 +126,7 @@ export function applyPhenoconversion(
   // R17: atomoxetine + strong inhibitor. FDA label-based handling, NOT the opioid ×0 rule.
   // No multiplier: the adjusted score is reported as null ("n/a") and the adjusted phenotype
   // is the fixed FDA-label description. The recommendation/alert lookup uses AS 0 (done in
-  // checkOrder). This is checked before R21 so a genotype-PM patient still gets label handling.
+  // checkOrder).
   if (drug === 'atomoxetine' && inhibitor.strength === 'strong') {
     const isUM = genotypeAS > 2.25;
     return {
@@ -119,20 +135,6 @@ export function applyPhenoconversion(
       adjustedPhenotype: ATOMOXETINE_LABEL_ADJUSTED_PHENOTYPE,
       phenoconverted: genotypePhenotype !== 'Poor Metabolizer',
       confidence: isUM ? 'reduced' : 'standard'
-    };
-  }
-
-  // R21: already PM by genotype (AS = 0) + ANY inhibitor (strong, moderate or weak).
-  // The drug-level alert still fires because the lookup uses AS 0.
-  if (genotypeAS === 0) {
-    return {
-      // Weak inhibitors don't populate the main inhibitor field (same convention as below)
-      inhibitor: inhibitor.strength === 'weak' ? null : inhibitor,
-      adjustedActivityScore: 0,
-      adjustedPhenotype: 'Poor Metabolizer',
-      phenoconverted: false,
-      confidence: 'standard',
-      inhibitorNote: `${inhibitor.drug} adds no further effect — this patient was already a poor metabolizer by genotype.`
     };
   }
 

@@ -43,6 +43,12 @@ export type MedicationRequest = FhirResource & {
   medicationCodeableConcept?: CodeableConcept;
 };
 
+export type MedicationOrder = FhirResource & {
+  resourceType: 'MedicationOrder';
+  status?: string;
+  medicationCodeableConcept?: CodeableConcept;
+};
+
 export type OrderSelectContext = {
   userId?: string;
   patientId?: string;
@@ -196,8 +202,8 @@ export function matchKnownDrug(name: string | undefined): string | null {
 }
 
 function drugOf(resource: FhirResource): string | null {
-  if (resource.resourceType !== 'MedicationRequest') return null;
-  const concept = (resource as MedicationRequest).medicationCodeableConcept;
+  if (resource.resourceType !== 'MedicationRequest' && resource.resourceType !== 'MedicationOrder') return null;
+  const concept = (resource as MedicationRequest | MedicationOrder).medicationCodeableConcept;
   const candidates = [concept?.text, ...(concept?.coding ?? []).map(c => c.display)];
   for (const name of candidates) {
     const drug = matchKnownDrug(name);
@@ -214,8 +220,9 @@ export type RequestMeds = {
 };
 
 /**
- * Ingredient names from every draftOrders MedicationRequest plus active
+ * Ingredient names from every draftOrders MedicationRequest/MedicationOrder plus active
  * prefetch.medications entries, and which draft order is selected.
+ * Accepts both R4 MedicationRequest and DSTU2 MedicationOrder.
  */
 export function medsFromRequest(context: OrderSelectContext, prefetch?: Prefetch | null): RequestMeds {
   const meds = new Set<string>();
@@ -233,7 +240,9 @@ export function medsFromRequest(context: OrderSelectContext, prefetch?: Prefetch
   }
 
   for (const resource of resourcesOf(prefetch?.medications)) {
-    if ((resource as MedicationRequest).status !== 'active') continue;
+    const status = (resource as MedicationRequest | MedicationOrder).status;
+    // R4: MedicationRequest status 'active'; DSTU2: MedicationOrder status 'active' or 'draft'.
+    if (status !== 'active' && status !== 'draft') continue;
     const drug = drugOf(resource);
     if (drug) meds.add(drug);
   }

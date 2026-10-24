@@ -18,6 +18,16 @@ function medicationRequest(id: string, name: string) {
   };
 }
 
+function medicationOrder(id: string, name: string, status: string = 'draft') {
+  return {
+    resourceType: 'MedicationOrder',
+    id,
+    status,
+    patient: { reference: 'Patient/P01' },
+    medicationCodeableConcept: { text: name }
+  };
+}
+
 function bundle(resources: object[]) {
   return { resourceType: 'Bundle', type: 'collection', entry: resources.map(resource => ({ resource })) };
 }
@@ -102,6 +112,26 @@ describe('POST /cds-services/rxgene-order-select', () => {
     expect(cards[0].summary).toContain('Insufficient data');
   });
 
+  it('DSTU2 MedicationOrder with no pgx -> one info card with Insufficient-data text', async () => {
+    const request = {
+      hook: 'order-select',
+      hookInstance: 'd1577c69-dfbe-44ad-ba6d-3e05e953b2ea',
+      context: {
+        userId: 'Practitioner/example',
+        patientId: 'P-dstu2',
+        selections: ['MedicationOrder/order-1'],
+        draftOrders: bundle([medicationOrder('order-1', 'Codeine sulfate 30 MG Oral Tablet')])
+      },
+      prefetch: {
+        patient: { resourceType: 'Patient', id: 'P-dstu2' }
+      }
+    };
+    const cards = await cardsFor(request);
+    expect(cards).toHaveLength(1);
+    expect(cards[0].indicator).toBe('info');
+    expect(cards[0].summary).toContain('Insufficient data');
+  });
+
   it('P02: *4/*4 + fluoxetine, add codeine -> critical + "adds no further effect" note', async () => {
     const cards = await cardsFor(
       orderSelect({
@@ -172,4 +202,23 @@ describe('fhir mapping', () => {
     expect(result.selected).toBe('codeine');
     expect(result.meds.sort()).toEqual(['codeine', 'fluoxetine']);
   });
+
+  it('medsFromRequest handles DSTU2 MedicationOrder with draft or active status', () => {
+    const result = medsFromRequest(
+      {
+        selections: ['MedicationOrder/new'],
+        draftOrders: bundle([medicationOrder('new', 'Codeine sulfate 30 mg oral tablet', 'draft')]) as never
+      },
+      {
+        medications: bundle([
+          medicationOrder('a', 'FLUOXETINE 20 MG CAPSULE', 'active'),
+          medicationOrder('b', 'paroxetine', 'stopped'),
+          medicationOrder('c', 'acetaminophen', 'draft')
+        ]) as never
+      }
+    );
+    expect(result.selected).toBe('codeine');
+    expect(result.meds.sort()).toEqual(['codeine', 'fluoxetine']);
+  });
+
 });

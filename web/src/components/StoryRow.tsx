@@ -165,6 +165,17 @@ const UNDERLINE: Record<Alert, string> = {
   GREY: 'var(--color-alert-grey)',
 };
 
+/**
+ * Col 03 placeholders ("Not checked yet" / the "Checking…" skeleton) enter softly but exit
+ * instantly (duration 0), so AnimatePresence unmounts them on the frame the real value mounts.
+ * That keeps the stale text out of the DOM, the accessibility tree and copy-paste (innerText).
+ */
+const PLACEHOLDER_EXIT = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 0.2 } },
+  exit: { opacity: 0, transition: { duration: 0 } },
+} as const;
+
 /** Three columns: 01 Genetic baseline · 02 Medication effect · 03 Current response. */
 export function StoryRow({ patientName, drug, gene, genotype, genotypePhenotype, assessment: a, level, pending }: StoryRowProps) {
   const reduce = !!useReducedMotion();
@@ -278,9 +289,11 @@ export function StoryRow({ patientName, drug, gene, genotype, genotypePhenotype,
         <div className="relative min-h-24">
           <AnimatePresence mode="popLayout" initial={false}>
             {pending && !checked ? (
-              <motion.div key="pending" {...enterExit(reduce)}>
+              // Transient placeholder. aria-hidden so the stale state is never read by a screen
+              // reader (App's aria-live Status region makes the real announcement). Instant exit
+              // (PLACEHOLDER_EXIT) so it unmounts at once and doesn't linger in the DOM/innerText.
+              <motion.div key="pending" aria-hidden="true" {...PLACEHOLDER_EXIT}>
                 <Skeleton className="h-24 w-56 rounded-lg" />
-                <span className="sr-only">Checking…</span>
               </motion.div>
             ) : value ? (
               <motion.p
@@ -299,7 +312,7 @@ export function StoryRow({ patientName, drug, gene, genotype, genotypePhenotype,
                 {value}
               </motion.p>
             ) : (
-              <motion.p key="idle" {...enterExit(reduce)} className="text-[40px]/[1.1] font-bold text-ink-muted">
+              <motion.p key="idle" aria-hidden="true" {...PLACEHOLDER_EXIT} className="text-[40px]/[1.1] font-bold text-ink-muted">
                 Not checked yet
               </motion.p>
             )}

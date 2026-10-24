@@ -1,6 +1,8 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PatientSummary } from '@/components/PatientSummary';
 import { GREEN_ALERT_TEXT } from '@/engine/cdsCard';
+import { clearsThisDrug } from '@/engine/templates';
 import type { Alert, CdsCard, DrugAssessment } from '@/engine/types';
 
 // UI wording (docs/PLAN-v3.md "UI language"). Technical terms will move to the EvidenceDrawer.
@@ -16,15 +18,6 @@ const BADGE_VARIANT: Record<Alert, 'destructive' | 'secondary' | 'outline' | 'gh
 
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
-/** Phenotype -> "Clears this drug: ..." scale (Slow / Reduced / Normal / Fast). */
-function clearsThisDrug(phenotype: string): string | null {
-  if (phenotype.startsWith('Poor')) return 'Slow';
-  if (phenotype.startsWith('Intermediate') || phenotype.startsWith('Likely Intermediate')) return 'Reduced';
-  if (phenotype.startsWith('Normal')) return 'Normal';
-  if (phenotype.startsWith('Ultrarapid') || phenotype.startsWith('Rapid')) return 'Fast';
-  return null;
 }
 
 /** Plain-language headline. Derived only from the engine's alert level and its CPIC text. */
@@ -171,6 +164,9 @@ export function AlertCard({ assessment: a, via = 'local', alert, cdsSummary, mis
             {a.source.fetched && ` · fetched ${a.source.fetched}`}
           </p>
         )}
+
+        {/* Hidden on a mismatch: the card says not to act on it. Moves into a Sheet in the design pass. */}
+        {!mismatch && <PatientSummary assessment={a} />}
       </CardContent>
     </Card>
   );

@@ -2,10 +2,10 @@
 // Server-only. The AI rewrites the engine's output; it never decides anything (R34).
 // Never log the API key or the full prompt.
 import { createHash } from 'node:crypto';
-import { cyp2d6Inhibitors, drugToGene } from '../../src/engine/data';
-import { DRUG_NAMES_ES, NOT_SAME_AS_SAFE } from '../../src/engine/templates';
-import type { SummaryLang } from '../../src/engine/templates';
-import type { DrugAssessment } from '../../src/engine/types';
+import { cyp2d6Inhibitors, drugToGene } from '../../src/engine/data.js';
+import { DRUG_NAMES_ES, NOT_SAME_AS_SAFE } from '../../src/engine/templates.js';
+import type { SummaryLang } from '../../src/engine/templates.js';
+import type { DrugAssessment } from '../../src/engine/types.js';
 
 /** Per model attempt (R36). */
 export const LLM_TIMEOUT_MS = 6000;

@@ -1,16 +1,16 @@
 // POST /cds-services/rxgene-order-select: the CDS Hooks order-select service.
 // Genotype source: prefetch.pgx, then a fhirServer fetch (3 s timeout), then
 // "Insufficient data" (the engine reports a missing genotype as GREY).
-import { checkOrder, toCdsCard } from '../../src/engine/index';
-import type { Patient } from '../../src/engine/index';
+import { checkOrder, toCdsCard } from '../../src/engine/index.js';
+import type { Patient } from '../../src/engine/index.js';
 import {
   LOINC_GENOTYPE,
   LOINC_SYSTEM,
   medsFromRequest,
   parseGenotype,
   patientName
-} from '../_lib/fhir';
-import type { Bundle, OrderSelectContext, Prefetch } from '../_lib/fhir';
+} from '../_lib/fhir.js';
+import type { Bundle, OrderSelectContext, Prefetch } from '../_lib/fhir.js';
 
 const FHIR_TIMEOUT_MS = 3000;
 

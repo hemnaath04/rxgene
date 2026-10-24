@@ -9,7 +9,7 @@
 //   "not the same as safe" / "no es lo mismo que seguro".
 // - No numbers unless they come from the assessment (the templates use none).
 
-import type { DrugAssessment } from './types';
+import type { DrugAssessment } from './types.js';
 
 export type SummaryLang = 'en' | 'es';
 

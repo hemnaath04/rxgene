@@ -1,8 +1,8 @@
 // FHIR <-> engine mapping for the CDS Hooks service (architecture spec section 4).
 // Also imported by the browser (cdsClient), so: no Node-only modules, and relative
 // imports only (Vercel's function bundler may not resolve the '@/' alias).
-import inhibitorsData from '../../src/data/inhibitors.json';
-import { drugToGene } from '../../src/engine/data';
+import inhibitorsData from '../../src/data/inhibitors.json' with { type: 'json' };
+import { drugToGene } from '../../src/engine/data.js';
 
 export type Gene = 'CYP2D6' | 'CYP2C19';
 

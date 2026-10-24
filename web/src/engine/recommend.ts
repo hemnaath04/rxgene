@@ -19,8 +19,8 @@ import {
   parseActivityValue,
   isAtLeastKey,
   curatedAlertLevel
-} from './data';
-import type { Alert, Recommendation } from './types';
+} from './data.js';
+import type { Alert, Recommendation } from './types.js';
 
 export type RecommendationResult = {
   recommendation: string;

@@ -1,7 +1,7 @@
 // Phenotype mapping from activity scores
 // Rules from .kiro/steering/clinical-rules.md
 
-import { cyp2c19Alleles } from './data';
+import { cyp2c19Alleles } from './data.js';
 
 /**
  * Map CYP2D6 activity score to phenotype label

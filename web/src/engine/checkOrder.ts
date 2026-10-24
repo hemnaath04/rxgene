@@ -1,12 +1,12 @@
 // Main engine: checkOrder() orchestrates all steps
 // Implements the algorithm from .plans/rxgene-build-spec.md section 4
 
-import type { Patient, DrugAssessment } from './types';
-import { getActivityScore } from './activityScore';
-import { activityScoreToPhenotype, cyp2c19DiplotypeToPhenotype } from './phenotype';
-import { applyPhenoconversion } from './phenoconversion';
-import { lookupByActivityScore, lookupByPhenotype, greyFixedResult, type RecommendationResult } from './recommend';
-import { drugToGene } from './data';
+import type { Patient, DrugAssessment } from './types.js';
+import { getActivityScore } from './activityScore.js';
+import { activityScoreToPhenotype, cyp2c19DiplotypeToPhenotype } from './phenotype.js';
+import { applyPhenoconversion } from './phenoconversion.js';
+import { lookupByActivityScore, lookupByPhenotype, greyFixedResult, type RecommendationResult } from './recommend.js';
+import { drugToGene } from './data.js';
 import {
   INDETERMINATE_TEXT,
   insufficientDataText,
@@ -15,7 +15,7 @@ import {
   ATOMOXETINE_CPIC_ROLE,
   ATOMOXETINE_DISCREPANCY_FLAG,
   ATOMOXETINE_SOURCE_LINKS
-} from './fixedTexts';
+} from './fixedTexts.js';
 
 /**
  * Check if a drug needs a PGx alert

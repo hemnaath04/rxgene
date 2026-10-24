@@ -1,7 +1,7 @@
 // Activity score calculation for CYP2D6 diplotypes
 // Rules from .kiro/steering/clinical-rules.md
 
-import { cyp2d6Alleles } from './data';
+import { cyp2d6Alleles } from './data.js';
 
 export type ActivityScoreResult = {
   activityScore: number | null;

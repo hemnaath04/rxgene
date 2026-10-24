@@ -3,9 +3,9 @@
 // Returns: { text, source: 'ai' | 'template', rateLimited?: true }
 // The AI only rewrites the engine's output. Missing env vars, an LLM error, a timeout or a
 // failed validation all return the fixed template. Never log the key or the prompt.
-import { renderTemplate } from '../src/engine/templates';
-import type { SummaryLang } from '../src/engine/templates';
-import type { Alert, DrugAssessment } from '../src/engine/types';
+import { renderTemplate } from '../src/engine/templates.js';
+import type { SummaryLang } from '../src/engine/templates.js';
+import type { Alert, DrugAssessment } from '../src/engine/types.js';
 import {
   cacheGet,
   cacheKey,
@@ -14,7 +14,7 @@ import {
   isRateLimited,
   llmConfig,
   summarizeWithFallback
-} from './_lib/llm';
+} from './_lib/llm.js';
 
 export type SummaryResponse = { text: string; source: 'ai' | 'template'; rateLimited?: boolean };
 

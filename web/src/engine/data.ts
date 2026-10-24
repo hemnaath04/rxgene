@@ -1,17 +1,17 @@
 // Data loader - imports CPIC snapshots and inhibitor data
 // web/src/data/ is a generated copy of repo-root data/ (npm run sync-data); never edit the copies.
-// Relative imports (not '@/'): web/api/* functions import the engine, and Vercel's
-// function bundler may not resolve the tsconfig alias.
-import cyp2d6AllelesData from '../data/cpic/cyp2d6_alleles.json';
-import cyp2c19AllelesData from '../data/cpic/cyp2c19_alleles.json';
-import codeineRecsData from '../data/cpic/recommendations/codeine.json';
-import tramadolRecsData from '../data/cpic/recommendations/tramadol.json';
-import atomoxetineRecsData from '../data/cpic/recommendations/atomoxetine.json';
-import clopidogrelRecsData from '../data/cpic/recommendations/clopidogrel.json';
-import guidelinesData from '../data/cpic/guidelines.json';
-import inhibitorsData from '../data/inhibitors.json';
-import alertLevelsData from '../data/alert_levels.json';
-import type { AlleleData, Recommendation, GuidelineInfo, Alert } from './types';
+// Server-reachable (web/api/* imports the engine) and run by Vercel as plain Node ESM:
+// relative imports only (no '@/'), explicit '.js' extensions, and JSON import attributes.
+import cyp2d6AllelesData from '../data/cpic/cyp2d6_alleles.json' with { type: 'json' };
+import cyp2c19AllelesData from '../data/cpic/cyp2c19_alleles.json' with { type: 'json' };
+import codeineRecsData from '../data/cpic/recommendations/codeine.json' with { type: 'json' };
+import tramadolRecsData from '../data/cpic/recommendations/tramadol.json' with { type: 'json' };
+import atomoxetineRecsData from '../data/cpic/recommendations/atomoxetine.json' with { type: 'json' };
+import clopidogrelRecsData from '../data/cpic/recommendations/clopidogrel.json' with { type: 'json' };
+import guidelinesData from '../data/cpic/guidelines.json' with { type: 'json' };
+import inhibitorsData from '../data/inhibitors.json' with { type: 'json' };
+import alertLevelsData from '../data/alert_levels.json' with { type: 'json' };
+import type { AlleleData, Recommendation, GuidelineInfo, Alert } from './types.js';
 
 /**
  * Parse a CPIC activity value or activity-score key.

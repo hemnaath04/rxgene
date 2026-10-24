@@ -1,7 +1,7 @@
 // CDS Hooks card conversion
 // Maps DrugAssessment to CDS Hooks card format
 
-import type { DrugAssessment, CdsCard } from './types';
+import type { DrugAssessment, CdsCard } from './types.js';
 
 /** R31/R33: the fixed GREEN disclaimer. Never reword it or reuse its last word elsewhere. */
 export const GREEN_ALERT_TEXT = 'No supported PGx alert (not the same as safe)';

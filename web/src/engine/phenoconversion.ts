@@ -1,10 +1,10 @@
 // Phenoconversion: inhibitor detection and activity score adjustment
 // Rules from .kiro/steering/clinical-rules.md
 
-import { cyp2d6Inhibitors } from './data';
-import type { InhibitorStrength } from './types';
-import { activityScoreToPhenotype } from './phenotype';
-import { ATOMOXETINE_LABEL_ADJUSTED_PHENOTYPE, umReducedConfidenceNote } from './fixedTexts';
+import { cyp2d6Inhibitors } from './data.js';
+import type { InhibitorStrength } from './types.js';
+import { activityScoreToPhenotype } from './phenotype.js';
+import { ATOMOXETINE_LABEL_ADJUSTED_PHENOTYPE, umReducedConfidenceNote } from './fixedTexts.js';
 
 export type InhibitorResult = {
   drug: string;

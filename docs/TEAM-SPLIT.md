@@ -106,3 +106,10 @@ checklist ticked.
 - [ ] Set up the Vercel project and check the CDS Hooks endpoints.
 - [ ] README limitations section.
 - [ ] Open and merge the PR from `dev` to `main` by 7:15. Verify the SundAI submission.
+
+## Added at 2:45 PM: pharmacist consult agent
+
+- **Ananya:** `.kiro/briefs/ananya-02-agent-requirements.md` adds R45–R54 to the spec by 3:15.
+- **Mithuna:** brief 11 (verdict layout), then `.kiro/briefs/mithuna-12-consult-agent.md`, working on the dev preview by 5:00.
+- **Claude:** verifies the live agent on the preview, then merges to main before the 5:30 freeze.
+- **Pitch line:** "An AI agent drafts the pharmacist's consult note, but every sentence cites a rule-engine result, and if it can't, you get the deterministic template."

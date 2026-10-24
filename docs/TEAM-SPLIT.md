@@ -1,0 +1,105 @@
+# Team split: who does what today
+
+**Read this first.** It's the short version of the build spec. Details:
+- Build spec (source of truth): [`.plans/rxgene-build-spec.md`](../.plans/rxgene-build-spec.md)
+- Strategy and pitch: [`docs/PLAN-v3.md`](PLAN-v3.md)
+- Clinical rules Kiro must follow: [`.kiro/steering/clinical-rules.md`](../.kiro/steering/clinical-rules.md)
+
+**Rules for everyone**
+- All code is written in **Kiro**. That's an event requirement.
+- Work on the `dev` branch, and push to it often.
+- `main` changes only through a PR from `dev`.
+- Never put API keys in the repo. They go in `.env` only.
+- **Submit by 7:30 PM.** Submissions lock at 8:00.
+
+**Gates**
+
+| Time | Gate |
+|---|---|
+| 1:30 PM | Frontend design handed over (otherwise Mithuna ships the plain UI) |
+| **2:00 PM** | **Test gate.** All 22 fixtures pass, and a rough backup video is recorded. |
+| **2:30 PM** | LLM base URL, key and model are in `.env` and the Vercel env |
+| **5:30 PM** | **Feature freeze.** Re-run the fixtures. |
+| 7:15 PM | PR from `dev` to `main` merged; production deploy checked |
+| **7:30 PM** | SundAI card submitted |
+
+---
+
+## Mithuna: engine, API and UI (in Kiro)
+
+Kiro models:
+- `claude-sonnet-4.5` for the engine.
+- `auto` for the UI.
+- `claude-haiku-4.5` for boilerplate.
+
+### By 2:00: Layer 1
+- [ ] Scaffold Vite + React + TS in `web/`. Add Vitest.
+- [ ] Engine in `web/src/engine/`, implementing spec §4 steps 1–6. Pure TS; no fetch, no
+      React.
+- [ ] A Vitest suite that runs every case in `tests/fixtures/expected_outputs.json`.
+- [ ] A Kiro hook that runs the tests when `web/src/engine/**` is saved.
+- [ ] Plain UI: patient picker (spec §7 presets), med list with add/remove, one alert card
+      per assessment.
+- [ ] Demo cases 1–3 work: Sarah, Marcus and Priya.
+- [ ] **All 22 fixtures pass.** Push to `dev`.
+
+### 2:30–4:30: Layer 2
+- [ ] Apply the frontend design. Gauge with two markers, evidence drawer, comparison strip.
+- [ ] Reverse case (Lena), UM reduced confidence (Dev), atomoxetine (Jordan).
+- [ ] `POST /api/summary`: OpenAI-compatible call, the validator (spec §6), and the EN/ES
+      template fallback.
+
+### 4:30–5:30: Layer 2b/3
+- [ ] CDS Hooks: `GET /cds-services` and `POST /cds-services/rxgene-order-select` (spec §5).
+- [ ] The clopidogrel path (Ana), with omeprazole as a label note.
+- [ ] Layer 3 only if everything above is done.
+
+**Done means:** fixtures pass, demo cases work on the Vercel preview, and no "safe"
+wording appears anywhere.
+
+---
+
+## Ananya: Kiro spec, science and clinical review
+
+### By 12:30
+- [ ] Write `.kiro/specs/rxgene-engine/requirements.md`. Use EARS "WHEN … THE SYSTEM
+      SHALL …" requirements, starting from the PLAN-v3 "Kiro spec" section and spec §1.
+      Mithuna runs design → tasks from it.
+- [ ] Check `data/inhibitors.json` against the FDA table, and check the allele values for
+      every demo patient in `data/cpic/cyp2d6_alleles.json`.
+
+### By 1:45
+- [ ] Review all 22 rows in `tests/fixtures/expected_outputs.csv`. **If you disagree with
+      a row, you win.** Tell Claude, who regenerates the fixtures.
+
+### 2:30–5:30
+- [ ] Check the clinical wording of the EN templates (`web/src/engine/templates.ts`).
+- [ ] Work through the PLAN-v3 pre-pitch verification checklist (open the real CPIC PDFs).
+- [ ] Verify the Borges et al. citation, or drop it from the slides.
+- [ ] Write the science part of the pitch, for tonight and for Sunday.
+
+**Done means:** a signed-off fixtures file, a requirements file in Kiro, and the
+checklist ticked.
+
+---
+
+## Hemnaath: design, demo and submission
+
+- [ ] **By 1:30:** the Codex frontend design (design only; Mithuna implements it in Kiro).
+- [ ] **By 2:30:** the LLM base URL, key and model, in local `.env` and the Vercel env.
+- [ ] **2:00:** record the rough backup video once Layer 1 passes.
+- [ ] 2:30–5:30: demo script (PLAN-v3, 60–90 s) and slides (30 s and 3 min versions).
+- [ ] 5:30–7:15: record the final demo video on the production URL.
+- [ ] **By 7:30:** the SundAI card, with the public repo URL, the demo URL, the video and
+      the Biotech & Healthcare track.
+
+---
+
+## Claude: lead and reviewer
+
+- [ ] Write a Kiro brief for each task, and review every diff against the fixtures and
+      `clinical-rules.md`.
+- [ ] Regenerate the fixtures when Ananya changes a row.
+- [ ] Set up the Vercel project and check the CDS Hooks endpoints.
+- [ ] README limitations section.
+- [ ] Open and merge the PR from `dev` to `main` by 7:15. Verify the SundAI submission.

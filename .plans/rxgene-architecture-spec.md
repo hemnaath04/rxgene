@@ -115,7 +115,7 @@ in `prefetch.medications`.
 
 - Env vars: `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`. These are server-only; never add
   a `VITE_` prefix.
-- The request is `chat/completions` with `temperature: 0` and `max_tokens: 220`. The system
+- The request is `chat/completions` with `temperature: 0` and `max_tokens: 600` (tested 2026-10-24: Haiku 5.5 needs the room for reasoning). `LLM_MODEL` is a comma-separated fallback list. The Manifest gateway returns HTTP 200 with an error message as the content, so check the content, not just the status (see brief 05). The system
   prompt says: rewrite this structured result for a patient in `<lang>`, change no facts,
   and add nothing.
 - **Cache:** a `Map` keyed by `sha256(JSON(assessment)+lang)`, capped at 500 entries. It

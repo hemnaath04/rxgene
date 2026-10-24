@@ -9,6 +9,6 @@ Fix every file that web/api/** imports, directly or indirectly (web/api/**, web/
 2. Add import attributes to every JSON import: `import x from '../data/inhibitors.json' with { type: 'json' };`
 3. None of these server-reachable files may use the '@/' alias. Replace any with relative paths plus the .js extension. Files only the browser loads may keep '@/'.
 4. Create web/.vercelignore containing `api/**/*.test.ts` so test files are no longer deployed as functions. Today /api/summary.test is a live (crashing) endpoint.
-5. Run `npx tsc -b`, `npm test` and `npm run build`. All must pass. Then run this Node ESM smoke test from web/, which mirrors how Vercel loads the code: `node --experimental-strip-types -e "import('./api/cds-services/rxgene-order-select.ts').then(m=>console.log(Object.keys(m)))"`. It must print the exported handler names with no ERR_MODULE_NOT_FOUND. (Strip-types requires the .ts extension, so this check also catches extensionless imports.)
+5. Run `npx tsc -b`, `npm test` and `npm run build`. All must pass. (Production verification happens on the Vercel preview after push: Claude POSTs a P01 order-select request and checks for a critical card. Don't try to emulate Vercel locally.)
 
 Don't run git. List the files you changed.

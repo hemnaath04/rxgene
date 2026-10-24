@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { ArrowRight, ArrowUpRight, Lock, Pause, Pill, Play, RotateCcw, TriangleAlert, X } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Info, Lock, Pause, Pill, Play, RotateCcw, TriangleAlert, X } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { FlowState, RxGeneResult, RxGeneUIProps, SelectOption } from '@/ui/types';
 import './rxgene-ui.css';
@@ -250,7 +250,10 @@ function Scene({
           {(result?.scoreBefore || result?.scoreAfter) && (
             <p className="rx-current-score">
               Activity score{' '}
-              <span className="font-semibold text-[var(--rx-coral)]">
+              <span
+                className="font-semibold"
+                style={{ color: result?.scoreBefore === result?.scoreAfter ? 'var(--rx-ink)' : result?.verdict.level === 'RED' ? 'var(--rx-coral)' : result?.verdict.level === 'YELLOW' ? '#d98a2b' : 'var(--rx-ink)' }}
+              >
                 {result?.scoreBefore} → {result?.scoreAfter}
               </span>
             </p>
@@ -282,12 +285,17 @@ function Ruler({ result }: { result?: RxGeneResult }) {
   return (
     <div className="rx-ruler">
       <div className="relative" style={{ height: u(20) }}>
-        {now && (
-          <span className="absolute -translate-x-1/2 font-semibold text-[var(--rx-coral)]" style={{ left: SPEED_X[now], fontSize: u(18) }}>
+        {now && now === byGenes && (
+          <span className="absolute -translate-x-1/2 whitespace-nowrap font-semibold text-[var(--rx-ink)]" style={{ left: SPEED_X[now], fontSize: u(18) }}>
+            By genes = now
+          </span>
+        )}
+        {now && now !== byGenes && (
+          <span className="absolute -translate-x-1/2 whitespace-nowrap font-semibold" style={{ left: SPEED_X[now], fontSize: u(18), color: nowColor }}>
             With medications
           </span>
         )}
-        {byGenes && (
+        {byGenes && now !== byGenes && (
           <span className="absolute -translate-x-1/2 font-semibold text-[var(--rx-ink)]" style={{ left: SPEED_X[byGenes], fontSize: u(18) }}>
             By genes
           </span>
@@ -519,16 +527,21 @@ export function RxGeneUI({
         {/* Verdict */}
         <section aria-label="Verdict" className="rx-verdict">
           <div className="rx-verdict-inner rx-verdict-grid">
-            <TriangleAlert
-              aria-hidden="true"
-              className="rx-v-icon rx-v-row"
-              strokeWidth={2}
-              style={{ color: verdict?.level === 'RED' ? 'var(--rx-coral)' : '#cfe4f0' }}
-            />
+            {verdict?.level === 'RED' || verdict?.level === 'YELLOW' ? (
+              <TriangleAlert
+                aria-hidden="true"
+                className="rx-v-icon rx-v-row"
+                strokeWidth={2}
+                style={{ color: verdict.level === 'RED' ? 'var(--rx-coral)' : '#f0b45c' }}
+              />
+            ) : (
+              <Info aria-hidden="true" className="rx-v-icon rx-v-row" strokeWidth={2} style={{ color: '#cfe4f0' }} />
+            )}
             <p className="rx-v-kicker rx-v-row">{verdict?.kicker ?? 'Prescription review'}</p>
             <h2
               className="rx-v-headline rx-v-row"
               data-long={(verdict?.headline?.length ?? 0) >= 18 || undefined}
+              data-qualified={verdict?.qualifier ? true : undefined}
             >
               {verdict?.headline ?? 'Choose a prescription'}
             </h2>

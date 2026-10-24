@@ -115,7 +115,7 @@ in `prefetch.medications`.
 
 - Env vars: `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`. These are server-only; never add
   a `VITE_` prefix.
-- The request is `chat/completions` with **no `temperature`** (Claude 5.x via Manifest returns 400 if it is sent) and `max_tokens: 600` (tested 2026-10-24: Haiku 5.5 needs the room for reasoning). `LLM_MODEL` is a comma-separated fallback list. The Manifest gateway returns HTTP 200 with an error message as the content, so check the content, not just the status (see brief 05). The system
+- The request is `chat/completions` with **no `temperature`** (Claude 5.x via Manifest returns 400 if it is sent) and `max_tokens: 600` (tested 2026-10-24: Haiku 5.5 needs the room for reasoning). `LLM_MODEL` = `anthropic/claude-sonnet-5-subscription,anthropic/claude-sonnet-5-5-subscription` (Sonnet 5 primary: fastest and accurate in the 2026-10-24 benchmark; Sonnet 5.5 backup). A 6 s timeout applies per attempt. Move on when a call fails or validation fails; the template shows instantly and the AI text replaces it when ready. The Manifest gateway returns HTTP 200 with an error message as the content, so check the content, not just the status (see brief 05). The system
   prompt says: rewrite this structured result for a patient in `<lang>`, change no facts,
   and add nothing.
 - **Cache:** a `Map` keyed by `sha256(JSON(assessment)+lang)`, capped at 500 entries. It

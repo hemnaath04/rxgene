@@ -1,13 +1,15 @@
 // Data loader - imports CPIC snapshots and inhibitor data
 // web/src/data/ is a generated copy of repo-root data/ (npm run sync-data); never edit the copies.
-import cyp2d6AllelesData from '@/data/cpic/cyp2d6_alleles.json';
-import cyp2c19AllelesData from '@/data/cpic/cyp2c19_alleles.json';
-import codeineRecsData from '@/data/cpic/recommendations/codeine.json';
-import tramadolRecsData from '@/data/cpic/recommendations/tramadol.json';
-import atomoxetineRecsData from '@/data/cpic/recommendations/atomoxetine.json';
-import clopidogrelRecsData from '@/data/cpic/recommendations/clopidogrel.json';
-import guidelinesData from '@/data/cpic/guidelines.json';
-import inhibitorsData from '@/data/inhibitors.json';
+// Relative imports (not '@/'): web/api/* functions import the engine, and Vercel's
+// function bundler may not resolve the tsconfig alias.
+import cyp2d6AllelesData from '../data/cpic/cyp2d6_alleles.json';
+import cyp2c19AllelesData from '../data/cpic/cyp2c19_alleles.json';
+import codeineRecsData from '../data/cpic/recommendations/codeine.json';
+import tramadolRecsData from '../data/cpic/recommendations/tramadol.json';
+import atomoxetineRecsData from '../data/cpic/recommendations/atomoxetine.json';
+import clopidogrelRecsData from '../data/cpic/recommendations/clopidogrel.json';
+import guidelinesData from '../data/cpic/guidelines.json';
+import inhibitorsData from '../data/inhibitors.json';
 import type { AlleleData, Recommendation, GuidelineInfo } from './types';
 
 /**

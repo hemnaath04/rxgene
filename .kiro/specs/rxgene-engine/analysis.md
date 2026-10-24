@@ -6,7 +6,7 @@
 
 **Decision key:** `fixed (Rxx changed)`, `not a problem because ...`, `known limitation (README or SCIENCE.md)`, or `OPEN` (needs a decision, usually because the fix changes engine behavior or adds fixed text).
 
-**Summary:** 42 findings. 27 fixed (wording or consistency only, no behavior change, R numbers stable). 3 partly fixed (#3, #5, #34). 2 not a problem (#27, #42). 5 known limitations (#32, #36, #37, #39, #41). 5 OPEN, needing a decision (#1, #8, #21, #31, #33).
+**Summary:** 42 findings (#1 now decided and fixed in the spec; see the update on #1). 27 fixed (wording or consistency only, no behavior change, R numbers stable). 3 partly fixed (#3, #5, #34). 2 not a problem (#27, #42). 5 known limitations (#32, #36, #37, #39, #41). 5 OPEN, needing a decision (#1, #8, #21, #31, #33).
 
 ---
 
@@ -21,7 +21,7 @@ Severity is tagged [H] high, [M] medium or [L] low.
    - R18's text says "the genotype-based result remains available", but no requirement says it is shown.
    - Fix: add precedence. Compute the genotype result first. R18 then only adds the "adjustment not assessed" flag when the genotype is not already PM. Require the genotype recommendation to be shown alongside the R18 text.
 
-   **Decision (Ananya, 2026-10-24):** OPEN (real conflict, behavior change). For a genotype poor metabolizer on atomoxetine plus a moderate inhibitor, R18's GREY could hide the genotype alert that R21 requires. Not changed here because the fix changes engine behavior and needs a fixture (for example *4/*4 + duloxetine + atomoxetine). Proposed: compute the genotype result first, show it, and add the R18 'adjustment not assessed' flag. Needs Ananya's decision, then a brief for Mithuna.
+   **Decision (Ananya, 2026-10-24, updated):** DECIDED and fixed in the spec. R18 now applies only when the genotype is not already a poor metabolizer; for a genotype PM (activity score 0) R21 applies and the poor-metabolizer atomoxetine recommendation is shown with the R21 note. This is narrower than Kiro's proposal: it does not show a genotype recommendation next to the R18 text for non-PM patients, so the approved fixture P16 (genotype normal + duloxetine) is unchanged. New fixture P26 (*4/*4 + duloxetine + atomoxetine) pins it. The engine still returns GREY for P26 (the one failing fixture test), so Mithuna needs a brief. Independently confirmed by property-based testing (see below).
 
 2. [H] **R31 picks GREEN from recommendation content, but R29 and R30 forbid that.** (R31, R29, R30, clinical-rules "Alert levels")
    - R31 says "WHEN a CPIC recommendation indicates standard dosing… THE SYSTEM SHALL assign GREEN". That is inference from the content. The steering file and R29/R30 say the level comes only from `alert_levels.json`.
@@ -277,3 +277,28 @@ Severity is tagged [H] high, [M] medium or [L] low.
 
    **Decision (Ananya, 2026-10-24):** not a problem: duplicate requirements stay so numbers stay stable. R41 is the single scope statement; merging would renumber.
 
+
+
+---
+
+## Property-based testing found the same conflict (fast-check, 2026-10-24)
+
+File: `web/src/engine/properties.test.ts`, written by Kiro (CLI) from the EARS requirements. 13 tests, 5 property groups (R33, R10/R11/R13, R3-R6, R7/R8, R21), 300 random cases each. **12 pass, 1 fails.**
+
+**Failing property (R21):** a genotype poor metabolizer with any inhibitor must still get the drug-level alert (never GREEN, never GREY) and the "adds no further effect" note.
+
+**Shrunk counterexample** (fast-check seed 1750353371, shrunk 5 times): `["*100/*100", ["abiraterone"], "atomoxetine"]`. `*100` is a no-function allele, so the genotype is a poor metabolizer; abiraterone is a moderate CYP2D6 inhibitor. The engine returns GREY "Not assessed" and no note. This is analysis finding #1, found by the property test without being pointed at it. The test is left failing on purpose; it was not weakened.
+
+**Engine probe (2026-10-24), genotype `*4/*4`:**
+
+| Medications and added drug | Alert | R21 note |
+|---|---|---|
+| duloxetine, atomoxetine | GREY (Not assessed) | none: this is finding #1 |
+| fluoxetine, atomoxetine | YELLOW | **none** (second gap: R17 is checked before R21, so no note is produced) |
+| duloxetine, codeine | RED | yes |
+| fluoxetine, codeine | RED | yes |
+| (none), atomoxetine | YELLOW | n/a |
+
+**Second gap (new, OPEN):** a genotype poor metabolizer on atomoxetine plus a strong inhibitor keeps the right alert (YELLOW) but gets no "adds no further effect" note, although R21 says any inhibitor. Decision needed: add fixture P27 (*4/*4 + fluoxetine + atomoxetine) and have Mithuna add the note, or narrow R21 for the R17 case.
+
+**Text mismatch (new):** the engine writes the R21 note as "X adds no further effect — this patient was already a poor metabolizer by genotype." The requirement and the fixtures say "X adds no further effect: already a poor metabolizer by genotype. The drug-level alert still applies." The tests pass because they match only "adds no further effect". Mithuna should align the engine text with R21.

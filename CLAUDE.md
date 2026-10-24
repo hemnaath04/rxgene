@@ -94,4 +94,4 @@ kiro-cli chat --no-interactive --trust-workspace --model <model> \
   `LLM_MODEL` in `.env` (never with a `VITE_` prefix).
 - If Ananya disagrees with a fixture row, her answer wins. Regenerate with
   `python3 scripts/make_expected.py tests/fixtures/expected_outputs`.
-- Deadlines: test gate 2:00 PM, feature freeze 5:30 PM, submit by 7:30 PM ET.
+- Deadlines (event: submissions close 8:00 PM sharp; window opens 6:00): code freeze 6:30 PM, last merge to main + prod check 6:45, submit by 7:30 PM ET. 5:30 was an internal target and no longer applies.

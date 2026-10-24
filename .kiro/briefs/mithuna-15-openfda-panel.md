@@ -1,4 +1,4 @@
-Model: claude-haiku-4.5. Run AFTER brief 12 (consult agent), and only if it's done before 5:00 PM. Otherwise skip it; it's optional. About 20 min.
+Model: claude-haiku-4.5. Run AFTER brief 12 (consult agent), and only if it's done before 6:00 PM. Otherwise skip it; it's optional. About 20 min.
 
 Context: the organizers' Healthcare & Biotech data portal (https://hackachusetts2026.vercel.app/#/healthcare) lists the **openFDA drug adverse events API**. Claude saved report counts for our demo drug pairs in `data/openfda/pair_reports.json` (fetched 2026-10-24, from `scripts/fetch_openfda.py`). Example: 609 FAERS reports list both codeine and fluoxetine; 92 are coded "DRUG INTERACTION" and 55 "DRUG INEFFECTIVE".
 

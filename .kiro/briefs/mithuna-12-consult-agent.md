@@ -1,4 +1,4 @@
-Model: claude-sonnet-4.5. Run AFTER brief 11. Target: working on the dev preview by 5:00 PM (freeze is 5:30).
+Model: claude-sonnet-4.5. Run AFTER brief 11. Target: working on the dev preview by 6:00 PM (code freeze is 6:30; the event closes submissions at 8:00).
 
 Read first: .kiro/briefs/ananya-02-agent-requirements.md (requirements R45-R54) and .kiro/specs/rxgene-engine/requirements.md, which now holds R45-R56, web/api/_lib/llm.ts, web/api/summary.ts, and web/src/engine/index.ts.
 

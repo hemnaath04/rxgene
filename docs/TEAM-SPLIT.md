@@ -21,9 +21,9 @@
 | 1:30 PM | Frontend design handed over (otherwise Mithuna ships the plain UI) |
 | **2:00 PM** | **Test gate.** All 22 fixtures pass, and a rough backup video is recorded. |
 | **2:30 PM** | LLM base URL, key and model are in `.env` and the Vercel env |
-| **5:30 PM** | **Feature freeze.** Re-run the fixtures. |
-| 7:15 PM | PR from `dev` to `main` merged; production deploy checked |
-| **7:30 PM** | SundAI card submitted |
+| **6:30 PM** | **Code freeze.** Re-run all tests and check_live.py. (Moved from 5:30: the event only closes submissions at 8:00.) |
+| 6:45 PM | Last PR from `dev` to `main` merged; production checked with check_live.py |
+| **7:30 PM** | SundAI card submitted (the event's 30-minute reminder). **Hard deadline: 8:00 PM sharp.** |
 
 ---
 
@@ -52,7 +52,7 @@ Kiro models:
 - [ ] `POST /api/summary`: OpenAI-compatible call, the validator (spec §6), and the EN/ES
       template fallback.
 
-### 4:30–5:30: Layer 2b/3
+### 4:30–6:30: Layer 2b/3
 - [ ] CDS Hooks: `GET /cds-services` and `POST /cds-services/rxgene-order-select` (spec §5).
 - [ ] The clopidogrel path (Ana), with omeprazole as a label note.
 - [ ] Layer 3 only if everything above is done.
@@ -75,7 +75,7 @@ wording appears anywhere.
 - [x] Review all 22 rows in `tests/fixtures/expected_outputs.csv` *(now 25 rows, all approved at the expected-output level)*. **If you disagree with
       a row, you win.** Tell Claude, who regenerates the fixtures.
 
-### 2:30–5:30
+### 2:30–6:30
 - [ ] Check the clinical wording of the EN templates (`web/src/engine/templates.ts`) *(review done; fixes pending from Mithuna)*.
 - [x] Work through the PLAN-v3 pre-pitch verification checklist (open the real CPIC PDFs).
 - [x] Verify the Borges et al. citation, or drop it from the slides *(verified; claim narrowed)*.
@@ -91,8 +91,8 @@ checklist ticked.
 - [ ] **By 1:30:** the Codex frontend design (design only; Mithuna implements it in Kiro).
 - [ ] **By 2:30:** the LLM base URL, key and model, in local `.env` and the Vercel env.
 - [ ] **2:00:** record the rough backup video once Layer 1 passes.
-- [ ] 2:30–5:30: demo script (PLAN-v3, 60–90 s) and slides (30 s and 3 min versions).
-- [ ] 5:30–7:15: record the final demo video on the production URL.
+- [ ] 2:30–6:30: demo script (PLAN-v3, 60–90 s) and slides (30 s and 3 min versions).
+- [ ] 6:45–7:30: record the final demo video on the production URL.
 - [ ] **By 7:30:** the SundAI card, with the public repo URL, the demo URL, the video and
       the Biotech & Healthcare track.
 
@@ -105,13 +105,13 @@ checklist ticked.
 - [ ] Regenerate the fixtures when Ananya changes a row.
 - [ ] Set up the Vercel project and check the CDS Hooks endpoints.
 - [ ] README limitations section.
-- [ ] Open and merge the PR from `dev` to `main` by 7:15. Verify the SundAI submission.
+- [ ] Open and merge the last PR from `dev` to `main` by 6:45. Verify the SundAI submission.
 
 ## Added at 2:45 PM: pharmacist consult agent
 
 - **Ananya:** `.kiro/briefs/ananya-02-agent-requirements.md` adds R45–R54 to the spec by 3:15.
-- **Mithuna:** brief 11 (verdict layout), then `.kiro/briefs/mithuna-12-consult-agent.md`, working on the dev preview by 5:00.
-- **Claude:** verifies the live agent on the preview, then merges to main before the 5:30 freeze.
+- **Mithuna:** brief 11 (verdict layout), then `.kiro/briefs/mithuna-12-consult-agent.md`, working on the dev preview by 6:00.
+- **Claude:** verifies the live agent on the preview, then merges to main by 6:45 (code freeze 6:30).
 - **Pitch line:** "An AI agent drafts the pharmacist's consult note, but every sentence cites a rule-engine result, and if it can't, you get the deterministic template."
 
 ## Added at 3:00 PM: more Kiro features
@@ -122,6 +122,6 @@ checklist ticked.
 ## Added at 3:10 PM: openFDA (organizers' data portal)
 
 - Claude saved openFDA FAERS counts for 10 demo drug pairs to `data/openfda/pair_reports.json`.
-- **Mithuna:** brief 15 (Evidence-sheet panel) runs only if brief 12 is done before 5:00. Order: 13 → 14 → 12 → (15).
+- **Mithuna:** brief 15 (Evidence-sheet panel) runs only if brief 12 is done before 6:00. Order: 13 → 14 → 12 → (15).
 - **Pitch / SundAI card:** challenge **H4** ("hard to translate"). We use the portal's FHIR guidance (standard shapes, not private JSON) and its openFDA API.
 

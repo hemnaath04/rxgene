@@ -33,6 +33,9 @@ off by Ananya.
 | Fluoxetine inhibition can persist after the drug is stopped (not modeled; steady-state limitation, R43) | Same CPIC atomoxetine 2019 narrative | "up to 2–3 months after fluoxetine discontinuation" | Source-matched | 2026-10-24 |
 | Clopidogrel, CYP2C19 poor metabolizer (ACS/PCI): avoid clopidogrel, use prasugrel or ticagrelor (RED, Strong). Intermediate: avoid standard-dose clopidogrel, same alternatives. | CPIC clopidogrel guideline 2022 update (Lee et al.), original PDF. https://files.cpicpgx.org/data/guideline/publication/clopidogrel/2022/35034351.pdf (also the CPIC API, population "CVI ACS PCI") | "Avoid clopidogrel if possible." | Source-matched (Claude, from the PDF text) | 2026-10-24 |
 | Omeprazole with clopidogrel: avoid concomitant use (a label-level note, not a computed phenoconversion) | FDA PLAVIX label, warnings 5.1 and interactions 7.1 (DailyMed set id de8b0b67-eb25-4684-83b5-7ad785314227, version 5, published 2025-06-11) | "Avoid concomitant use of omeprazole or esomeprazole." | Source-matched (Claude, from the label XML) | 2026-10-24 |
+| About 99.5% of 487,409 UK Biobank participants "may have an atypical response to at least one drug" (predicted from 14 CPIC pharmacogenes); nearly 24% of participants had been prescribed a drug for which they are predicted to have an atypical response. Both are predictions from genotypes, not measured adverse-event rates. | McInnes et al., "Pharmacogenetics at Scale: An Analysis of the UK Biobank", *Clin Pharmacol Ther* 2021;109(6), DOI 10.1002/cpt.2122. https://pmc.ncbi.nlm.nih.gov/articles/PMC8144239/ | "99.5% of individuals may have an atypical response to at least one drug" | Source-matched (Claude, abstract and text) | 2026-10-24 |
+| The current XELODA (capecitabine) FDA label carries a boxed warning on DPD deficiency and tells prescribers to test for DPYD variants before starting, unless immediate treatment is necessary. The label (DailyMed set id e702d84d-7162-4751-bf37-d724cc7e45a5, version 32, published 2026-02-06) shows patient information revised 10/2025. This is stronger than "consider testing". The 5-FU (fluorouracil) label was NOT opened. | FDA XELODA label, boxed warning and section 5.1. https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=e702d84d-7162-4751-bf37-d724cc7e45a5 | "Test patients for genetic variants of DPYD prior to initiating XELODA" | Source-matched (Claude, from the label XML) | 2026-10-24 |
+| Kiro describes using deterministic checks alongside AI generation (a verifiable alternative to the unverified quote below) | Kiro IDE page. https://kiro.dev/ide/ | "uses deterministic tools such as property-based tests to verify that code is correct" | Source-matched (Claude, from the page text) | 2026-10-24 |
 | Allele activity values for the demo patients: `*1` 1.0, `*2` 1.0, `*4` 0.0, `*5` 0.0, `*9` 0.25, `*10` 0.25, `*17` 0.5, `*41` 0.25 | CPIC API allele table. https://api.cpicpgx.org/v1/allele?genesymbol=eq.CYP2D6 | e.g. `"name":"*10","activityvalue":"0.25"` | Source-matched | 2026-10-24 |
 | About 20–30% of people in settings where CYP2D6 genotype might be used also take a phenoconverting inhibitor (a reported figure, not a measured cohort rate) | Cicali et al., *Clin Pharmacol Ther* 2021;110(3):677-687. https://pmc.ncbi.nlm.nih.gov/articles/PMC8404400/ | "approximately 20–30% of individuals are also taking an enzyme inhibitor" | Source-matched | 2026-10-24 |
 | Five of the ten FDA-classified strong or moderate CYP2D6 inhibitors are on the 2021 Top 300 Drugs list | Same paper | "five of the ten CYP2D6 inhibitors classified by the FDA as strong" | Source-matched | 2026-10-24 |
@@ -58,10 +61,9 @@ off by Ananya.
 | The exact 0 and 0.5 factors in Borges et al. 2010 | Seen only through Cicali's description of Borges, not in Borges itself. |
 | CPIC thresholds as standardized by Caudle et al. 2020 | Not opened. We cite the 2021 opioid guideline's Table 1 instead. |
 | Supplementary Material S1 of the SSRI/SNRI guideline | Not opened. |
-| 99.5% of 487,409 UK Biobank participants carry a variant that may change drug response (McInnes et al., 2020) | Carried over from the plan; not opened by us. |
-| FDA updated capecitabine and 5-FU labels for DPD deficiency | Not opened. DPYD is not built today, so it only appears as "what's next". |
-| Kiro team's wording "AI proposes, deterministic code decides" | Not opened. Verify before quoting it to Kiro judges. |
-| Fixtures P03–P23 matching all of the above | Walkthrough in progress. Approved so far: P01, P02. |
+| The 5-FU (fluorouracil) label update for DPD deficiency | Not opened. Only the capecitabine (XELODA) label was checked. DPYD is not built today, so it only appears as "what's next". |
+| The Kiro team post of 2026-10-22 and its wording "AI proposes, deterministic code decides" | Searched the Kiro blog index and the web: not found. UNVERIFIED: do not quote it, and it is excluded from the pitch. Use the Kiro IDE page line above instead. |
+| Fixtures P01–P25 matching all of the above | All 25 approved by Ananya at the expected-output level. This is not independent verification of every source and not clinical validation. |
 
 ## Known discrepancies to be ready for
 
@@ -109,8 +111,8 @@ off by Ananya.
 - The exact 0 and 0.5 factors in Borges et al. 2010 (seen only through Cicali et al.).
 - The table title naming the population "adults" in the CPIC atomoxetine PDF (population taken
   from the CPIC API field).
-- The UK Biobank 99.5% figure, the capecitabine and 5-FU label update, and the Kiro team's
-  "AI proposes, deterministic code decides" wording.
+- The 5-FU (fluorouracil) label, and the Kiro team post of 2026-10-22 with its wording "AI
+  proposes, deterministic code decides" (not found; do not quote it).
 
 **Clinical limitations of the model**
 - Steady state only: no inhibitor onset or washout. Fluoxetine inhibition may last 2 to 3
@@ -132,5 +134,10 @@ off by Ananya.
   their genes behave." Supported by Cicali et al., as a reported figure.
 - "The CPIC 2023 antidepressant guideline says there is no agreed method. Only the 2021
   opioid guideline states the rule, so that is all we compute." Supported.
-- "Over 99% of people carry at least one variant that can change drug response." Unverified
-  until the UK Biobank paper is opened.
+- "In a UK Biobank analysis of 487,409 people, 99.5% may have an atypical response to at
+  least one drug, based on 14 CPIC genes." Supported by McInnes et al. 2021. Say "may have" and
+  "predicted": it is a prediction from genotypes, not a measured outcome. (The pitch script does
+  not use it.)
+- "The FDA's capecitabine label now carries a boxed warning to test for DPYD variants before
+  treatment." Supported for capecitabine only (label revised 10/2025), not for 5-FU. Use it for
+  the "what's next" slide.

@@ -92,7 +92,16 @@ off by Ananya.
 - **Source-matched only (an agent or Claude string-matched the source; no human check):**
   every other quote in this file, the CPIC allele values, and all recommendation texts.
 - **`data/alert_levels.json`:** 15 of 41 entries are covered by an approved fixture. The other
-  26 are listed in `_unvalidated_entries` in that file and were not individually reviewed.
+  26 are listed in `_reviewed_entries` in that file. All 26 previously unvalidated alert-level
+  entries were reviewed by Ananya for consistency with the documented CPIC recommendations and
+  approved RxGene fixtures. Their alert levels were retained unchanged. This review does not
+  constitute independent verification of every primary source or clinical validation of the
+  application.
+  - GREEN means no supported PGx alert, not overall medication safety.
+  - Atomoxetine Normal and Ultrarapid rows may have identical dosing text but different alert
+    levels because their CPIC clinical implications differ.
+  - The CYP2C19 Likely Poor and Likely Intermediate entries remain in the mapping even if the
+    current engine cannot produce those phenotypes.
 
 **Not opened or not checked**
 - CPIC supplementary material (the antidepressant guideline's S1 and the atomoxetine

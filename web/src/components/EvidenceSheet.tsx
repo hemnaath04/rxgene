@@ -6,12 +6,14 @@ import { LevelChip } from '@/components/AlertLevel';
 import { CdsExchangePanel } from '@/components/CdsExchangePanel';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import inhibitors from '@/data/inhibitors.json';
+import pairReports from '@/data/openfda/pair_reports.json';
 import { toCdsCard } from '@/engine/cdsCard';
 import { ATOMOXETINE_AS1_CONTROVERSY_NOTE } from '@/engine/fixedTexts';
 import type { CdsCard, DrugAssessment } from '@/engine/types';
 import type { CardEntry } from '@/lib/cardEntries';
 import type { CdsExchange, OrderSelectRequest } from '@/lib/cdsClient';
 import { enterExit } from '@/lib/motion';
+import { reportsFor } from '@/lib/openfda';
 import { REQUIREMENT_TITLES, requirementsFor } from '@/lib/requirements';
 import { capitalize, formatScore, parseSourceLinks, populationLine, sourceLine, toVerdict } from '@/lib/verdict';
 import type { Mode } from '@/lib/url';
@@ -64,6 +66,58 @@ function recommendationTitle(a: DrugAssessment): string {
   if (a.alert === 'GREY' && !a.strength) return 'RxGene result (fixed text; no CPIC recommendation applied)';
   if (a.cpicRole) return 'CPIC recommendation (supporting context, verbatim and in full)';
   return 'CPIC recommendation (verbatim and in full)';
+}
+
+/**
+ * Real-world reports panel (openFDA FAERS). Subordinate to CPIC evidence.
+ * Shows matching drug+co-medication pairs from the snapshot, with disclaimers.
+ * No matching pair -> no panel rendered.
+ */
+function OpenFDAPanel({ drug, meds }: { drug: string; meds: string[] }) {
+  const reports = reportsFor(drug, meds);
+
+  // No matching pairs: render nothing
+  if (reports.length === 0) {
+    return null;
+  }
+
+  return (
+    <Section title="Real-world reports (openFDA FAERS)">
+      <div className="flex flex-col gap-4">
+        {reports.map((report) => (
+          <div key={report.query} className="rounded-lg border border-ink/15 bg-ink/5 px-4 py-3">
+            <p className="text-sm leading-relaxed text-ink">
+              {report.totalReports} reports submitted to FDA list both{' '}
+              <span className="font-semibold">{capitalize(report.drug)}</span> and{' '}
+              <span className="font-semibold">{capitalize(report.coMedication)}</span>, in any role. Reporters coded{' '}
+              <span className="font-semibold">{report.reactionReports['DRUG_INTERACTION'] ?? 0}</span> as "drug
+              interaction" and <span className="font-semibold">{report.reactionReports['DRUG_INEFFECTIVE'] ?? 0}</span>{' '}
+              as "drug ineffective"; these terms do not identify which medicine they refer to.
+            </p>
+            <p className="mt-2 text-xs leading-relaxed text-ink-muted">
+              A report does not establish that either medicine caused an event, and FAERS is not a complete record of
+              adverse events. Counts are not compared between medication pairs. RxGene's clinical rules do not use these
+              reports.
+            </p>
+            <p className="mt-2 text-xs leading-relaxed text-ink-muted">
+              Do not rely on openFDA to make decisions regarding medical care. Results are unvalidated.
+            </p>
+            <p className="mt-2 text-xs text-ink-muted">
+              Data retrieved: {pairReports.fetched}.{' '}
+              <a
+                href={report.query}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-0.5 break-all underline underline-offset-1"
+              >
+                Source <ExternalLink aria-hidden="true" className="size-2.5 shrink-0" strokeWidth={1.5} />
+              </a>
+            </p>
+          </div>
+        ))}
+      </div>
+    </Section>
+  );
 }
 
 function AssessmentEvidence({ a, meds }: { a: DrugAssessment; meds: string[] }) {
@@ -221,6 +275,8 @@ function AssessmentEvidence({ a, meds }: { a: DrugAssessment; meds: string[] }) 
         </ul>
         <p className="text-xs text-ink-muted">From .kiro/specs/rxgene-engine/requirements.md, derived from the assessment.</p>
       </Section>
+
+      <OpenFDAPanel drug={a.drug} meds={meds} />
 
       <CardJson card={toCdsCard(a)} label="CDS Hooks card JSON (built by the engine's toCdsCard)" />
     </>

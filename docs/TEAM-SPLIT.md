@@ -12,6 +12,8 @@
 - Never put API keys in the repo. They go in `.env` only.
 - **Submit by 7:30 PM.** Submissions lock at 8:00.
 
+**Vercel:** project `rxgene` (Hemnaath's projects). Root `web`, production branch `main` (public URL for judges), pushes to `dev` give login-protected previews. LLM env vars are set for Production and Preview.
+
 **Gates**
 
 | Time | Gate |

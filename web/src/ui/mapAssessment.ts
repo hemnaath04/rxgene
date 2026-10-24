@@ -64,8 +64,13 @@ function currentSpeedAndLabel(a: DrugAssessment): { currentSpeed: FlowSpeed | nu
 /** flowState per the spec: GREY -> notAssessed; strong/moderate phenoconversion -> inhibited/reduced; etc. */
 function flowStateAndInhibitor(a: DrugAssessment): { flowState: FlowState; inhibitor: InhibitorView | null } {
   const flowState = flowStateFor(a, true, false);
+  const noEffect = !!alreadySlowInhibitor(a);
   const inhibitor: InhibitorView | null = a.inhibitor
-    ? { drug: capitalize(a.inhibitor.drug), strengthLabel: `${capitalize(a.inhibitor.strength)} inhibitor` }
+    ? {
+        drug: capitalize(a.inhibitor.drug),
+        strengthLabel: noEffect ? 'No further effect' : `${capitalize(a.inhibitor.strength)} inhibitor`,
+        noEffect,
+      }
     : null;
   return { flowState, inhibitor };
 }

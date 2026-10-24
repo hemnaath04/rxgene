@@ -32,6 +32,8 @@ export type InhibitorView = {
   drug: string;
   /** Free text, e.g. "Strong inhibitor" — the UI does not classify strength itself. */
   strengthLabel: string;
+  /** True when the inhibitor changes nothing (patient already slow by genes, R21). Shown muted. */
+  noEffect?: boolean;
 };
 
 /** The bottom verdict band content. All text comes from the backend verbatim. */

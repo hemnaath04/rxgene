@@ -1,6 +1,6 @@
-Model: auto. Read docs/DESIGN.md (from the frontend designer), .plans/rxgene-build-spec.md section 7, and docs/PLAN-v3.md ("UI language" and the 60-90 s demo script).
+Model: auto. Read docs/DESIGN.md and look at the mockup image docs/design/mockup-case1.webp. DESIGN.md wins where the image and the doc differ (section 5 lists the deliberate fixes). Also read .plans/rxgene-build-spec.md section 7, and docs/PLAN-v3.md ("UI language" and the 60-90 s demo script).
 
-Task: apply the design to the existing components. Don't change the engine, the API or the data flow.
+Task: apply the design to the existing components (App.tsx, PatientPicker, MedList, AlertCard) and add Gauge, StoryRow, ComparisonStrip, VerdictBar, EvidenceSheet and PatientExplanationSheet. Implement every state in DESIGN.md section 3 and the motion spec in section 4 exactly. Don't change the engine, the API or the data flow.
 
 1. Put the design tokens in web/src/index.css as CSS variables used by the Tailwind theme (@theme). Alert-level colors must also carry an icon and a label, never color alone.
 2. Gauge: a single Slow / Reduced / Normal / Fast scale with a hollow marker ("by genes") and a solid marker ("right now"). Animate them apart with motion/react (a spring of about 600 ms) when an inhibitor changes the phenotype. Respect prefers-reduced-motion. Map Poor to Slow, Intermediate to Reduced, Normal to Normal and Ultrarapid to Fast. For Indeterminate or Insufficient data, show no marker and "Not assessed".

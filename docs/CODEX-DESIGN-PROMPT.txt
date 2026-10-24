@@ -1,0 +1,9 @@
+You are designing (not coding) the UI for RxGene, a pre-prescription pharmacogenomics check for pharmacists. Read README.md, docs/PLAN-v3.md (the "UI language" and "Pitch" sections) and .plans/rxgene-build-spec.md section 7.
+
+Produce a design document in Markdown only. Do not write React or CSS files, because the event requires all code to be written in Kiro. Include:
+1. The layout for desktop (judges view it on a laptop) and a usable narrow layout.
+2. Design tokens: colors for the RED/YELLOW/GREEN/GREY alert levels (accessible contrast, and never color alone), typography, and spacing.
+3. Every component and its states: PatientPicker, MedList, AlertCard, Gauge (one Slow/Reduced/Normal/Fast scale; a hollow marker for "by genes" and a solid one for "right now"; how the animation looks when an inhibitor is added), EvidenceDrawer, ComparisonStrip, PatientSummary (EN/ES toggle and the source tag).
+4. Exact UI copy for each state, using the plain-language words in PLAN-v3. Never use the word "safe".
+5. What the screen looks like at each beat of the 60–90 second demo script.
+Keep it implementable by one developer in about 2 hours.

@@ -26,8 +26,13 @@ off by Ananya.
 | Codeine, CYP2D6 poor metabolizer: avoid codeine | CPIC opioid guideline 2021, Table 2, and the CPIC API recommendation view | "Avoid codeine use because of possibility of diminished analgesia." | Source-matched | 2026-10-24 |
 | Atomoxetine, strong CYP2D6 inhibitor: handled like a poor metabolizer, with a longer titration interval (label-based, not the opioid ×0 rule) | FDA STRATTERA label, section 2.5 (DailyMed set id 309de576-c318-404a-bc15-660c2b1876fb, version 69, published 2026-07-23) | "a longer titration interval of 4 weeks is recommended" | Source-matched (Claude, from the label XML) | 2026-10-24 |
 | Atomoxetine, poor metabolizer: a dosing and plasma-concentration pathway, not "avoid" | CPIC atomoxetine guideline 2019 (Brown et al.). https://pmc.ncbi.nlm.nih.gov/articles/PMC6612570/ | "consider obtaining a plasma concentration 4 h after dosing" | Source-matched | 2026-10-24 |
+| Atomoxetine, adult (40 mg/day) poor-metabolizer recommendation and its strength (Moderate), word for word as in fixture P14 | CPIC atomoxetine guideline 2019 (Brown et al.), original PDF, the fixed-dose table's poor-metabolizer row. https://files.cpicpgx.org/data/guideline/publication/atomoxetine/2019/30801677.pdf (also the CPIC API, population "adults") | "consider obtaining a plasma concentration 2–4 hours after dosing" | Source-matched (Claude, from the PDF text; the table title naming the population was not captured by the extraction) | 2026-10-24 |
 | Atomoxetine, ultrarapid: caution because standard dosing may not reach adequate concentrations (alert level YELLOW) | Same CPIC atomoxetine guideline, ultrarapid row implication, and the CPIC API | "unlikely ultrarapid metabolizers would achieve adequate serum concentrations" | Source-matched | 2026-10-24 |
-| Atomoxetine at activity score 1.0 is allele-dependent (open item) | Same CPIC atomoxetine guideline, table footnote | "prescribing recommendations for those with an AS of 1.0 are allele-dependent" | Source-matched | 2026-10-24 |
+| Atomoxetine at activity score 1.0 depends on the `*10` allele (requirement R44). With `*10` present: titration row (YELLOW). Without: standard 1.0 row (GREEN). | Same CPIC atomoxetine guideline, original PDF, adult-dose table, two separate rows. https://files.cpicpgx.org/data/guideline/publication/atomoxetine/2019/30801677.pdf. The CPIC API returns only the "not present" row. | rows "1.0 (*10 allele present)" and "1.0 (*10 allele not present)"; footnote: "allele-dependent, based on the presence of the CYP2D6*10 allele" | Source-matched (Claude, from the PDF text; the API does not have the "present" row) | 2026-10-24 |
+| Atomoxetine phenoconversion is described by CPIC for strong CYP2D6 inhibitors only; CPIC 2019 says nothing about moderate or weak inhibitors, and neither does the FDA STRATTERA label. So RxGene shows "Not assessed" for a moderate inhibitor and does NOT claim that CPIC states no adjustment. | CPIC atomoxetine guideline 2019, narrative on phenoconversion (original PDF); FDA STRATTERA label text searched for "moderate CYP2D6" (0 hits). https://files.cpicpgx.org/data/guideline/publication/atomoxetine/2019/30801677.pdf | "Individuals taking atomoxetine along with a strong CYP2D6 inhibitor" | Source-matched (Claude searched the full PDF and label text); the CPIC supplementary material was NOT opened | 2026-10-24 |
+| Fluoxetine inhibition can persist after the drug is stopped (not modeled; steady-state limitation, R43) | Same CPIC atomoxetine 2019 narrative | "up to 2–3 months after fluoxetine discontinuation" | Source-matched | 2026-10-24 |
+| Clopidogrel, CYP2C19 poor metabolizer (ACS/PCI): avoid clopidogrel, use prasugrel or ticagrelor (RED, Strong). Intermediate: avoid standard-dose clopidogrel, same alternatives. | CPIC clopidogrel guideline 2022 update (Lee et al.), original PDF. https://files.cpicpgx.org/data/guideline/publication/clopidogrel/2022/35034351.pdf (also the CPIC API, population "CVI ACS PCI") | "Avoid clopidogrel if possible." | Source-matched (Claude, from the PDF text) | 2026-10-24 |
+| Omeprazole with clopidogrel: avoid concomitant use (a label-level note, not a computed phenoconversion) | FDA PLAVIX label, warnings 5.1 and interactions 7.1 (DailyMed set id de8b0b67-eb25-4684-83b5-7ad785314227, version 5, published 2025-06-11) | "Avoid concomitant use of omeprazole or esomeprazole." | Source-matched (Claude, from the label XML) | 2026-10-24 |
 | Allele activity values for the demo patients: `*1` 1.0, `*2` 1.0, `*4` 0.0, `*5` 0.0, `*9` 0.25, `*10` 0.25, `*17` 0.5, `*41` 0.25 | CPIC API allele table. https://api.cpicpgx.org/v1/allele?genesymbol=eq.CYP2D6 | e.g. `"name":"*10","activityvalue":"0.25"` | Source-matched | 2026-10-24 |
 | About 20–30% of people in settings where CYP2D6 genotype might be used also take a phenoconverting inhibitor (a reported figure, not a measured cohort rate) | Cicali et al., *Clin Pharmacol Ther* 2021;110(3):677-687. https://pmc.ncbi.nlm.nih.gov/articles/PMC8404400/ | "approximately 20–30% of individuals are also taking an enzyme inhibitor" | Source-matched | 2026-10-24 |
 | Five of the ten FDA-classified strong or moderate CYP2D6 inhibitors are on the 2021 Top 300 Drugs list | Same paper | "five of the ten CYP2D6 inhibitors classified by the FDA as strong" | Source-matched | 2026-10-24 |
@@ -51,10 +56,8 @@ off by Ananya.
 | Claim | Why it is unverified |
 |---|---|
 | The exact 0 and 0.5 factors in Borges et al. 2010 | Seen only through Cicali's description of Borges, not in Borges itself. |
-| Atomoxetine adult poor-metabolizer text ("40 mg/day … 80 mg/day … 2 to 4 hours") | Matches the live CPIC API. Not found in the 2019 article's own poor-metabolizer table, which shows the paediatric text. |
 | CPIC thresholds as standardized by Caudle et al. 2020 | Not opened. We cite the 2021 opioid guideline's Table 1 instead. |
 | Supplementary Material S1 of the SSRI/SNRI guideline | Not opened. |
-| Omeprazole with clopidogrel: label-level interaction note | Fixture P19 itself says "verify against FDA label". Not opened. |
 | 99.5% of 487,409 UK Biobank participants carry a variant that may change drug response (McInnes et al., 2020) | Carried over from the plan; not opened by us. |
 | FDA updated capecitabine and 5-FU labels for DPD deficiency | Not opened. DPYD is not built today, so it only appears as "what's next". |
 | Kiro team's wording "AI proposes, deterministic code decides" | Not opened. Verify before quoting it to Kiro judges. |
@@ -68,15 +71,51 @@ off by Ananya.
    card leads with the FDA label, shows the CPIC text only as supporting genotype-based
    context, and states that the two are different guidance contexts, not interchangeable
    (requirement R17).
-2. **Atomoxetine at activity score 1.0.** CPIC's table footnote says the recommendation is
-   allele-dependent, based on the `*10` allele. Our data has a single row for 1.0. Decide how
-   to handle diplotypes that contain `*10`.
+2. **Atomoxetine at activity score 1.0 (resolved, R44).** CPIC's table footnote says the
+   recommendation is allele-dependent, based on the `*10` allele, and the PDF has two rows.
+   The API returns only the "not present" row. Decision (Ananya): follow CPIC. A `*10`
+   allele at exactly 1.0 uses the titration row (YELLOW); otherwise the standard row. CPIC
+   still marks the whole 1.0 area "controversy remains".
 3. **Activity score 1.0 label.** The 2019 atomoxetine paper treats it as a normal or
    intermediate metabolizer depending on context; the 2021 opioid table puts it in the
    intermediate range (0 < x < 1.25). The app uses the 2021 label, and uses the
    standard-titration atomoxetine row at 1.0, as `clinical-rules.md` says.
 4. **CYP2C19 phenoconversion is not modeled**, although the FDA table lists fluoxetine as a
    strong CYP2C19 inhibitor. See the README limitations.
+
+## Remaining limitations and verification status (2026-10-24)
+
+**What a person verified vs what an agent verified**
+- **Human-verified (Ananya):** six FDA inhibitor rows only: fluoxetine, paroxetine, bupropion
+  (strong), duloxetine (moderate), sertraline (weak), omeprazole (CYP2C19 weak).
+- **Reviewed by Ananya at the expected-output level:** all 25 fixtures (P01 to P25).
+- **Source-matched only (an agent or Claude string-matched the source; no human check):**
+  every other quote in this file, the CPIC allele values, and all recommendation texts.
+- **`data/alert_levels.json`:** 15 of 41 entries are covered by an approved fixture. The other
+  26 are listed in `_unvalidated_entries` in that file and were not individually reviewed.
+
+**Not opened or not checked**
+- CPIC supplementary material (the antidepressant guideline's S1 and the atomoxetine
+  supplement); Caudle et al. 2020.
+- The exact 0 and 0.5 factors in Borges et al. 2010 (seen only through Cicali et al.).
+- The table title naming the population "adults" in the CPIC atomoxetine PDF (population taken
+  from the CPIC API field).
+- The UK Biobank 99.5% figure, the capecitabine and 5-FU label update, and the Kiro team's
+  "AI proposes, deterministic code decides" wording.
+
+**Clinical limitations of the model**
+- Steady state only: no inhibitor onset or washout. Fluoxetine inhibition may last 2 to 3
+  months after it is stopped (CPIC atomoxetine 2019), so a recently stopped fluoxetine is not flagged.
+- CYP2C19 phenoconversion is not modeled, although the FDA table lists fluoxetine as a strong
+  CYP2C19 inhibitor. Omeprazole with clopidogrel appears only as a label note.
+- The x0 and x0.5 rule is applied to codeine and tramadol only (CPIC opioids 2021). Atomoxetine
+  with a strong inhibitor follows the FDA label; with a moderate inhibitor it is "Not assessed"
+  because neither CPIC 2019 nor the label addresses moderate inhibitors in the sections checked.
+- If several inhibitors are listed, only the strongest is applied (a project design choice).
+- Atomoxetine at activity score 1.0 is marked "controversy remains" by CPIC. The `*10` rule (R44)
+  follows the PDF, not the API.
+- Atomoxetine ultrarapid is YELLOW from CPIC's implication text; no fixture covers it.
+- Synthetic data only. Not a medical device. "No supported PGx alert" does not mean safe.
 
 ## Pitch lines this supports
 

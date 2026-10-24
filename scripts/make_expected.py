@@ -1,4 +1,4 @@
-import json, csv, pathlib, sys
+import json, csv, pathlib, sys, re
 API="https://api.cpicpgx.org/v1"
 import subprocess
 def get(q): return json.loads(subprocess.run(["curl","-s",API+q],capture_output=True,text=True).stdout)
@@ -51,7 +51,7 @@ C19P={('Normal function','Normal function'):'Normal Metabolizer',('Increased fun
 GREY_TEXT={
  'Indeterminate':'Indeterminate: this gene result includes a variant we cannot interpret, so no pharmacogenomic check was done for this drug. Ask a pharmacist.',
  'Insufficient data':'Insufficient data: there is no CYP2D6 result on file, so no pharmacogenomic check was done for this drug.',
- 'Not assessed':'Not assessed: a moderate CYP2D6 inhibitor is present and CPIC states no adjustment for atomoxetine, so RxGene does not compute this. Pharmacist review needed.',
+ 'Not assessed':'Not assessed: {inhibitor} is a moderate CYP2D6 inhibitor. RxGene does not have a validated phenoconversion adjustment for atomoxetine with moderate inhibitors. The genotype-based result remains available, but the medication-adjusted phenotype has not been determined. Pharmacist review recommended.',
 }
 cases=[
  ('P01','*1/*1',None,['fluoxetine'],'codeine','Demo case 1: genotype says normal, fluoxetine makes them a poor metabolizer'),
@@ -69,7 +69,7 @@ cases=[
  ('P13','*1/*1',None,['fluoxetine'],'atomoxetine','Demo case 2: drug builds up. Use PM-equivalent rec; cite atomoxetine label + CPIC atomoxetine narrative'),
  ('P14','*4/*4',None,[],'atomoxetine','PM by genotype: slower titration'),
  ('P15','*1/*4',None,[],'atomoxetine','Trap: phenotype label IM but CPIC atomoxetine rec for AS 1.0 = standard titration. Key atomoxetine rules on AS'),
- ('P16','*1/*1',None,['duloxetine'],'atomoxetine','Moderate inhibitor: CPIC states no adjustment for atomoxetine -> pharmacist review, do not compute'),
+ ('P16','*1/*1',None,['duloxetine'],'atomoxetine','Moderate inhibitor with atomoxetine: no validated adjustment (neither CPIC 2019 nor the FDA label addresses it in the sections checked) -> Not assessed, pharmacist review, do not compute'),
  ('P17',None,'*2/*2',[],'clopidogrel','CYP2C19 PM (ACS/PCI)'),
  ('P18',None,'*1/*2',[],'clopidogrel','CYP2C19 IM (ACS/PCI)'),
  ('P19',None,'*1/*17',['omeprazole'],'clopidogrel','RM = standard dose; omeprazole is a label-level interaction (Layer 2), NOT a computed phenoconversion'),
@@ -78,6 +78,7 @@ cases=[
  ('P22','*1/*1',None,['sertraline'],'codeine','Weak inhibitor (FDA): no activity-score adjustment'),
  ('P23','*10/*10',None,[],'atomoxetine','Discriminates the *10 value: current 0.25 gives AS 0.5 (titration row, YELLOW); the old 0.5 would give AS 1.0 (standard-titration row, GREEN). Phenotype label is IM either way'),
  ('P24','*1x2/*10',None,[],'codeine','Upper boundary: AS exactly 2.25 (2.0 + 0.25) is NM because the range is inclusive, not UM. Pairs with P09 (1.25, lower boundary)'),
+ ('P25','*10x2/*17',None,[],'atomoxetine','CPIC adult table: AS 1.0 with a *10 allele present (*10x2 + *17 = 0.5 + 0.5) uses the titration row, not the standard 1.0 row. Contrast P15 (*1/*4, *10 not present)'),
 ]
 rows=[]
 for pid,dip6,dip19,meds,drug,note in cases:
@@ -90,7 +91,7 @@ for pid,dip6,dip19,meds,drug,note in cases:
         p=C19P.get(tuple(f)) or C19P.get(tuple(f[::-1]))
         ph,txt,cls=R['clopidogrel'][p]
         r.update(genotype_AS='n/a (CYP2C19 has no activity score)',genotype_phenotype=p,inhibitor='',adjusted_AS='',adjusted_phenotype=p,phenoconverted='no',alert=alert_for('clopidogrel','CVI ACS PCI ',p),cpic_recommendation=txt,cpic_strength=cls,source='CPIC clopidogrel 2022 (ACS/PCI)')
-        if 'omeprazole' in meds: r['extra_flag']='Label interaction: clopidogrel + omeprazole (verify against FDA label). Shown separately from genotype result.'
+        if 'omeprazole' in meds: r['extra_flag']='Label interaction: FDA PLAVIX label advises avoiding concomitant use of omeprazole or esomeprazole. Shown separately from the genotype result.'
     else:
         s,p=d6(dip6)
         inh=next((m for m in meds if m.split(' ')[0] in STRONG|MODERATE),'')
@@ -104,12 +105,17 @@ for pid,dip6,dip19,meds,drug,note in cases:
             elif strength=='moderate': adj=s*0.5
             if drug=='atomoxetine' and strength=='moderate':
                 r.update(adjusted_AS='not computed',adjusted_phenotype='not computed',phenoconverted='unknown',alert='GREY',
-                    cpic_recommendation=GREY_TEXT['Not assessed'],cpic_strength='',source='CPIC atomoxetine 2019 (narrative only)')
+                    cpic_recommendation=GREY_TEXT['Not assessed'].format(inhibitor=inh.split(' ')[0].capitalize()),cpic_strength='',source='CPIC atomoxetine guideline 2019 and FDA STRATTERA label reviewed; no specific moderate CYP2D6 inhibitor adjustment identified in the sections checked (2026-10-24). Supplementary material not reviewed.')
             else:
                 if drug in('codeine','tramadol'):
                     ph,txt,cls=lookup_pheno(drug,pheno(adj)); akey=pheno(adj); pop='general'
                 else:
                     ph,txt,cls,akey=lookup_as(drug,adj); pop='adults'
+                    if abs(adj-1.0)<1e-9 and re.search(r'\*10(?!\d)',dip6 or ''):
+                        # R44: CPIC atomoxetine 2019 has a separate row "1.0 (*10 allele present)"; reuse the titration text (key from alert_levels.json).
+                        spec=LEVELS['atomoxetine']['adults']['1.0 (*10 present)']
+                        ph,txt,cls,_k=lookup_as(drug,float(spec['useRecommendationKey'])); akey='1.0 (*10 present)'
+                        r['tests_requirement']="R44: activity score exactly 1.0 with a *10 allele present uses CPIC's '1.0 (*10 allele present)' titration row (YELLOW), not the standard 1.0 row."
                 src='CPIC opioids 2021 (phenoconversion rule stated in guideline)' if drug in('codeine','tramadol') else 'CPIC atomoxetine 2019 recs by AS; inhibitor handling per FDA label + CPIC atomoxetine narrative'
                 r.update(adjusted_AS=adj,adjusted_phenotype=pheno(adj),phenoconverted='yes' if pheno(adj)!=p else 'no',alert=alert_for(drug,pop,akey),cpic_recommendation=txt,cpic_strength=cls,source=src)
                 if strength=='strong' and p=='Ultrarapid Metabolizer':
@@ -132,6 +138,16 @@ for pid,dip6,dip19,meds,drug,note in cases:
     if drug in ('codeine','tramadol') and not orig_meds and r.get('genotype_AS')!='':
         # Genotype-only case (no medications, so no inhibitor): cite the phenotype recommendation, not the phenoconversion rule.
         r['source']=f"CPIC opioid guideline 2021, CYP2D6 {r['genotype_phenotype'].lower().replace(' metabolizer','-metabolizer')} {drug} recommendation."
+    if pid=='P15': r['source']="CPIC atomoxetine guideline 2019, adult-dose table, row '1.0 (*10 allele not present)' (adults)."
+    if pid=='P22': r['source']='CPIC opioid guideline 2021, CYP2D6 normal-metabolizer codeine recommendation; FDA CYP2D6 inhibitor classification (sertraline: weak, no modeled adjustment).'
+    if pid=='P23': r['source']='CPIC atomoxetine guideline 2019, adult-dose table, CYP2D6 intermediate-metabolizer row (activity score 0.5) (adults).'
+    if pid=='P25': r['source']="CPIC atomoxetine guideline 2019, adult-dose table, row '1.0 (*10 allele present)' (adults)."
+    if pid=='P14': r['source']='CPIC atomoxetine guideline 2019, CYP2D6 poor-metabolizer atomoxetine recommendation (adults).'  # no inhibitor on this row
+    if pid=='P11': r['source']='CPIC opioid guideline 2021, CYP2D6 strong-inhibitor phenoconversion convention and tramadol poor-metabolizer recommendation; FDA CYP2D6 inhibitor classification.'
+    if pid=='P12':
+        # Pins R22: adding an inhibitor re-checks every medication already on the list.
+        r['triggered_by']=added
+        r['tests_requirement']=f"R22: adding {added} re-checks every medication already on the list; the alert is on {drug} (affected medication), triggered by {added} (added medication)."
     r['note']=note; r.setdefault('extra_flag',''); r.setdefault('confidence','standard'); r.setdefault('inhibitor_note','')
     rows.append(r)
 cols=list(dict.fromkeys(k for r in rows for k in r)); cols=[c for c in cols if c not in('note','extra_flag')]+['extra_flag','note']

@@ -150,7 +150,6 @@ export function StoryRow({
   }
 
   return (
-  return (
     <section
       aria-label="How current medications change this assessment"
       className="panel rounded-2xl p-4 sm:p-5"

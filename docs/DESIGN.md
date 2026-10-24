@@ -1,3 +1,11 @@
+# Exact-reference UI-only handoff (latest direction, 2026-10-24)
+
+The user supplied a final screenshot and explicitly requested only the UI, with backend integration handled separately. This supersedes the compact connected-workbench visual direction below for the default screen.
+
+The default entry renders a controlled presentation view with a separate local demo adapter. It uses the open molecular background, prominent DNA and enzyme artwork, three stage headings without enclosing cards, glossy pathway particles, an unboxed metabolism ruler and a full-width petrol verdict band. The initial Sarah / fluoxetine / codeine fixture matches the reference state. Normal and inhibited motion is illustrative and pausable, with a static reduced-motion version.
+
+Public integration types live in `web/src/ui/types.ts`; the presentation component accepts values/results and emits input/check/reset/evidence/explanation callbacks. It makes no network calls and computes no clinical decisions. The previous connected app remains in `web/src/ConnectedApp.tsx` as an unmounted reference. Existing engine, API and clinical data remain available for the backend team.
+
 # RxGene design spec
 
 ## Implementation refresh — October 24, 2026

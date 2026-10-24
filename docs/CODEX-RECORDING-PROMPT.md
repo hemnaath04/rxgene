@@ -83,12 +83,10 @@ S9 EHR       https://sandbox.cds-hooks.org  → "Rx View". The RxGene service
              Medication and pick "Codeine sulfate 30 MG Oral Tablet". Rest on the RxGene card
              ("Insufficient data…" is correct: the sandbox patient has no genotype).
 S10 KIRO     Open a Terminal window (dark theme, font 16 pt, sized 1440×900) in ~/projects/rxgene.
-             Record these, typed at a natural speed, pausing 3 s after each output:
-               1) less +/R21 .kiro/specs/rxgene-engine/requirements.md   (show R21, then q)
-               2) grep -n "Shrunk counterexample" -A1 .kiro/specs/rxgene-engine/analysis.md
-               3) printf '{"hook_event_name":"preToolUse","tool_name":"fs_write","tool_input":{"path":"data/inhibitors.json"}}' | node scripts/kiro-guard-clinical-data.mjs; echo "exit=$?"
-                  (shows the guard blocking the write, exit=2)
-               4) ls .kiro/briefs | head -25
+             Type `scripts/demo-kiro.sh` (don't press Enter yet), start the recording, wait 1 s,
+             press Enter. The script clears the screen and runs, with pauses, the R21 spec rule, the
+             property-test counterexample, the fix commit, "13 passed", and the Kiro hook blocking
+             a clinical-data write (exit=2). It takes about 20 s. Don't type anything else.
 S11 CLOSE    https://rxgene.vercel.app/?patient=sarah&add=codeine  — rest on the headline, "Slow" and the
              verdict band. No clicks.
 

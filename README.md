@@ -75,6 +75,12 @@ docs/             hackathon plan, verified team answers
 4. Refresh the data if needed: `python3 scripts/fetch_cpic.py`.
 5. Build the engine against `tests/fixtures/expected_outputs.json` first, then the UI.
 
+## Git workflow
+
+- Push straight to `dev`. `main` only changes through a PR from `dev`.
+- After cloning, run `git config core.hooksPath .githooks` once. The hook blocks direct pushes to `main`.
+- Merge `dev` into `main` (via PR) before submitting. Judges read `main`.
+
 ## Test patients
 
 21 synthetic cases cover genotype-only alerts, phenoconversion (strong and moderate

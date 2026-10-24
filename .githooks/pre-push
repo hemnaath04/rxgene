@@ -1,0 +1,11 @@
+#!/bin/sh
+# Block direct pushes to main. Changes reach main only through a PR from dev.
+# Enable once per clone: git config core.hooksPath .githooks
+while read local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ]; then
+    echo "Direct push to main is blocked. Push to dev and open a PR:"
+    echo "  git push origin dev && gh pr create --base main --head dev --fill"
+    exit 1
+  fi
+done
+exit 0

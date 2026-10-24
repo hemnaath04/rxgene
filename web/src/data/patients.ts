@@ -76,6 +76,14 @@ export const patients: PresetPatient[] = [
   },
 ];
 
-export function findPatient(id: string): PresetPatient | undefined {
-  return patients.find(p => p.id === id);
+/** Find a preset by ID ('P01') or by name ('sarah'), case-insensitively. */
+export function findPatient(idOrName: string): PresetPatient | undefined {
+  const key = idOrName.trim().toLowerCase();
+  if (!key) return undefined;
+  return patients.find(p => p.id.toLowerCase() === key || p.name.toLowerCase() === key);
+}
+
+/** The name used in the URL (?patient=sarah). */
+export function patientSlug(patient: PresetPatient): string {
+  return patient.name.toLowerCase();
 }

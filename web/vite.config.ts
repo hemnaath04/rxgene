@@ -15,7 +15,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    // Engine tests (src/**) plus the CDS Hooks handler tests (api/**)
-    include: ['src/**/*.test.{ts,tsx}', 'api/**/*.test.ts']
+    // Engine/UI tests (src/**), CDS Hooks handler tests (api/**), dev plugin tests (vite-plugins/**)
+    include: ['src/**/*.test.{ts,tsx}', 'api/**/*.test.ts', 'vite-plugins/**/*.test.ts']
   }
 })

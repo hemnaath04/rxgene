@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { GREEN_ALERT_TEXT } from '@/engine/cdsCard';
-import type { Alert, DrugAssessment } from '@/engine/types';
+import type { Alert, CdsCard, DrugAssessment } from '@/engine/types';
 
 // UI wording (docs/PLAN-v3.md "UI language"). Technical terms will move to the EvidenceDrawer.
 const PHENOCONVERSION_TEXT = "Another medicine changed how this patient's genes work.";
@@ -54,6 +54,38 @@ function formatScore(score: number | null): string | null {
   return score !== null && Number.isFinite(score) ? score.toFixed(2) : null;
 }
 
+/** Where a card's alert level came from. */
+export type CardVia = 'cds-hooks' | 'local-fallback' | 'local';
+
+const VIA_LABEL: Record<CardVia, string> = {
+  'cds-hooks': 'via CDS Hooks',
+  'local-fallback': 'local fallback',
+  local: 'local',
+};
+
+function ViaBadge({ via }: { via: CardVia }) {
+  return <Badge variant="outline">{VIA_LABEL[via]}</Badge>;
+}
+
+function MismatchWarning({ text }: { text: string }) {
+  return (
+    <p role="alert" className="font-semibold text-destructive">
+      Mismatch: {text} Do not act on this card; ask a pharmacist.
+    </p>
+  );
+}
+
+type AlertCardProps = {
+  assessment: DrugAssessment;
+  via?: CardVia;
+  /** Alert level from the server card (EHR mode). Defaults to the assessment's level. */
+  alert?: Alert;
+  /** Server card summary, used as the title when the levels disagree. */
+  cdsSummary?: string;
+  /** Set when the server card and the local engine disagree. */
+  mismatch?: string;
+};
+
 type PhenotypeColumnProps = {
   title: string;
   phenotype: string;
@@ -75,19 +107,22 @@ function PhenotypeColumn({ title, phenotype, activityScore }: PhenotypeColumnPro
   );
 }
 
-export function AlertCard({ assessment: a }: { assessment: DrugAssessment }) {
+export function AlertCard({ assessment: a, via = 'local', alert, cdsSummary, mismatch }: AlertCardProps) {
+  // In EHR mode the level comes from the server card; the local assessment fills in detail.
+  const shown = alert ?? a.alert;
   return (
     <Card>
       <CardHeader>
         <CardTitle>
-          <Badge variant={BADGE_VARIANT[a.alert]}>{a.alert}</Badge> {headline(a)}
+          <Badge variant={BADGE_VARIANT[shown]}>{shown}</Badge> {mismatch && cdsSummary ? cdsSummary : headline(a)}
         </CardTitle>
         <CardDescription>
-          Gene result: {a.gene} {a.genotype ?? 'none on file'}
+          <ViaBadge via={via} /> Gene result: {a.gene} {a.genotype ?? 'none on file'}
           {a.triggeredBy !== a.drug && ` · Re-checked because ${a.triggeredBy} was added`}
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {mismatch && <MismatchWarning text={mismatch} />}
         {/* R19: genotype phenotype and adjusted phenotype always side by side */}
         <dl className="grid grid-cols-2 gap-4">
           <PhenotypeColumn
@@ -142,17 +177,42 @@ export function AlertCard({ assessment: a }: { assessment: DrugAssessment }) {
 }
 
 /** GREY card for a drug RxGene has no CPIC guideline for (checkOrder returns no assessment). */
-export function NotCoveredCard({ drug }: { drug: string }) {
+export function NotCoveredCard({ drug, via = 'local' }: { drug: string; via?: CardVia }) {
   return (
     <Card>
       <CardHeader>
         <CardTitle>
           <Badge variant={BADGE_VARIANT.GREY}>GREY</Badge> {capitalize(drug)}: not assessed
         </CardTitle>
-        <CardDescription>RxGene has no CPIC guideline for this drug.</CardDescription>
+        <CardDescription>
+          <ViaBadge via={via} /> RxGene has no CPIC guideline for this drug.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <p>{NOT_ASSESSED_TEXT}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+/**
+ * A server card the local engine has no matching assessment for. Shown as returned,
+ * always with the mismatch warning.
+ */
+export function CdsOnlyCard({ card, alert, mismatch }: { card: CdsCard; alert: Alert; mismatch: string }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          <Badge variant={BADGE_VARIANT[alert]}>{alert}</Badge> {card.summary}
+        </CardTitle>
+        <CardDescription>
+          <ViaBadge via="cds-hooks" />
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <MismatchWarning text={mismatch} />
+        <p className="whitespace-pre-wrap">{card.detail}</p>
       </CardContent>
     </Card>
   );

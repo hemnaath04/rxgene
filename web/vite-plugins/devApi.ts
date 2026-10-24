@@ -15,9 +15,40 @@ const CORS_HEADERS: Record<string, string> = {
 // Same paths as the "headers" sources in vercel.json
 const CORS_PATH = /^\/(api\/)?cds-services(\/.*)?$/;
 
-/** vercel.json rewrites: /cds-services and /cds-services/:path* -> /api/cds-services/... */
-function rewrite(pathname: string): string {
-  return /^\/cds-services(\/|$)/.test(pathname) ? `/api${pathname}` : pathname;
+// Query params Vite adds to module requests (?import, ?t=<hmr timestamp>, ?v=<dep hash>).
+const VITE_MODULE_PARAMS = ['import', 't', 'v'];
+
+// One route segment, e.g. a CDS service id. No dots (file extensions), no leading '_'.
+const SEGMENT = '[A-Za-z0-9][A-Za-z0-9_-]*';
+
+// The only paths the plugin serves. Everything else (including /api/_lib/*.ts, which the
+// browser imports as an ES module via cdsClient.ts) goes to Vite.
+const API_ROUTES: RegExp[] = [
+  /^\/api\/summary$/,
+  new RegExp(`^/api/cds-services(?:/${SEGMENT})?$`),
+  new RegExp(`^/cds-services(?:/${SEGMENT})?$`)
+];
+
+/**
+ * Match a request URL (path + query) against the real API routes. Returns the handler
+ * path under /api (applying the vercel.json /cds-services rewrite), or null when Vite
+ * should serve the request: module queries, /api/_lib/, file extensions, other paths.
+ */
+export function matchApiRoute(requestUrl: string): string | null {
+  let url: URL;
+  try {
+    url = new URL(requestUrl, 'http://localhost');
+  } catch {
+    return null;
+  }
+  if (VITE_MODULE_PARAMS.some(p => url.searchParams.has(p))) return null;
+
+  const pathname = url.pathname.length > 1 ? url.pathname.replace(/\/+$/, '') : url.pathname;
+  if (/^\/api\/_lib(\/|$)/.test(pathname)) return null;
+  if (pathname.slice(pathname.lastIndexOf('/') + 1).includes('.')) return null;
+  if (!API_ROUTES.some(route => route.test(pathname))) return null;
+
+  return pathname.startsWith('/api/') ? pathname : `/api${pathname}`;
 }
 
 /**
@@ -82,9 +113,9 @@ export function devApi(): Plugin {
 
       // Registered directly (not in a returned hook), so it runs before Vite's SPA fallback.
       server.middlewares.use((req, res, next) => {
+        const pathname = matchApiRoute(req.url ?? '/');
+        if (!pathname) return next();
         const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
-        const pathname = rewrite(url.pathname);
-        if (pathname !== '/api' && !pathname.startsWith('/api/')) return next();
 
         const cors = CORS_PATH.test(url.pathname) ? CORS_HEADERS : {};
         const method = (req.method ?? 'GET').toUpperCase();

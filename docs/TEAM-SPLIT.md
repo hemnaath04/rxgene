@@ -113,3 +113,9 @@ checklist ticked.
 - **Mithuna:** brief 11 (verdict layout), then `.kiro/briefs/mithuna-12-consult-agent.md`, working on the dev preview by 5:00.
 - **Claude:** verifies the live agent on the preview, then merges to main before the 5:30 freeze.
 - **Pitch line:** "An AI agent drafts the pharmacist's consult note, but every sentence cites a rule-engine result, and if it can't, you get the deterministic template."
+
+## Added at 3:00 PM: more Kiro features
+
+- **Mithuna:** brief 14 (`.kiroignore`, a PreToolUse guard on clinical data, a Stop hook that runs the tests). Order: 13 → 14 → 12.
+- **Ananya:** `ananya-03-analyze-and-agent-spec.md` (Analyze Requirements on R1–R56, plus the consult-agent design.md and tasks.md), by 3:45.
+

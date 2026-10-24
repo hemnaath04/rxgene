@@ -1,0 +1,384 @@
+/*
+ * Scoped styles for the UI-only RxGene exact scene. A desktop proportional coordinate system
+ * (--u = 1/1586 of the viewport width) reproduces the reference layout at 1586x992 and scales
+ * it down linearly at 1440x900 etc. Only the control bar and the bottom verdict have surfaces;
+ * the scene itself is open and full-bleed. Below 1100px a responsive flow layout is used.
+ */
+
+.rx {
+  --rx-ink: #062647;
+  --rx-ink-soft: #2b5a74;
+  --rx-marine: #1c6a93;
+  --rx-coral: #ff4b25;
+  --rx-green: #46c24a;
+  --rx-blue-dot: #7fb4d6;
+  --rx-line: #2b5a74;
+  --rx-control-border: #9ec6de;
+  --rx-glass: rgba(236, 248, 253, 0.72);
+  --rx-glass-border: rgba(255, 255, 255, 0.75);
+  /* viewport-relative length unit, defined for desktop below */
+  --u: 1px;
+
+  position: relative;
+  min-height: 100dvh;
+  isolation: isolate;
+  color: var(--rx-ink);
+  font-family: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  background:
+    radial-gradient(120% 85% at 0% 0%, #d7eef8, transparent 66%),
+    radial-gradient(95% 72% at 100% 100%, rgba(255, 221, 170, 0.45), transparent 70%),
+    #e6f4fb;
+}
+
+.rx h1,
+.rx h2,
+.rx h3 {
+  font-family: 'Sora Variable', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Full-bleed molecular photo + readable central scrim. */
+.rx::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image: url('/art/molecular-background.webp');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.92;
+}
+.rx::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(130% 92% at 50% 40%, rgba(240, 250, 254, 0.82), rgba(230, 244, 251, 0.3) 55%, transparent 78%),
+    linear-gradient(to bottom, rgba(230, 244, 251, 0.35), transparent 22%, transparent 70%);
+}
+
+.rx-glass {
+  background: var(--rx-glass);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--rx-glass-border);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 12px 34px -20px rgba(6, 38, 71, 0.4);
+}
+
+.rx-press {
+  transition: background-color 150ms ease, transform 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (prefers-reduced-motion: no-preference) and (pointer: fine) {
+  .rx-press:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+}
+
+/* ---- Glossy spherical particles ---- */
+.rx-sphere {
+  border-radius: 9999px;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 38%),
+    radial-gradient(circle at 50% 50%, var(--c1), var(--c2) 70%);
+  box-shadow: 0 0 10px 1px var(--halo), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+.rx-sphere-green { --c1: #8be36a; --c2: #2f9f3a; --halo: rgba(70, 194, 74, 0.55); }
+.rx-sphere-coral { --c1: #ff8a5f; --c2: #e23a17; --halo: rgba(255, 75, 37, 0.6); }
+.rx-sphere-blue { --c1: #bcd9ec; --c2: #87b4d4; --halo: rgba(127, 180, 214, 0.35); }
+
+/* Keyframes include translateY(-50%) because animation replaces the inline transform. */
+@keyframes rx-travel {
+  0% { transform: translate(0, -50%); opacity: 0; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { transform: translate(var(--rx-travel-x, 300px), -50%); opacity: 0; }
+}
+.rx-anim-travel {
+  animation: rx-travel 2.6s linear infinite;
+  animation-delay: var(--rx-delay, 0s);
+}
+@keyframes rx-pulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+.rx-anim-pulse { animation: rx-pulse 2s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rx-anim-travel,
+  .rx-anim-pulse { animation: none; }
+  .rx-anim-travel { opacity: 1; transform: translateY(-50%); }
+}
+
+/* Local clip so moving spheres never create a scrollbar. */
+.rx-flow-clip { overflow: hidden; }
+
+.rx-enzyme-glow {
+  position: absolute;
+  inset: 10% 14%;
+  border-radius: 9999px;
+  filter: blur(16px);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+.rx-enzyme-glow[data-active='true'] { opacity: 0.6; background: radial-gradient(circle, rgba(70, 194, 74, 0.45), transparent 66%); }
+.rx-enzyme-glow[data-blocked='true'] { opacity: 0.7; background: radial-gradient(circle, rgba(255, 75, 37, 0.5), transparent 64%); }
+@media (prefers-reduced-motion: reduce) { .rx-enzyme-glow { transition: none; } }
+
+/* DNA crop wrapper: hide the asset's huge transparent side margins. */
+.rx-dna-frame { position: relative; overflow: hidden; }
+.rx-dna-frame::after {
+  /* soft fade at the bottom edge of the crop */
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 18%;
+  background: linear-gradient(to bottom, transparent, #e6f4fb);
+  pointer-events: none;
+}
+.rx-dna-img { position: absolute; object-fit: contain; max-width: none; }
+
+/* ---- Bottom verdict full-bleed band (blue petrol, not near-black) ---- */
+.rx-verdict {
+  position: relative;
+  border-top: 1px solid rgba(180, 230, 245, 0.7);
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  background: linear-gradient(180deg, rgba(16, 70, 102, 0.92), rgba(10, 52, 80, 0.95));
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+}
+
+/* =====================================================================
+ * DESKTOP proportional coordinate system (>= 1100px)
+ * ===================================================================== */
+@media (min-width: 1100px) {
+  .rx { --u: calc(100vw / 1586); }
+
+  .rx-shell { position: relative; width: 100%; min-height: 100dvh; }
+
+  /* Header */
+  .rx-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: calc(70 * var(--u));
+    padding: 0 calc(60 * var(--u));
+  }
+  .rx-brand { font-size: calc(40 * var(--u)); line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
+  .rx-descriptor { font-size: calc(22 * var(--u)); color: var(--rx-marine); font-weight: 500; }
+  .rx-header-right { display: flex; align-items: center; gap: calc(22 * var(--u)); }
+  .rx-header-right .rx-hitem { font-size: calc(17 * var(--u)); }
+
+  /* Control bar: top69, left/right46, h109, radius24 */
+  .rx-controls {
+    position: absolute;
+    top: calc(69 * var(--u));
+    left: calc(46 * var(--u));
+    width: calc(1494 * var(--u));
+    height: calc(109 * var(--u));
+    border-radius: calc(24 * var(--u));
+    display: grid;
+    grid-template-columns: calc(305 * var(--u)) calc(371 * var(--u)) calc(351 * var(--u)) 1fr;
+    align-items: center;
+    column-gap: calc(39 * var(--u));
+    padding: 0 calc(31 * var(--u));
+  }
+  .rx-field-label { font-size: calc(17 * var(--u)); color: var(--rx-marine); font-weight: 500; margin-bottom: calc(6 * var(--u)); display: block; }
+  .rx-field-control { height: calc(48 * var(--u))!important; border-radius: calc(12 * var(--u)); font-size: calc(22 * var(--u)); }
+  .rx-check-btn {
+    height: calc(66 * var(--u));
+    border-radius: calc(12 * var(--u));
+    font-size: calc(22 * var(--u));
+    padding: 0 calc(26 * var(--u));
+    white-space: nowrap;
+  }
+  .rx-check-btn svg { flex: none; }
+  /* faint dividers between the first three control columns (reference x382 / x792) */
+  .rx-controls > :nth-child(1) { padding-right: calc(32 * var(--u)); border-right: 1px solid rgba(158, 198, 222, 0.6); }
+  .rx-controls > :nth-child(2) { padding-right: calc(37 * var(--u)); border-right: 1px solid rgba(158, 198, 222, 0.6); }
+
+  /* Title block: top185, left79 */
+  .rx-title-block { position: absolute; top: calc(185 * var(--u)); left: calc(79 * var(--u)); right: calc(46 * var(--u)); }
+  .rx-title { font-size: calc(62 * var(--u)); line-height: 1.03; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; }
+  .rx-subtitle { font-size: calc(27 * var(--u)); color: var(--rx-ink-soft); margin-top: calc(6 * var(--u)); }
+
+  /* Scene: top302, height538 */
+  .rx-scene { position: absolute; top: calc(302 * var(--u)); left: 0; width: 100%; height: calc(538 * var(--u)); }
+
+  /* Stage headings at scene-top 0 */
+  .rx-stage-head { position: absolute; top: 0; display: flex; align-items: center; gap: calc(12 * var(--u)); }
+  .rx-stage-head .rx-num {
+    width: calc(48 * var(--u)); height: calc(48 * var(--u)); border-radius: 9999px;
+    border: 1px solid rgba(6, 38, 71, 0.25); display: flex; align-items: center; justify-content: center;
+    font-size: calc(18 * var(--u)); font-weight: 600; color: var(--rx-marine); flex: none;
+  }
+  .rx-stage-head h2 { font-size: calc(24 * var(--u)); font-weight: 600; white-space: nowrap; }
+  .rx-stage-head .rx-rule { height: 1px; background: rgba(6, 38, 71, 0.15); flex: 1; }
+  .rx-head-1 { left: calc(79 * var(--u)); width: calc(520 * var(--u)); }
+  .rx-head-2 { left: calc(630 * var(--u)); width: calc(534 * var(--u)); }
+  .rx-head-3 { left: calc(1193 * var(--u)); width: calc(310 * var(--u)); }
+
+  /* Scene body region — child coordinates are already relative to the Scene origin. */
+  .rx-body { position: absolute; top: 0; left: 0; width: 100%; height: calc(538 * var(--u)); }
+
+  /* 01 baseline copy + DNA */
+  .rx-baseline-copy { position: absolute; left: calc(76 * var(--u)); top: calc(130 * var(--u)); width: calc(175 * var(--u)); }
+  .rx-baseline-dip { font-size: calc(22 * var(--u)); font-weight: 700; white-space: nowrap; }
+  .rx-baseline-phen { font-size: calc(20 * var(--u)); }
+  .rx-baseline-lock { position: absolute; left: calc(76 * var(--u)); top: calc(210 * var(--u)); display: flex; align-items: flex-start; gap: calc(8 * var(--u)); font-size: calc(16 * var(--u)); color: var(--rx-ink-soft); }
+  .rx-baseline-lock span { display: inline-block; width: calc(100 * var(--u)); line-height: 1.15; }
+  .rx-dna-frame {
+    position: absolute; left: calc(218 * var(--u)); top: calc(42 * var(--u));
+    width: calc(200 * var(--u)); height: calc(390 * var(--u));
+  }
+  .rx-dna-img { width: calc(435 * var(--u)); height: calc(652 * var(--u)); left: calc(-125 * var(--u)); top: calc(-20 * var(--u)); }
+
+  /* Inherited capability annotation */
+  .rx-capability { position: absolute; left: calc(404 * var(--u)); top: calc(135 * var(--u)); width: calc(190 * var(--u)); font-size: calc(20 * var(--u)); line-height: 1.15; }
+  .rx-capability-arrow { position: absolute; left: calc(404 * var(--u)); top: calc(185 * var(--u)); width: calc(274 * var(--u)); height: calc(2 * var(--u)); background: rgba(43, 90, 116, 0.6); }
+  .rx-capability-arrow::before { content: ''; position: absolute; left: calc(-4 * var(--u)); top: 50%; width: calc(8 * var(--u)); height: calc(8 * var(--u)); border-radius: 9999px; background: var(--rx-line); transform: translateY(-50%); }
+  .rx-capability-arrow::after { content: ''; position: absolute; right: calc(-2 * var(--u)); top: 50%; border-top: calc(5 * var(--u)) solid transparent; border-bottom: calc(5 * var(--u)) solid transparent; border-left: calc(7 * var(--u)) solid var(--rx-line); transform: translateY(-50%); }
+
+  /* Capsule */
+  .rx-capsule-wrap { position: absolute; left: calc(435 * var(--u)); top: calc(226 * var(--u)); width: calc(75 * var(--u)); }
+  .rx-capsule { width: calc(75 * var(--u)); height: calc(33 * var(--u)); border-radius: 9999px; overflow: hidden; border: calc(2 * var(--u)) solid var(--rx-marine); display: flex; }
+  .rx-capsule > span { flex: 1; }
+  .rx-capsule > span:first-child { background: #eaf4fb; }
+  .rx-capsule > span:last-child { background: #ffffff; }
+  .rx-capsule-label { font-size: calc(22 * var(--u)); font-weight: 600; text-align: center; margin-top: calc(6 * var(--u)); }
+
+  /* Enzyme image */
+  .rx-enzyme { position: absolute; left: calc(675 * var(--u)); top: calc(128 * var(--u)); width: calc(340 * var(--u)); height: calc(227 * var(--u)); }
+  .rx-enzyme img { width: 100%; height: 100%; object-fit: contain; }
+  .rx-enzyme-label { position: absolute; left: calc(735 * var(--u)); top: calc(338 * var(--u)); font-size: calc(22 * var(--u)); font-weight: 700; white-space: nowrap; }
+
+  /* Inhibitor badge */
+  .rx-inhibitor { position: absolute; left: calc(731 * var(--u)); top: calc(45 * var(--u)); width: calc(240 * var(--u)); }
+  .rx-inhibitor-badge { height: calc(64 * var(--u)); border-radius: calc(12 * var(--u)); border: calc(2 * var(--u)) solid var(--rx-coral); background: rgba(255, 236, 230, 0.9); display: flex; align-items: center; gap: calc(10 * var(--u)); padding: 0 calc(14 * var(--u)); }
+  .rx-inhibitor-drug { font-size: calc(25 * var(--u)); font-weight: 700; color: var(--rx-coral); line-height: 1.05; }
+  .rx-inhibitor-strength { font-size: calc(18 * var(--u)); color: var(--rx-coral); }
+  .rx-inhibitor-stem { position: absolute; left: 50%; top: calc(64 * var(--u)); width: calc(4 * var(--u)); height: calc(46 * var(--u)); background: var(--rx-coral); transform: translateX(-50%); }
+  .rx-inhibitor-tcap { position: absolute; left: 50%; top: calc(108 * var(--u)); width: calc(34 * var(--u)); height: calc(4 * var(--u)); background: var(--rx-coral); transform: translateX(-50%); }
+
+  /* Particle path: left520, center at scene 261 (global y547). Height 60u so the 48u coral
+     pile/gate don't clip; top = 261 - 30 = 231. */
+  .rx-path { position: absolute; left: calc(520 * var(--u)); top: calc(231 * var(--u)); width: calc(680 * var(--u)); height: calc(60 * var(--u)); }
+  .rx-path-line { position: absolute; inset-inline: 0; top: 50%; transform: translateY(-50%); border-top: 1px solid rgba(6, 38, 71, 0.22); }
+  .rx-path-line[data-dashed='true'] { border-top-style: dashed; }
+  .rx-gate { position: absolute; left: calc(312 * var(--u)); top: 50%; width: calc(8 * var(--u)); height: calc(48 * var(--u)); border-radius: 9999px; background: var(--rx-coral); transform: translateY(-50%); box-shadow: 0 0 calc(12 * var(--u)) calc(2 * var(--u)) rgba(255, 75, 37, 0.6); }
+
+  /* Output label to the RIGHT of the enzyme */
+  .rx-output { position: absolute; left: calc(1060 * var(--u)); top: calc(180 * var(--u)); width: calc(160 * var(--u)); font-size: calc(20 * var(--u)); line-height: 1.15; }
+
+  /* 03 current response */
+  .rx-current { position: absolute; left: calc(1256 * var(--u)); top: calc(100 * var(--u)); width: calc(280 * var(--u)); }
+  .rx-current-label { font-size: calc(20 * var(--u)); }
+  .rx-current-word { font-size: calc(110 * var(--u)); line-height: 0.95; font-weight: 700; letter-spacing: -0.02em; }
+  .rx-current-word[data-small='true'] { font-size: calc(46 * var(--u)); line-height: 1.02; }
+  .rx-current-underline { width: calc(200 * var(--u)); height: calc(2 * var(--u)); background: var(--rx-marine); opacity: 0.6; margin-top: calc(6 * var(--u)); }
+  .rx-current-score { font-size: calc(22 * var(--u)); margin-top: calc(10 * var(--u)); }
+  .rx-current-note { font-size: calc(18 * var(--u)); color: var(--rx-marine); }
+
+  /* Caption + concept caption centered */
+  .rx-caption { position: absolute; left: 0; right: 0; top: calc(381 * var(--u)); text-align: center; font-size: calc(23 * var(--u)); }
+  .rx-concept { position: absolute; left: 0; right: 0; top: calc(416 * var(--u)); display: flex; align-items: center; justify-content: center; gap: calc(14 * var(--u)); font-size: calc(16 * var(--u)); color: var(--rx-marine); }
+
+  /* Ruler: left376, top445, width835 */
+  .rx-ruler { position: absolute; left: calc(376 * var(--u)); top: calc(445 * var(--u)); width: calc(835 * var(--u)); height: calc(80 * var(--u)); }
+
+  /* Verdict band */
+  .rx-verdict { position: absolute; left: 0; top: calc(840 * var(--u)); width: 100%; height: calc(152 * var(--u)); }
+  .rx-verdict-inner { position: relative; width: 100%; height: 100%; }
+  .rx-v-icon { position: absolute; left: calc(50 * var(--u)); top: calc(40 * var(--u)); width: calc(62 * var(--u)); height: calc(62 * var(--u)); }
+  .rx-v-kicker { position: absolute; left: calc(140 * var(--u)); top: calc(28 * var(--u)); font-size: calc(17 * var(--u)); color: #bcd9ec; }
+  .rx-v-headline { position: absolute; left: calc(140 * var(--u)); top: calc(56 * var(--u)); font-size: calc(48 * var(--u)); font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+  .rx-v-headline[data-long='true'] { font-size: calc(32 * var(--u)); max-width: calc(350 * var(--u)); line-height: 1.05; }
+  .rx-v-qualifier { position: absolute; left: calc(140 * var(--u)); top: calc(109 * var(--u)); font-size: calc(16 * var(--u)); color: #bcd9ec; }
+  .rx-v-divider { position: absolute; left: calc(507 * var(--u)); top: calc(30 * var(--u)); width: 1px; height: calc(92 * var(--u)); background: rgba(255, 255, 255, 0.25); }
+  .rx-v-rationale { position: absolute; left: calc(535 * var(--u)); top: calc(28 * var(--u)); width: calc(620 * var(--u)); font-size: calc(21 * var(--u)); line-height: 1.3; }
+  .rx-v-source { position: absolute; left: calc(535 * var(--u)); top: calc(96 * var(--u)); font-size: calc(17 * var(--u)); color: #bcd9ec; }
+  .rx-v-evidence { position: absolute; left: calc(1221 * var(--u)); top: calc(16 * var(--u)); width: calc(320 * var(--u)); height: calc(49 * var(--u)); border-radius: calc(10 * var(--u)); font-size: calc(17 * var(--u)); }
+  .rx-v-explain { position: absolute; left: calc(1286 * var(--u)); top: calc(81 * var(--u)); font-size: calc(17 * var(--u)); }
+  .rx-v-footer { position: absolute; right: calc(50 * var(--u)); bottom: calc(12 * var(--u)); font-size: calc(12 * var(--u)); color: #9cc4db; }
+}
+
+/* =====================================================================
+ * RESPONSIVE flow (<= 1099px): no absolute positioning, no overflow
+ * ===================================================================== */
+@media (max-width: 1099px) {
+  .rx-shell { display: flex; flex-direction: column; min-height: 100dvh; }
+  .rx-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; }
+  .rx-brand { font-size: 28px; line-height: 1; font-weight: 700; }
+  .rx-descriptor { font-size: 16px; color: var(--rx-marine); font-weight: 500; }
+  .rx-header-right { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+
+  .rx-controls {
+    position: static; width: auto; height: auto;
+    margin: 0 16px; border-radius: 18px; padding: 16px;
+    display: grid; grid-template-columns: 1fr; gap: 14px;
+  }
+  .rx-field-label { font-size: 15px; color: var(--rx-marine); font-weight: 500; margin-bottom: 6px; display: block; }
+  .rx-field-control { height: 48px!important; border-radius: 12px; font-size: 17px; }
+  .rx-check-btn { height: 50px; width: 100%; border-radius: 12px; font-size: 18px; }
+
+  .rx-title-block { position: static; margin: 16px 16px 0; }
+  .rx-title { font-size: clamp(28px, 7vw, 40px); line-height: 1.05; font-weight: 700; }
+  .rx-subtitle { font-size: 15px; color: var(--rx-ink-soft); margin-top: 4px; }
+
+  /* Interleave headings with content: scene is a flex column; body contents are promoted into it
+     via display:contents, then explicit order weaves each heading before its stage. */
+  .rx-scene { position: static; width: auto; height: auto; margin: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .rx-stage-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .rx-stage-head .rx-num { width: 36px; height: 36px; border-radius: 9999px; border: 1px solid rgba(6,38,71,0.25); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; color: var(--rx-marine); }
+  .rx-stage-head h2 { font-size: 18px; font-weight: 600; }
+  .rx-stage-head .rx-rule { display: none; }
+  .rx-head-1, .rx-head-2, .rx-head-3 { position: static; width: auto; }
+  .rx-body { display: contents; }
+  .rx-head-1 { order: 1; }
+  .rx-body > .rx-m-stage:nth-of-type(1) { order: 2; }
+  .rx-head-2 { order: 3; }
+  .rx-body > .rx-m-stage:nth-of-type(2) { order: 4; }
+  .rx-head-3 { order: 5; }
+  .rx-current { order: 6; }
+  .rx-caption { order: 7; }
+  .rx-concept { order: 8; }
+  .rx-ruler { order: 9; }
+
+  .rx-baseline-copy, .rx-baseline-lock, .rx-capability, .rx-capability-arrow, .rx-capsule-wrap,
+  .rx-enzyme, .rx-enzyme-label, .rx-inhibitor, .rx-output, .rx-current, .rx-caption,
+  .rx-concept, .rx-ruler, .rx-dna-frame {
+    position: static; left: auto; top: auto; width: auto;
+  }
+  .rx-baseline-lock span { width: auto; }
+  /* Particle layer: keep it clipped to a fixed band so absolute spheres can't overflow. */
+  .rx-path { position: relative; left: auto; top: auto; width: 100%; max-width: 420px; height: 40px; margin: 4px auto 0; }
+  .rx-gate { left: 60%; }
+  .rx-m-stage { display: flex; flex-direction: column; gap: 8px; }
+  .rx-m-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .rx-dna-frame { position: relative; width: 120px; height: 230px; overflow: hidden; }
+  .rx-dna-img { position: absolute; width: 260px; height: 390px; left: -74px; top: -12px; object-fit: contain; max-width: none; }
+  .rx-enzyme { width: 100%; max-width: 320px; height: auto; }
+  .rx-enzyme img { width: 100%; height: auto; }
+  .rx-current-word { font-size: clamp(44px, 12vw, 72px); line-height: 1; font-weight: 700; }
+  .rx-current-word[data-small='true'] { font-size: clamp(26px, 7vw, 36px); }
+  .rx-ruler { width: calc(100% - 40px); max-width: 560px; margin: 8px auto 0; }
+
+  .rx-verdict { position: static; width: auto; }
+  .rx-verdict-grid { display: flex; flex-direction: column; gap: 12px; padding: 18px 20px; }
+  .rx-v-row { display: block; }
+  .rx-v-icon { width: 40px; height: 40px; }
+  .rx-v-kicker { font-size: 14px; color: #bcd9ec; }
+  .rx-v-headline { font-size: clamp(26px, 7vw, 40px); font-weight: 700; line-height: 1.02; }
+  .rx-v-qualifier { font-size: 14px; color: #bcd9ec; }
+  .rx-v-divider { display: none; }
+  .rx-v-rationale { font-size: 16px; line-height: 1.35; }
+  .rx-v-source { font-size: 14px; color: #bcd9ec; }
+  .rx-v-evidence { height: 48px; width: 100%; max-width: 320px; border-radius: 10px; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .rx-v-explain { font-size: 16px; display: inline-flex; align-items: center; gap: 8px; }
+  .rx-v-footer { font-size: 12px; color: #9cc4db; }
+}

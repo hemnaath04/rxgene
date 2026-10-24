@@ -3,15 +3,23 @@
 RxGene is a pharmacogenomics safety check. A wrong rule can tell a patient a painkiller will
 work when it won't, so we built it the way you'd build clinical software: **rules first, then
 code, then independent checks that the code still matches the rules.** Kiro was the tool at
-every step. Every line of app code in `web/` was written by Kiro. People and a lead agent wrote
-the specs, reviewed every diff and owned the clinical data.
+every step. Kiro wrote the rule engine, the CDS Hooks and summary APIs, the consult agent, the
+tests and the adapter that connects the UI to real data. People and a lead agent wrote the specs,
+reviewed every diff and owned the clinical data.
+
+**Full disclosure: the desktop visual layer was prototyped in OpenAI Codex.** That's the
+presentation component `web/src/ui/RxGeneUI.tsx` with its CSS and view-model types, the molecular
+artwork in `web/public/art/`, `MoleculeStage`, and restyles of several components (PR #6, about
+2,700 lines, 1:52–4:49 PM). It makes no clinical decisions. Kiro then wired it to the real engine,
+API and consult agent (brief 20, `RxGeneConnected.tsx` + `mapAssessment.ts`).
 
 ## Our AI development strategy
 
 | Role | Who | How |
 |---|---|---|
 | Clinical rules (EARS requirements), expected outputs, source checks | Ananya, our genetics teammate | Kiro spec mode, property-based tests, MCP |
-| All app code: engine, API, UI, consult agent | Mithuna | **Kiro CLI**, headless, one scoped brief at a time |
+| Engine, APIs, consult agent, tests, UI integration | Mithuna, plus the lead agent for brief 20 | **Kiro CLI**, headless, one scoped brief at a time |
+| Desktop visual design and presentation layer | Hemnaath | OpenAI Codex (prototype), integrated by Kiro |
 | Planning, writing briefs, reviewing every diff and deploy | A lead agent on each laptop | 23 briefs in [`.kiro/briefs/`](.kiro/briefs/) |
 
 - **Each Kiro task got a written brief:** which files to touch, which requirements apply, which test cases must pass, and what "done" means. Briefs written after a live test quote the exact failure. For example, brief 16 quotes the measured 9.8 s, 1,238-token final call that was timing out.
@@ -29,7 +37,7 @@ the specs, reviewed every diff and owned the clinical data.
 
 ## Spec-driven development
 
-**[`.kiro/specs/rxgene-engine/requirements.md`](.kiro/specs/rxgene-engine/requirements.md): 56 EARS requirements (R1–R56).**
+**[`.kiro/specs/rxgene-engine/requirements.md`](.kiro/specs/rxgene-engine/requirements.md): 55 active EARS requirements (R1–R56; R23 was removed in review).**
 - Our genetics teammate wrote them before any engine code existed.
 - Example: *"WHEN a patient's genotype activity score is 0 AND any CYP2D6 inhibitor is present, THE SYSTEM SHALL still issue the drug-level alert … AND SHALL include an inhibitor note."*
 - Every alert in the app shows the requirement IDs that produced it (R39), so a clinician can trace any warning back to a rule they can read.
@@ -39,6 +47,8 @@ the specs, reviewed every diff and owned the clinical data.
 - Result: **42 findings: 27 fixed, 3 partly fixed, 2 not a problem, 5 known limitations, 5 open.** Every finding has our decision beside it.
 - The most important one was a real clinical conflict we had missed. **R18** (atomoxetine + a moderate inhibitor gives "not assessed") could hide the alert **R21** requires for a patient who is already a poor metabolizer by genotype.
 - Resolution: R18 now defers to R21. We added fixture P26, and the engine was fixed (commit 7af163b).
+
+**Engine design and tasks ([`design.md`](.kiro/specs/rxgene-engine/design.md), [`tasks.md`](.kiro/specs/rxgene-engine/tasks.md))** complete the engine's requirements → design → tasks flow: architecture, data model and correctness properties, then 24 tasks traced to requirement IDs and commits.
 
 **[`.kiro/specs/consult-agent/`](.kiro/specs/consult-agent/): the full requirements → design → tasks flow** for the pharmacist consult agent.
 - Each of the 8 tasks lists the requirements it satisfies (R45–R56).
@@ -120,7 +130,7 @@ The pharmacist consult agent shows the strategy end to end.
 | | |
 |---|---|
 | Kiro briefs | 23 |
-| EARS requirements | 56 |
+| EARS requirements | 55 active (R1–R56, R23 removed) |
 | Expected-output test patients | 26 |
 | Automated tests | 128, including 13 property tests × 300 cases |
 | Kiro requirements-analysis findings | 42 (27 fixed) |

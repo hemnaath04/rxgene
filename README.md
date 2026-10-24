@@ -57,7 +57,8 @@ integration.
 
 ## How we built it with Kiro
 
-Every line of app code in `web/` was written by **Kiro**, as the event requires. Our
+Kiro wrote the rule engine, APIs, consult agent, tests and the UI's data adapter. The desktop
+visual layer was prototyped in OpenAI Codex and integrated by Kiro ([details](KIRO.md)). Our
 workflow made the safety rules reviewable *before* any code existed:
 
 | Kiro feature | How we used it | Where |

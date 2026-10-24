@@ -1,13 +1,15 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
+/* Local variable fonts (no Google CDN). Sora for headings, Plus Jakarta Sans for body. */
+@import "@fontsource-variable/sora";
+@import "@fontsource-variable/plus-jakarta-sans";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif;
+    --font-heading: 'Sora Variable', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,37 +50,44 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* RxGene design tokens (docs/DESIGN.md section 2). Exact values; don't approximate. */
+/*
+ * RxGene design tokens. Deep ink/navy, medium blue, watery pale-blue surfaces, coral for
+ * inhibitors/RED, illustrative emerald for conceptual particle flow only. Exact values.
+ */
 @theme {
-    --color-ink: oklch(0.24 0.06 255);
-    --color-ink-muted: oklch(0.42 0.05 250);
-    --color-panel: oklch(0.98 0.01 230 / 0.78);
-    --color-panel-solid: oklch(0.98 0.01 230);
-    --color-verdict: oklch(0.30 0.06 230);
-    --color-verdict-muted: oklch(0.85 0.02 230);
-    --color-alert-red: oklch(0.62 0.21 35);
+    --color-ink: oklch(0.29 0.055 245);
+    --color-ink-muted: oklch(0.46 0.045 243);
+    --color-marine: oklch(0.52 0.09 232);
+    /* Visible control boundary (>=3:1 non-text contrast on the pale frosted fill). */
+    --color-control-border: oklch(0.58 0.08 235);
+    --color-panel: oklch(0.985 0.012 225 / 0.72);
+    --color-panel-solid: oklch(0.985 0.012 225);
+    --color-verdict: oklch(0.32 0.055 232);
+    --color-verdict-muted: oklch(0.84 0.025 228);
+    --color-alert-red: oklch(0.60 0.18 33);
     --color-alert-red-text: oklch(0.50 0.19 33);
     --color-alert-amber: oklch(0.72 0.15 75);
     --color-alert-neutral: oklch(0.60 0.03 240);
     --color-alert-grey: oklch(0.55 0.01 250);
+    --color-flow: oklch(0.70 0.15 158);
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
     --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 :root {
-    --background: oklch(0.97 0.02 210);
-    --foreground: oklch(0.24 0.06 255);
+    --background: oklch(0.96 0.02 220);
+    --foreground: oklch(0.29 0.055 245);
     --card: oklch(1 0 0);
-    --card-foreground: oklch(0.24 0.06 255);
+    --card-foreground: oklch(0.29 0.055 245);
     --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.24 0.06 255);
-    /* --color-primary (DESIGN.md): the shadcn theme maps --color-primary to this variable. */
-    --primary: oklch(0.32 0.09 255);
+    --popover-foreground: oklch(0.29 0.055 245);
+    /* shadcn maps --color-primary to this. Rich marine-blue for the primary action. */
+    --primary: oklch(0.42 0.095 240);
     --primary-foreground: oklch(0.985 0 0);
     --secondary: oklch(0.97 0 0);
     --secondary-foreground: oklch(0.205 0 0);
     --muted: oklch(0.95 0.01 230);
-    --muted-foreground: oklch(0.42 0.05 250);
+    --muted-foreground: oklch(0.46 0.045 243);
     --accent: oklch(0.97 0 0);
     --accent-foreground: oklch(0.205 0 0);
     --destructive: oklch(0.577 0.245 27.325);
@@ -145,114 +154,209 @@
   html {
     @apply font-sans;
     }
+  h1, h2, h3 {
+    font-family: var(--font-heading);
+    }
 }
 
-/* Frosted surface for the control bar, story columns, gauge and strip (DESIGN.md section 2). */
+/* Frosted watery surface for the control bar, verdict evidence and sheets. */
 @utility panel {
   background-color: var(--color-panel);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
-  border: 1px solid oklch(1 0 0 / 0.6);
+  border: 1px solid oklch(1 0 0 / 0.55);
+  box-shadow: 0 1px 0 oklch(1 0 0 / 0.5) inset, 0 10px 30px -18px oklch(0.3 0.05 240 / 0.35);
 }
 
 /*
- * Background: layered radial gradients plus soft CSS bokeh at opacity 0.35.
- * No photographic image behind text (DESIGN.md section 5).
+ * Page background: the molecular-background.webp photo as a fixed layer with a quiet-center
+ * scrim so body text stays readable, over a pale-blue radial-gradient fallback that shows if
+ * the image is missing. No photographic image sits directly behind long paragraphs; the scrim
+ * brightens the center.
  */
 .app-bg {
   position: relative;
   isolation: isolate;
   min-height: 100dvh;
   background:
-    radial-gradient(120% 80% at 0% 0%, oklch(0.93 0.04 220), transparent 70%),
-    radial-gradient(90% 70% at 100% 100%, oklch(0.93 0.04 220), transparent 70%),
-    oklch(0.97 0.02 210);
+    radial-gradient(120% 85% at 0% 0%, oklch(0.93 0.045 220), transparent 68%),
+    radial-gradient(95% 72% at 100% 100%, oklch(0.93 0.05 60 / 0.45), transparent 70%),
+    oklch(0.96 0.02 215);
 }
 
 .app-bg::before {
   content: '';
   position: fixed;
   inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image: url('/art/molecular-background.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.9;
+}
+
+/* Quiet-center scrim: brighter in the middle where the content column reads. */
+.app-bg::after {
+  content: '';
+  position: fixed;
+  inset: 0;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.35;
   background:
-    radial-gradient(circle 90px at 6% 30%, oklch(0.86 0.07 220), transparent),
-    radial-gradient(circle 60px at 18% 78%, oklch(0.90 0.06 70), transparent),
-    radial-gradient(circle 120px at 42% 12%, oklch(0.88 0.05 210), transparent),
-    radial-gradient(circle 70px at 64% 70%, oklch(0.90 0.06 60), transparent),
-    radial-gradient(circle 110px at 86% 22%, oklch(0.86 0.07 225), transparent),
-    radial-gradient(circle 80px at 95% 84%, oklch(0.90 0.06 70), transparent),
-    radial-gradient(circle 50px at 32% 52%, oklch(0.90 0.05 200), transparent);
+    radial-gradient(130% 92% at 50% 40%, oklch(0.97 0.015 220 / 0.82), oklch(0.96 0.02 220 / 0.3) 55%, transparent 78%),
+    linear-gradient(to bottom, oklch(0.96 0.02 220 / 0.35), transparent 22%, transparent 78%, oklch(0.96 0.02 220 / 0.45));
 }
 
 /*
- * Buttons (DESIGN.md section 4, "Controls"): press = scale 0.96 over 150 ms --ease-out, never
- * when disabled; hover changes background-color only, over 150 ms ease. Unlayered, so it
- * overrides the shadcn button's transition-all and translate-y press.
+ * Buttons: press = scale 0.96 over 150 ms --ease-out, never when disabled; hover changes
+ * background-color only. Unlayered so it overrides the shadcn button's transition-all.
  */
 .press {
   transition:
     background-color 150ms ease,
     transform 150ms var(--ease-out);
 }
-.press:active:not(:disabled):not([data-disabled]) {
-  transform: scale(0.96);
-  translate: none;
+@media (prefers-reduced-motion: no-preference) and (pointer: fine) {
+  .press:active:not(:disabled):not([data-disabled]) {
+    transform: scale(0.96);
+    translate: none;
+  }
 }
 
 /*
- * Particle flow in story column 02 (DESIGN.md section 4). Predetermined constant motion, so it
- * is a CSS animation on transform only. Each dot is a wrapper as wide as its track that moves
- * translateX(0% -> 100%); the visible dot sits at the wrapper's left edge.
+ * Particle flow through the enzyme in the molecule stage. Predetermined constant motion, so it
+ * is a CSS animation on transform + opacity only. Each dot is a wrapper as wide as its track
+ * that moves translateX(0% -> 100%); the visible dot sits at the wrapper's left edge.
+ *
+ * Playback is gated by data-play on .flow-track: paused (or before an assessment) the dots
+ * rest at evenly spaced positions. No background drift — nothing animates until Play is pressed.
  */
 .flow-track {
   position: relative;
-  height: 16px;
+  height: 20px;
+  /* Clip the full-width particle wrappers so their translateX doesn't cause page scroll. */
   overflow: hidden;
 }
 .flow-line {
   position: absolute;
   inset-inline: 0;
   top: 50%;
-  border-top: 2px solid currentColor;
+  border-top: 2px solid oklch(0.45 0.06 245 / 0.55);
   transform: translateY(-50%);
-  opacity: 0.6;
 }
 .flow-line[data-dashed='true'] {
   border-top-style: dashed;
+  opacity: 0.6;
 }
 .flow-dot {
   position: absolute;
   inset: 0;
+  transform: translateX(var(--rest));
+}
+/* Normal / reduced: particles cross the full width (through the enzyme channel). */
+.flow-track[data-play='true'] .flow-dot {
   animation: rx-flow 2.4s linear infinite;
   animation-delay: calc(var(--i) * -0.48s);
+}
+/* Inhibited: particles travel only up to the gate (center) and fade — no output travel. */
+.flow-track[data-span='gate'][data-play='true'] .flow-dot {
+  animation-name: rx-flow-gate;
 }
 .flow-dot::after {
   content: '';
   position: absolute;
   left: 0;
   top: 50%;
-  width: 10px;
-  height: 10px;
+  width: 11px;
+  height: 11px;
   border-radius: 9999px;
   background: currentColor;
+  box-shadow: 0 0 10px 2px color-mix(in oklch, currentColor 55%, transparent);
   transform: translate(-50%, -50%);
 }
+/* Reduced (constrained) track: sparse, dim, neutral — not a success flow. */
 .flow-track[data-dim='true'] .flow-dot {
-  opacity: 0.25;
+  opacity: 0.4;
+}
+.flow-track[data-dim='true'] .flow-dot::after {
+  box-shadow: none;
 }
 @keyframes rx-flow {
   from {
     transform: translateX(0%);
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: 1;
   }
   to {
     transform: translateX(100%);
+    opacity: 0;
+  }
+}
+/* Travel to ~50% (the enzyme gate) then fade out: input approaches the blocked channel. */
+@keyframes rx-flow-gate {
+  from {
+    transform: translateX(0%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(48%);
+    opacity: 0;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .flow-dot {
+  .flow-track[data-play='true'] .flow-dot {
     animation: none;
-    transform: translateX(var(--rest));
+  }
+}
+
+/* Soft luminous halo behind the enzyme art when the pathway is active. */
+.enzyme-glow {
+  position: absolute;
+  inset: 6% 12%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, color-mix(in oklch, var(--color-flow) 42%, transparent), transparent 68%);
+  filter: blur(14px);
+  opacity: 0;
+  transition: opacity 300ms var(--ease-out);
+  pointer-events: none;
+}
+.enzyme-glow[data-active='true'] {
+  opacity: 0.7;
+}
+.enzyme-glow[data-blocked='true'] {
+  background: radial-gradient(circle, color-mix(in oklch, var(--color-alert-red) 45%, transparent), transparent 66%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .enzyme-glow {
+    transition: none;
+  }
+}
+
+/*
+ * Reduced motion for the Base UI sheet. Its enter/leave uses translate transitions defined on
+ * the sheet-content data-slot, outside MotionConfig. Under prefers-reduced-motion we suppress
+ * all movement (no translate/scale) and keep a gentle opacity-only 150ms transition. Scoped to
+ * the actual slot so nothing else is affected; focus management is untouched.
+ */
+@media (prefers-reduced-motion: reduce) {
+  [data-slot='sheet-content'] {
+    transition-property: opacity;
+    transition-duration: 150ms;
+  }
+  [data-slot='sheet-content'][data-starting-style],
+  [data-slot='sheet-content'][data-ending-style] {
+    translate: none !important;
+    transform: none !important;
+  }
+  [data-slot='sheet-overlay'] {
+    transition-duration: 150ms;
   }
 }

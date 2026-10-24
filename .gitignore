@@ -6,3 +6,6 @@ build/
 .DS_Store
 __pycache__/
 *.log
+
+# Demo video working files (audio, clips, renders): never commit
+media/

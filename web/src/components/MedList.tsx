@@ -46,7 +46,7 @@ export function MedList({ meds, checking, onAdd, onRemove }: MedListProps) {
         Current medications
       </span>
 
-      <div className="flex min-h-12 flex-wrap items-center gap-2">
+      <div className="flex min-h-11 flex-wrap items-center gap-2">
         {meds.length === 0 ? (
           <span className="text-base text-ink-muted">None</span>
         ) : (
@@ -54,7 +54,7 @@ export function MedList({ meds, checking, onAdd, onRemove }: MedListProps) {
             {meds.map(med => (
               <li
                 key={med}
-                className="flex h-12 items-center gap-1 rounded-lg border border-ink/20 bg-panel-solid pr-1 pl-3 text-lg font-semibold text-ink"
+                className="flex h-11 items-center gap-1 rounded-lg border border-ink/20 bg-panel-solid pr-1 pl-3 text-base font-semibold text-ink"
               >
                 {capitalize(med)}
                 <Button
@@ -76,7 +76,7 @@ export function MedList({ meds, checking, onAdd, onRemove }: MedListProps) {
             render={
               <Button
                 variant="outline"
-                className="press h-12 rounded-lg border-dashed border-ink/30 bg-transparent px-3 text-base font-medium text-ink"
+                className="press h-11 rounded-lg border-dashed border-control-border bg-transparent px-3 text-base font-medium text-ink focus-visible:ring-2 focus-visible:ring-marine/60"
               />
             }
           >

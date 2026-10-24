@@ -72,3 +72,46 @@ describe('R21 already-poor-metabolizer de-escalation', () => {
     expect(a.inhibitorNote).toContain('adds no further effect');
   });
 });
+
+// R28 reverse case (task 18). Esomeprazole is not in the engine's known drugs,
+// so only the omeprazole form is tested here.
+describe('R28 omeprazole added to a patient already on clopidogrel', () => {
+  const R28_TEXT =
+    'Label interaction: FDA clopidogrel label advises avoiding concomitant use of omeprazole or esomeprazole. Shown separately from the genotype result.';
+
+  function cyp2c19Patient(cyp2c19: string, meds: string[]): Patient {
+    return { id: 'edge', name: 'edge', cyp2d6: '', cyp2c19, meds };
+  }
+
+  it("'*1/*1' on clopidogrel, omeprazole added: re-checked clopidogrel card with the label note, still GREEN", () => {
+    const results = checkOrder(cyp2c19Patient('*1/*1', ['clopidogrel']), 'omeprazole');
+    const a = results.find(x => x.drug === 'clopidogrel');
+
+    expect(a).toBeDefined();
+    expect(a!.alert).toBe('GREEN');
+    expect(a!.triggeredBy).toBe('omeprazole');
+    expect(a!.labelNote).toBe(R28_TEXT);
+    // Label-level note only: no CYP2C19 phenoconversion (R42)
+    expect(a!.phenoconverted).toBe(false);
+    expect(a!.inhibitor).toBeNull();
+    expect(a!.genotypePhenotype).toBe('Normal Metabolizer');
+    expect(a!.adjustedPhenotype).toBe('Normal Metabolizer');
+  });
+
+  it('P19 shape unchanged: omeprazole on the list, clopidogrel added -> one GREEN card with the note', () => {
+    const results = checkOrder(cyp2c19Patient('*1/*17', ['omeprazole']), 'clopidogrel');
+
+    expect(results).toHaveLength(1);
+    expect(results[0].drug).toBe('clopidogrel');
+    expect(results[0].triggeredBy).toBe('clopidogrel');
+    expect(results[0].alert).toBe('GREEN');
+    expect(results[0].genotypePhenotype).toBe('Rapid Metabolizer');
+    expect(results[0].labelNote).toBe(R28_TEXT);
+  });
+
+  it('CYP2D6 *1/*1 on codeine, sertraline (weak) added: GREEN with no label note, so no re-check card', () => {
+    const results = checkOrder(patient('*1/*1', ['codeine']), 'sertraline');
+
+    expect(results.find(x => x.drug === 'codeine')).toBeUndefined();
+  });
+});

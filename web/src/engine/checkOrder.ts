@@ -242,9 +242,10 @@ export function checkOrder(patient: Patient, addedDrug: string): DrugAssessment[
     if (isSupportedDrug(med)) {
       const assessment = assessDrug(med, addedDrug, patient, allMedications);
       if (assessment) {
-        // Only include if there's an alert (not just GREEN/no change)
-        // or if phenoconversion occurred
-        if (assessment.phenoconverted || assessment.alert !== 'GREEN') {
+        // Only include if there's an alert (not just GREEN/no change),
+        // if phenoconversion occurred, or if the re-check carries a
+        // label-level note (R28: omeprazole added to a patient on clopidogrel)
+        if (assessment.phenoconverted || assessment.alert !== 'GREEN' || assessment.labelNote) {
           assessments.push(assessment);
         }
       }

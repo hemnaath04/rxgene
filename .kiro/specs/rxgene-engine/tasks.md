@@ -15,7 +15,7 @@ Build order follows the commit history. Hashes are matched from commit messages;
 
 - [x] 4. Reverse case: adding a drug re-checks the list (R22) — **done in f4f7e9e (engine loop); card prefix "Adding X affects a current medication:" in e3d37bb**
   - `checkOrder` re-assesses every covered drug on the list against `meds + addedDrug`, with `triggeredBy` set to the added drug (fixture P12).
-  - Re-checked drugs are returned only when phenoconverted or not GREEN, so an unchanged GREEN re-check produces no card (see task 18).
+  - Re-checked drugs are returned when phenoconverted, not GREEN, or carrying a label note, so an unchanged GREEN re-check with no note produces no card (see task 18).
 
 - [x] 5. CYP2C19 clopidogrel, genotype only (R27, R42) — **done in f4f7e9e**
   - `cyp2c19DiplotypeToPhenotype` maps functional statuses to a phenotype (our coding of CPIC's convention, not cross-checked; analysis #33); lookup by phenotype in `CVI ACS PCI`.
@@ -64,8 +64,9 @@ Build order follows the commit history. Hashes are matched from commit messages;
   - `hasStar10Allele` (`*10`, `*10xN`, `*36+*10`) and `lookupAtomoxetineStar10` (curated `1.0 (*10 present)`, text from key `0.75`, YELLOW); without `*10`, the standard 1.0 row (fixtures P15, P25).
   - `ATOMOXETINE_AS1_CONTROVERSY_NOTE` shown in the evidence sheet for activity score 1.0.
 
-- [ ] 18. Omeprazole–clopidogrel label note (R28) — **partly done in 1423791 (note on the card itself); brand names removed in 7953d82. Gap: when clopidogrel is already on the list with a GREEN result and omeprazole is the drug being added, the re-checked clopidogrel carries `labelNote` but is dropped by the reverse-case filter (task 4), so no card shows the note (analysis #21)**
+- [x] 18. Omeprazole–clopidogrel label note (R28) — **partly done in 1423791 (note on the card itself); brand names removed in 7953d82; reverse case fixed in pending: the reverse-case filter in `checkOrder` also keeps a re-checked assessment that carries `labelNote`, so adding omeprazole to a patient already on clopidogrel shows the note**
   - `OMEPRAZOLE_CLOPIDOGREL_LABEL_NOTE` set when omeprazole is on the list; shown in `AlertCard`, the story row and the evidence sheet; no CYP2C19 phenoconversion (fixture P19).
+  - Reverse-case tests in `edge-cases.test.ts` (omeprazole added to `*1/*1` on clopidogrel; P19 shape; sertraline added to codeine still gives no re-check card). Esomeprazole is not an engine-known drug, so it is not tested.
 
 - [x] 19. Molecular workbench UI (R19, R32) — **done in c41de38; neutral pathway for uncomputed and unknown results in 38330ee; merged in 53b0600; final reference UI in b97f0dd and 178bb2d**
   - Guided particle flow showing genotype vs adjusted state; uncomputed dosing and unknown gene results stay neutral instead of implying a speed.
@@ -86,4 +87,4 @@ Build order follows the commit history. Hashes are matched from commit messages;
   - `lib/openfda.ts` and the evidence-sheet panel over `data/openfda/pair_reports.json`, labeled unvalidated and not for medical decisions; it does not affect any level.
 
 - [x] 24. Requirement coverage check (R1–R44, R23 removed) — **every requirement in R1–R44 is covered by at least one task above; none is uncovered**
-  - Covered only by unticked tasks, so still open: R9 (3), R18 multi-inhibitor naming (13), R20 (15), R28 (18), R30 (14), R33 and R35 for the summary validator (9), R38 (11).
+  - Covered only by unticked tasks, so still open: R9 (3), R18 multi-inhibitor naming (13), R20 (15), R30 (14), R33 and R35 for the summary validator (9), R38 (11).

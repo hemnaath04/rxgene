@@ -65,21 +65,21 @@ wording appears anywhere.
 ## Ananya: Kiro spec, science and clinical review
 
 ### By 12:30
-- [ ] Write `.kiro/specs/rxgene-engine/requirements.md`. Use EARS "WHEN … THE SYSTEM
+- [x] Write `.kiro/specs/rxgene-engine/requirements.md`. Use EARS "WHEN … THE SYSTEM
       SHALL …" requirements, starting from the PLAN-v3 "Kiro spec" section and spec §1.
       Mithuna runs design → tasks from it.
-- [ ] Check `data/inhibitors.json` against the FDA table, and check the allele values for
+- [x] Check `data/inhibitors.json` against the FDA table, and check the allele values for
       every demo patient in `data/cpic/cyp2d6_alleles.json`.
 
 ### By 1:45
-- [ ] Review all 22 rows in `tests/fixtures/expected_outputs.csv`. **If you disagree with
+- [x] Review all 22 rows in `tests/fixtures/expected_outputs.csv` *(now 25 rows, all approved at the expected-output level)*. **If you disagree with
       a row, you win.** Tell Claude, who regenerates the fixtures.
 
 ### 2:30–5:30
-- [ ] Check the clinical wording of the EN templates (`web/src/engine/templates.ts`).
-- [ ] Work through the PLAN-v3 pre-pitch verification checklist (open the real CPIC PDFs).
-- [ ] Verify the Borges et al. citation, or drop it from the slides.
-- [ ] Write the science part of the pitch, for tonight and for Sunday.
+- [ ] Check the clinical wording of the EN templates (`web/src/engine/templates.ts`) *(review done; fixes pending from Mithuna)*.
+- [x] Work through the PLAN-v3 pre-pitch verification checklist (open the real CPIC PDFs).
+- [x] Verify the Borges et al. citation, or drop it from the slides *(verified; claim narrowed)*.
+- [ ] Write the science part of the pitch, for tonight and for Sunday *(approved; not yet sent to Hemnaath)*.
 
 **Done means:** a signed-off fixtures file, a requirements file in Kiro, and the
 checklist ticked.

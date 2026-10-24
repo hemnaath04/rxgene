@@ -286,12 +286,14 @@ Technical terms live in the evidence drawer.
 
 Someone opens the actual PDFs at cpicpgx.org and confirms, before anything goes on a slide:
 
-- [ ] Activity score thresholds (0 / <1.25 / 1.25–2.25 / >2.25) — CPIC opioid guideline, genetic test interpretation section
-- [ ] Phenoconversion wording: strong → score 0, moderate → × 0.5
-- [ ] Codeine recommendation text for poor metabolizers
-- [ ] Atomoxetine recommendation text for poor metabolizers (dosing pathway, not "avoid")
-- [ ] Allele activity values for every allele in the demo patients
-- [ ] The 20–30% phenoconversion statistic, read in the source paper, not a summary
+- [x] Activity score thresholds (0 / <1.25 / 1.25–2.25 / >2.25) — CPIC opioid guideline, genetic test interpretation section *(found in the guideline's Table 1, background section; source-matched 2026-10-24)*
+- [x] Phenoconversion wording: strong → score 0, moderate → × 0.5 *(CPIC opioid guideline 2021; source-matched 2026-10-24)*
+- [x] Codeine recommendation text for poor metabolizers *(matches CPIC 2021 Table 2 and the API; source-matched 2026-10-24)*
+- [x] Atomoxetine recommendation text for poor metabolizers (dosing pathway, not "avoid") *(CPIC 2019 PDF, fixed-dose table, rated Moderate; source-matched 2026-10-24)*
+- [x] Allele activity values for every allele in the demo patients *(match the CPIC API; source-matched 2026-10-24)*
+- [x] The 20–30% phenoconversion statistic, read in the source paper, not a summary *(Cicali et al. 2021, PMC8404400; a reported figure citing recent studies; source-matched 2026-10-24)*
+
+*Ticked by Claude on 2026-10-24 after string-matching each source. This is not human verification, except for six FDA inhibitor rows checked by Ananya. See docs/SCIENCE.md.*
 
 ## After the event
 

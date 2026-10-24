@@ -126,7 +126,21 @@ off by Ananya.
 - Atomoxetine at activity score 1.0 is marked "controversy remains" by CPIC. The `*10` rule (R44)
   follows the PDF, not the API.
 - Atomoxetine ultrarapid is YELLOW from CPIC's implication text; no fixture covers it.
+- **Clopidogrel indication.** Clopidogrel is modeled for acute coronary syndrome (ACS) and/or percutaneous coronary intervention (PCI) only. CPIC recommendations and recommendation strengths differ for neurovascular and other cardiovascular indications. RxGene does not collect or verify the patient's clinical indication, so its clopidogrel recommendations must not be generalized to all patients taking clopidogrel.
 - Synthetic data only. Not a medical device. "No supported PGx alert" does not mean safe.
+
+**Conclusions kept from the outside source reviews (2026-10-24)**
+- The five CYP2D6 inhibitor classifications (fluoxetine, paroxetine and bupropion strong; duloxetine
+  moderate; sertraline weak) are unchanged. FDA defines strong as at least a 5-fold, moderate as 2-fold
+  to under 5-fold, and weak as 1.25-fold to under 2-fold increase in exposure (AUC) of a sensitive substrate.
+- The x0 and x0.5 phenoconversion conventions are attributed to CPIC (opioid guideline 2021), not to the
+  FDA inhibitor table, which supplies only the strength class.
+- Omeprazole's weak CYP2C19 inhibitor classification in the FDA table does not negate the separate
+  PLAVIX warning to avoid concomitant use of omeprazole or esomeprazole.
+- Fixture P19 stays GREEN for the genotype result only, with the FDA interaction warning displayed
+  separately.
+- The FDA table also lists clopidogrel as a moderate CYP2C8 inhibitor and a weak CYP2B6 inhibitor. These
+  are outside the current modeled scope.
 
 ## Pitch lines this supports
 

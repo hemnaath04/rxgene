@@ -125,6 +125,7 @@ taken word for word from the CPIC API.
 - **Several inhibitors on the list: the strongest one is applied.** This is a project design choice, not a CPIC rule.
 - **Ultrarapid metabolizers on a strong inhibitor are flagged "reduced confidence"**, because they may not phenoconvert to the same extent (CPIC 2023).
 - **CYP2C19 phenoconversion is not modeled.** No CPIC-stated adjustment rule for CYP2C19 was identified in the sources we checked, so RxGene does not compute one. The FDA interaction table lists fluoxetine as a strong inhibitor of CYP2C19 as well as CYP2D6, so a patient on fluoxetine who is prescribed clopidogrel may respond differently from what their genotype predicts, and RxGene will not flag it. Omeprazole with clopidogrel is shown as a label-level note only.
+- **Clopidogrel indication.** Clopidogrel is modeled for acute coronary syndrome (ACS) and/or percutaneous coronary intervention (PCI) only. CPIC recommendations and recommendation strengths differ for neurovascular and other cardiovascular indications. RxGene does not collect or verify the patient's clinical indication, so its clopidogrel recommendations must not be generalized to all patients taking clopidogrel.
 - **"No supported alert" is not the same as safe.** It means RxGene has no guideline-backed flag for that combination.
 - **The AI summary never decides anything.** It rewrites the rule engine's output, is validated, and falls back to a fixed template.
 

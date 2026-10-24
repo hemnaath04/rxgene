@@ -1,6 +1,6 @@
 Model: claude-sonnet-4.5. Run AFTER brief 11. Target: working on the dev preview by 5:00 PM (freeze is 5:30).
 
-Read first: .kiro/briefs/ananya-02-agent-requirements.md (requirements R45-R54; Ananya is adding them to the spec in parallel, and the numbers are stable), web/api/_lib/llm.ts, web/api/summary.ts, and web/src/engine/index.ts.
+Read first: .kiro/briefs/ananya-02-agent-requirements.md (requirements R45-R54) and .kiro/specs/rxgene-engine/requirements.md, which now holds R45-R56, web/api/_lib/llm.ts, web/api/summary.ts, and web/src/engine/index.ts.
 
 Goal: a **pharmacist consult agent**. The pharmacist clicks "Review full medication list". An LLM agent calls deterministic tools for every drug on the list and drafts a consult note with citations. The rule engine still decides everything; the agent only gathers tool results and writes them up. Tool calling through our gateway is verified: `anthropic/claude-sonnet-5-subscription` with OpenAI-style `tools` returned a correct `tool_calls` response in 1.8 s.
 
@@ -42,6 +42,11 @@ Export OpenAI-format tool definitions (JSON Schema params) and an executor `runT
 - the note names a drug outside the list + addedDrug + the drugs named in the recommendation texts (use KNOWN_DRUGS from fhir.ts to detect drug names);
 - the note contains a number not found in JSON.stringify(trace results);
 - the note contains "safe"/"seguro", except in "not the same as safe".
+Also enforce Ananya's added rules (see the spec):
+- **R55:** every medication on the list must have a check_drug call in the trace AND a mention in the note. A GREY drug's sentence must contain the engine's fixed GREY text verbatim (from messages.ts). A GREEN drug must use exactly "No supported PGx alert (not the same as safe)", be labeled a genotype result only, and never imply the whole list is cleared.
+- **R56:** when the engine returns a qualifier, the note must keep it: both phenotypes side by side, the reduced-confidence flag, the poor-metabolizer inhibitor note, the atomoxetine FDA/CPIC "Different guidance contexts" text, the omeprazole–clopidogrel label note, and the population for atomoxetine/clopidogrel. Simplest enforcement: put these qualifier strings in the check_drug result and require each non-empty one to appear (case-insensitive substring) in the note's sentences for that drug.
+Add tests for both R55 and R56: a missing GREY drug falls back to the template, and a dropped reduced-confidence flag falls back to the template.
+
 On any failure, or when the LLM is unavailable, build `templateConsultNote(assessments)` deterministically: the same section headings, one sentence per assessment built from the engine fields, and cites pointing at synthetic trace ids. Return `source: "template"` and a reason.
 
 ## 4. Endpoint: web/api/consult.ts

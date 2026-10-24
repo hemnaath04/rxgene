@@ -19,6 +19,8 @@ export type DrugAssessment = {
   genotypePhenotype: string;              // includes 'Indeterminate' and 'Insufficient data'
   inhibitor: { drug: string; strength: 'strong' | 'moderate' | 'weak' } | null;
   adjustedActivityScore: number | null;
+  // R17: display string when no score is computed (P13: "n/a (label-based, no score computed)").
+  adjustedActivityScoreLabel?: string;
   adjustedPhenotype: string | 'not computed';
   phenoconverted: boolean | null;
   confidence: 'standard' | 'reduced';
@@ -26,7 +28,7 @@ export type DrugAssessment = {
   recommendation: string;                 // CPIC text verbatim, or the fixed not-assessed text
   strength: string;                       // CPIC classification
   inhibitorNote?: string;                 // de-escalation / weak-inhibitor note
-  labelNote?: string;                     // e.g. omeprazole + clopidogrel
+  labelNote?: string;                     // R28: omeprazole + clopidogrel label note (fixed text)
   // R20: the genotype (e.g. Ultrarapid) recommendation, shown alongside the converted one.
   genotypeRecommendation?: string;
   // R17 (atomoxetine + strong inhibitor): FDA label fields. labelRecommendation is shown FIRST.

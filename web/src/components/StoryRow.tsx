@@ -147,7 +147,7 @@ function captionFor(a: DrugAssessment | null, checked: boolean, patientName: str
   if (inh?.strength === 'strong') return `${capitalize(inh.drug)} reduces ${gene} activity. ${patientName}'s genes are unchanged.`;
   if (inh?.strength === 'moderate') return `${capitalize(inh.drug)} partly reduces ${gene} activity. ${patientName}'s genes are unchanged.`;
   if (a.inhibitorNote?.startsWith('Weak')) return `A weak ${gene} inhibitor is on the list. It doesn't change the activity score.`;
-  if (gene === 'CYP2C19') return `RxGene doesn't model ${gene} inhibition.${a.labelNote ? ' See the label note below.' : ''}`;
+  if (gene === 'CYP2C19') return `RxGene doesn't model ${gene} inhibition.${a.labelNote ? ' The label interaction above is not computed.' : ''}`;
   return `No ${gene} inhibitor on the medication list.`;
 }
 
@@ -183,25 +183,26 @@ export function StoryRow({ patientName, drug, gene, genotype, genotypePhenotype,
   const isWord = value !== null && value === nowSpeed;
 
   const g = a ? formatScore(a.genotypeActivityScore) : null;
-  const adj = a ? formatScore(a.adjustedActivityScore) : null;
+  const adj = a ? (a.adjustedActivityScoreLabel ?? formatScore(a.adjustedActivityScore)) : null;
   const scoreChanged = g !== null && adj !== null && g !== adj;
 
   let scoreSub: string | null = null;
   if (a && a.gene === 'CYP2D6' && g !== null) {
-    if (a.phenoconverted) scoreSub = 'Rule-adjusted';
+    if (a.adjustedActivityScoreLabel) scoreSub = 'Label-based (FDA), no score computed';
+    else if (a.phenoconverted) scoreSub = 'Rule-adjusted';
     else if (alreadySlowInhibitor(a)) scoreSub = 'No further change';
     else if (a.adjustedPhenotype === 'not computed') scoreSub = 'Pharmacist review';
     else scoreSub = 'Same as genes';
   }
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+    <div className="grid min-w-0 grid-cols-1 gap-5 lg:grid-cols-3">
       {/* 01 Genetic baseline */}
-      <section aria-labelledby="story-01" className="panel flex flex-col gap-4 rounded-2xl p-6">
+      <section aria-labelledby="story-01" className="panel flex min-w-0 flex-col gap-4 rounded-2xl p-5 sm:p-6">
         <StepLabel n="01" title="Genetic baseline" id="story-01" />
         <div className="flex flex-1 items-center justify-between gap-4">
-          <div className="flex flex-col gap-1">
-            <p className="text-xl font-semibold text-ink">
+          <div className="flex min-w-0 flex-col gap-1">
+            <p className="text-xl font-semibold break-words text-ink">
               {gene} · {genotype ?? 'no result on file'}
             </p>
             <p className="text-base text-ink">{byGenesText(genotypePhenotype)}</p>
@@ -215,7 +216,7 @@ export function StoryRow({ patientName, drug, gene, genotype, genotypePhenotype,
       </section>
 
       {/* 02 Medication effect */}
-      <section aria-labelledby="story-02" className="panel flex flex-col gap-3 rounded-2xl p-6">
+      <section aria-labelledby="story-02" className="panel flex min-w-0 flex-col gap-3 rounded-2xl p-5 sm:p-6">
         <StepLabel n="02" title="Medication effect" id="story-02" />
 
         <div className="relative flex min-h-12 justify-center">
@@ -234,14 +235,15 @@ export function StoryRow({ patientName, drug, gene, genotype, genotypePhenotype,
               </motion.div>
             )}
             {!inhibitor && a?.labelNote && (
-              <motion.div
+              <motion.p
                 key="label-note"
                 {...enterExit(reduce, STEP.inhibitorBadge)}
-                className="flex items-center gap-2 rounded-lg border border-ink/25 bg-panel-solid px-3 py-1.5 text-sm text-ink"
+                className="flex items-start gap-2 rounded-lg border border-ink/25 bg-panel-solid px-3 py-1.5 text-sm font-medium text-ink"
               >
-                <Info aria-hidden="true" className="size-4" strokeWidth={1.5} />
-                Label interaction note (not computed)
-              </motion.div>
+                <Info aria-hidden="true" className="mt-0.5 size-4 shrink-0" strokeWidth={1.5} />
+                {/* R28: the label text itself, not a generic badge. */}
+                <span>{a.labelNote}</span>
+              </motion.p>
             )}
           </AnimatePresence>
         </div>
@@ -269,7 +271,7 @@ export function StoryRow({ patientName, drug, gene, genotype, genotypePhenotype,
       </section>
 
       {/* 03 Current response */}
-      <section aria-labelledby="story-03" className="panel flex flex-col gap-3 rounded-2xl p-6">
+      <section aria-labelledby="story-03" className="panel flex min-w-0 flex-col gap-3 rounded-2xl p-5 sm:p-6">
         <StepLabel n="03" title="Current response" id="story-03" />
         <p className="text-base text-ink">With current medications</p>
 
@@ -285,9 +287,12 @@ export function StoryRow({ patientName, drug, gene, genotype, genotypePhenotype,
                 key={`value-${value}`}
                 {...enterExit(reduce, STEP.currentValue)}
                 className={cn(
-                  'font-extrabold tracking-[-0.02em]',
-                  // 96/1 per DESIGN.md; 72px in the 1024–1279px three-column layout so "Reduced" fits.
-                  isWord ? 'text-[96px]/none lg:text-[72px]/none xl:text-[96px]/none' : 'text-[48px]/[1.1]',
+                  'font-extrabold tracking-[-0.02em] break-words',
+                  // 96/1 per DESIGN.md; 64px on phones so "Reduced" fits a 390px screen;
+                  // 72px in the 1024–1279px three-column layout so "Reduced" fits.
+                  isWord
+                    ? 'text-[64px]/none sm:text-[96px]/none lg:text-[72px]/none xl:text-[96px]/none'
+                    : 'text-[36px]/[1.1] sm:text-[48px]/[1.1]',
                   level ? DISPLAY_COLOR[level] : 'text-ink'
                 )}
               >

@@ -96,6 +96,17 @@ export function computeCYP2D6ActivityScore(diplotype: string): ActivityScoreResu
 }
 
 /**
+ * R44: true when the CYP2D6 diplotype contains a *10 allele: *10, *10xN (e.g. *10x2), or a
+ * *36 combination that contains *10 (e.g. *36+*10). Used only for the atomoxetine AS 1.0 row.
+ */
+export function hasStar10Allele(diplotype: string | null | undefined): boolean {
+  if (!diplotype) return false;
+  return diplotype
+    .split('/')
+    .some(allele => allele.split('+').some(part => /^\*10(?:x(?:≥|>=)?\d+)?$/i.test(part.trim())));
+}
+
+/**
  * Compute activity score for a patient, handling missing genotype
  */
 export function getActivityScore(genotype: string | undefined): ActivityScoreResult {

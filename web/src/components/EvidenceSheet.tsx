@@ -7,12 +7,13 @@ import { CdsExchangePanel } from '@/components/CdsExchangePanel';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import inhibitors from '@/data/inhibitors.json';
 import { toCdsCard } from '@/engine/cdsCard';
+import { ATOMOXETINE_AS1_CONTROVERSY_NOTE } from '@/engine/fixedTexts';
 import type { CdsCard, DrugAssessment } from '@/engine/types';
 import type { CardEntry } from '@/lib/cardEntries';
 import type { CdsExchange, OrderSelectRequest } from '@/lib/cdsClient';
 import { enterExit } from '@/lib/motion';
 import { REQUIREMENT_TITLES, requirementsFor } from '@/lib/requirements';
-import { capitalize, formatScore, sourceLine, toVerdict } from '@/lib/verdict';
+import { capitalize, formatScore, parseSourceLinks, populationLine, sourceLine, toVerdict } from '@/lib/verdict';
 import type { Mode } from '@/lib/url';
 
 type EvidenceSheetProps = {
@@ -58,10 +59,21 @@ function phenoconversionText(a: DrugAssessment): string {
   return 'Not computed';
 }
 
+/** R38: CPIC text is labeled verbatim; a GREY fixed text (R7/R8/R18) is labeled as RxGene's own. */
+function recommendationTitle(a: DrugAssessment): string {
+  if (a.alert === 'GREY' && !a.strength) return 'RxGene result (fixed text; no CPIC recommendation applied)';
+  if (a.cpicRole) return 'CPIC recommendation (supporting context, verbatim and in full)';
+  return 'CPIC recommendation (verbatim and in full)';
+}
+
 function AssessmentEvidence({ a, meds }: { a: DrugAssessment; meds: string[] }) {
   const g = formatScore(a.genotypeActivityScore);
-  const adj = formatScore(a.adjustedActivityScore);
+  const adj = a.adjustedActivityScoreLabel ?? formatScore(a.adjustedActivityScore);
   const ids = requirementsFor(a, meds);
+  const population = populationLine(a)?.replace(/^Population: /, '') ?? null;
+  const links = parseSourceLinks(a.sourceLinks);
+  const showAs1Note =
+    a.drug === 'atomoxetine' && a.genotypeActivityScore !== null && Math.abs(a.genotypeActivityScore - 1) < 1e-9;
 
   return (
     <>
@@ -72,6 +84,13 @@ function AssessmentEvidence({ a, meds }: { a: DrugAssessment; meds: string[] }) 
           {a.discrepancyFlag && (
             <p className="rounded-lg bg-alert-amber/10 px-3 py-2 text-sm text-ink">{a.discrepancyFlag}</p>
           )}
+        </Section>
+      )}
+
+      {/* R28: the label interaction, separate from the genotype result. */}
+      {a.labelNote && (
+        <Section title="Label interaction">
+          <p className="rounded-lg border border-ink/25 bg-ink/5 px-3 py-2 text-base font-medium text-ink">{a.labelNote}</p>
         </Section>
       )}
 
@@ -112,12 +131,14 @@ function AssessmentEvidence({ a, meds }: { a: DrugAssessment; meds: string[] }) 
           )}
           {a.triggeredBy !== a.drug && <Row term="Re-checked because">{a.triggeredBy} was added</Row>}
           {a.inhibitorNote && <Row term="Inhibitor note">{a.inhibitorNote}</Row>}
-          {a.labelNote && <Row term="Label note">{a.labelNote}</Row>}
         </dl>
       </Section>
 
-      <Section title="CPIC recommendation (verbatim)">
-        <blockquote className="border-l-4 border-ink/30 pl-3 text-base text-ink">{a.recommendation}</blockquote>
+      <Section title={recommendationTitle(a)}>
+        {/* R38: verbatim and in full, every condition kept; never shortened or paraphrased. */}
+        <blockquote className="border-l-4 border-ink/30 pl-3 text-base whitespace-pre-line break-words text-ink">
+          {a.recommendation || 'No recommendation text (see the data error).'}
+        </blockquote>
         {/* R17: the CPIC poor-metabolizer text is supporting genotype-based context only. */}
         {a.cpicRole && <p className="text-sm text-ink-muted">{a.cpicRole}</p>}
         {/* R20: the genotype (unconverted) recommendation, shown alongside the converted one. */}
@@ -130,6 +151,8 @@ function AssessmentEvidence({ a, meds }: { a: DrugAssessment; meds: string[] }) 
         <dl>
           <Row term="Strength">{a.strength || 'None given'}</Row>
           {sourceLine(a) && <Row term="Guideline version">{sourceLine(a)}</Row>}
+          {/* R26/R27/R17: the population used stays visible. */}
+          {population && <Row term="Population">{population}</Row>}
           <Row term="Guideline">
             {a.source.guideline ? (
               a.source.url ? (
@@ -151,13 +174,29 @@ function AssessmentEvidence({ a, meds }: { a: DrugAssessment; meds: string[] }) 
           </Row>
           <Row term="Fetched">{a.source.fetched || 'Not available'}</Row>
         </dl>
-        {/* R17: FDA label + CPIC source links. */}
-        {a.sourceLinks && (
-          <p className="text-xs break-words text-ink-muted">
-            <span className="font-semibold">Sources: </span>
-            {a.sourceLinks}
-          </p>
+        {/* R17: FDA label + CPIC source links and versions. */}
+        {links.length > 0 && (
+          <div className="flex flex-col gap-1">
+            <p className="text-sm font-semibold text-ink">Sources</p>
+            <ul className="flex flex-col gap-1 text-xs break-words text-ink-muted">
+              {links.map(link => (
+                <li key={link.label}>
+                  {link.label}
+                  {link.url && (
+                    <>
+                      {': '}
+                      <a className="break-all underline underline-offset-2" href={link.url} target="_blank" rel="noreferrer">
+                        {link.url}
+                      </a>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
+        {/* R44: CPIC's "controversy remains" note for atomoxetine at activity score 1.0. */}
+        {showAs1Note && <p className="rounded-lg bg-ink/5 px-3 py-2 text-sm text-ink">{ATOMOXETINE_AS1_CONTROVERSY_NOTE}</p>}
       </Section>
 
       {a.gene === 'CYP2D6' && (
@@ -249,9 +288,11 @@ export function EvidenceSheet({ open, onOpenChange, entries, selectedKey, onSele
                   <LevelChip level={selected.level} />
                   <ViaBadge via={selected.via} />
                 </div>
-                <p className="text-lg font-semibold text-ink">
-                  {capitalize(selected.drug)}: {selected.headline} {selected.qualifier}
+                <p className="text-lg font-semibold break-words text-ink">
+                  {capitalize(selected.drug)}: {selected.headline}
                 </p>
+                {/* R31: GREEN is the genotype result only, not an overall medication clearance. */}
+                {selected.qualifier && <p className="text-base text-ink">{selected.qualifier}</p>}
                 {selected.mismatch && <MismatchWarning text={selected.mismatch} className="text-alert-red-text" />}
               </div>
 

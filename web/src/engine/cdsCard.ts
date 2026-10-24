@@ -2,9 +2,16 @@
 // Maps DrugAssessment to CDS Hooks card format
 
 import type { DrugAssessment, CdsCard } from './types.js';
+import { GREEN_ALERT_TEXT, GREEN_SCOPE_TEXT } from './fixedTexts.js';
 
-/** R31/R33: the fixed GREEN disclaimer. Never reword it or reuse its last word elsewhere. */
-export const GREEN_ALERT_TEXT = 'No supported PGx alert (not the same as safe)';
+/** R31/R33: the fixed GREEN text lives in fixedTexts.ts; re-exported for existing importers. */
+export { GREEN_ALERT_TEXT };
+
+/** First sentence of a CPIC recommendation, verbatim ("Avoid clopidogrel if possible."). */
+function firstSentence(text: string): string {
+  const match = text.match(/^.*?\.(?=\s|$)/);
+  return match ? match[0] : text;
+}
 
 /**
  * Create a plain-language summary (under 140 chars)
@@ -15,6 +22,12 @@ function createSummary(assessment: DrugAssessment): string {
   if (alert === 'RED') {
     if (phenoconverted && inhibitor) {
       return `Avoid ${drug}: ${inhibitor.drug} changes how this patient's ${assessment.gene} works`;
+    }
+    // R38: clopidogrel PM ("Avoid clopidogrel if possible.") and IM ("Avoid standard dose
+    // (75 mg) clopidogrel if possible.") differ; keep CPIC's own first sentence verbatim.
+    if (drug === 'clopidogrel') {
+      const lead = firstSentence(assessment.recommendation);
+      if (lead && lead.length <= 110) return `${lead} (${assessment.gene} genotype)`;
     }
     return `Avoid ${drug}: PGx alert based on ${assessment.gene} genotype`;
   }
@@ -94,6 +107,8 @@ function createDetail(assessment: DrugAssessment): string {
       assessment.adjustedActivityScore !== assessment.genotypeActivityScore
     ) {
       parts.push(`**Adjusted Activity Score:** ${assessment.adjustedActivityScore.toFixed(2)}`);
+    } else if (assessment.adjustedActivityScoreLabel) {
+      parts.push(`**Adjusted Activity Score:** ${assessment.adjustedActivityScoreLabel}`);
     }
   }
 
@@ -113,6 +128,10 @@ function createDetail(assessment: DrugAssessment): string {
 
   // Recommendation
   parts.push('');
+  if (assessment.alert === 'GREEN') {
+    // R31: the GREEN text, labeled as the genotype result only (not an overall clearance).
+    parts.push(`**${GREEN_ALERT_TEXT}.** ${GREEN_SCOPE_TEXT}`);
+  }
   parts.push(`**Recommendation:** ${assessment.recommendation}`);
 
   if (assessment.strength) {

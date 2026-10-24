@@ -78,7 +78,7 @@ export function Gauge({ byGenes, now, level, reducedConfidence = false, nowNote 
       }.`;
 
   return (
-    <section aria-labelledby="gauge-heading" className="panel rounded-2xl px-8 pt-5 pb-5">
+    <section aria-labelledby="gauge-heading" className="panel min-w-0 rounded-2xl px-5 pt-5 pb-5 sm:px-8">
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
         <h2 id="gauge-heading" className="text-xl font-semibold text-ink">
           Clears this drug

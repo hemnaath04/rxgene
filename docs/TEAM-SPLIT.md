@@ -140,3 +140,8 @@ checklist ticked.
 - Brief 12 landed (88/88 tests). Live, the final note call times out (8 s limit vs 9.8 s needed) and is truncated (1,200 vs 1,238 tokens).
 - **Mithuna's order is now: 16 (agent fix, FIRST) → 13 → 14 → 15.**
 
+## 3:45 PM: brief 14 verified; PBT found the R21 bugs
+
+- Brief 14 verified: the clinical-data and secrets guards block with exit 2 (via the `--agent rxgene` profile, since CLI 2.34 ignores .kiroignore and standalone hooks).
+- Ananya's property tests found the R18/R21 bug and a second R17/R21 gap. **Mithuna's order: 16 → 17 → 13 → 15.**
+

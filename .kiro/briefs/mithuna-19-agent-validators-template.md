@@ -11,4 +11,4 @@ Source: Ananya's review of the consult agent in `.kiro/specs/consult-agent/tasks
 
 Tests (consult.test.ts): one per item, plus "the template note for Dev keeps 'reduced confidence'", "the template for Ana keeps the clopidogrel label note and the ACS/PCI population", and "a live-style note naming morphine (not in any tool result) falls back to the template".
 
-Run `npx tsc -b`, `npx vitest run` and `npm run build`. Don't run git. List the files you changed. Afterward Claude re-tests Sarah and Dev live. If the stricter checks push the live agent into the template too often, Claude will send a prompt-tuning follow-up.
+Run `npx tsc -b`, `npx vitest run` and `npm run build`. Don't run git. List the files you changed. Afterward the lead re-tests Sarah and Dev live. If the stricter checks push the live agent into the template too often, the lead will send a prompt-tuning follow-up.

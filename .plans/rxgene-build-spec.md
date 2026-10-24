@@ -2,14 +2,14 @@
 
 Source plan: `docs/PLAN-v3.md`. This spec is what the team builds. Where it differs from
 v3, the **Deviations** section explains why. Clinical rules live in
-`.kiro/steering/clinical-rules.md`. Agent and model roles live in `CLAUDE.md`.
+`.kiro/steering/clinical-rules.md`. Agent and model roles live in each teammate's local agent setup.
 
 ## 1. Decisions (from the interview)
 
 | Topic | Decision |
 |---|---|
-| Who writes code | **Kiro writes all committed code.** Claude oversees: writes briefs, reviews diffs, gates on tests. Codex only **designs** the frontend (Hemnaath delivers the design). |
-| Team | **Mithuna:** engine + API + UI in Kiro. **Ananya:** Kiro requirements file, clinical tables, expected-output review, science pitch. **Hemnaath:** Codex frontend design, demo, submission. **Claude:** lead and reviewer. |
+| Who writes code | **Kiro writes all committed code.** The lead oversees: writes briefs, reviews diffs, gates on tests. Codex only **designs** the frontend (Hemnaath delivers the design). |
+| Team | **Mithuna:** engine + API + UI in Kiro. **Ananya:** Kiro requirements file, clinical tables, expected-output review, science pitch. **Hemnaath:** Codex frontend design, demo, submission. **The lead:** lead and reviewer. |
 | Phenoconversion scope | Computed for **codeine and tramadol only** (CPIC opioids 2021). Atomoxetine + strong inhibitor uses the PM-equivalent recommendation (FDA label + CPIC atomoxetine 2019 narrative). Atomoxetine + moderate inhibitor shows "pharmacist review" and is not computed. |
 | Reverse case | Adding an inhibitor re-checks the **whole medication list** and alerts on CYP2D6 drugs already on it. |
 | Washout | Steady-state only. Meds are active or absent; no dates. This is listed under limitations. |
@@ -216,7 +216,7 @@ toCdsCard(a: DrugAssessment): CdsCard
 
 ## 10. Timeline and gates
 
-| Time | Mithuna (Kiro) | Ananya | Hemnaath | Claude |
+| Time | Mithuna (Kiro) | Ananya | Hemnaath | The lead |
 |---|---|---|---|---|
 | 11:30–12:30 | Vite scaffold, engine steps 1–3, fixtures wired | Requirements file; review allele/inhibitor tables | Codex design starts; LLM URL/key to `.env` | Briefs, reviews, Vercel project |
 | 12:30–2:00 | Engine steps 4–6, CDS card, plain UI, cases 1–3 | Review fixtures (sign off by 1:45) | Design by **1:30** | Review diffs vs. fixtures |

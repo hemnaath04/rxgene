@@ -11,7 +11,9 @@ reviewed every diff and owned the clinical data.
 presentation component `web/src/ui/RxGeneUI.tsx` with its CSS and view-model types, the molecular
 artwork in `web/public/art/`, `MoleculeStage`, and restyles of several components (PR #6, about
 2,700 lines, 1:52–4:49 PM). It makes no clinical decisions. Kiro then wired it to the real engine,
-API and consult agent (brief 20, `RxGeneConnected.tsx` + `mapAssessment.ts`).
+API and consult agent (brief 20, `RxGeneConnected.tsx` + `mapAssessment.ts`). The last-hour layout
+fixes from our recording review (PR #13 and a follow-up spacing pass) were made outside Kiro, by
+the lead agent and Codex; they change presentation only.
 
 ## Our AI development strategy
 

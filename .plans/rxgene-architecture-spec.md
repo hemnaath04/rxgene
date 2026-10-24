@@ -109,13 +109,13 @@ in `prefetch.medications`.
 - `medications: 'MedicationRequest?patient={{context.patientId}}&status=active'`
 
 **Hedge:** if the sandbox's Rx View fires a different hook, add a second service
-`rxgene-order-sign` that uses the same handler. Claude checks this at the 4:30 gate.
+`rxgene-order-sign` that uses the same handler. The lead checks this at the 4:30 gate.
 
 ## 5. LLM layer (`api/_lib/llm.ts`)
 
 - Env vars: `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`. These are server-only; never add
   a `VITE_` prefix.
-- The request is `chat/completions` with **no `temperature`** (Claude 5.x via Manifest returns 400 if it is sent) and `max_tokens: 600` (tested 2026-10-24: Haiku 5.5 needs the room for reasoning). `LLM_MODEL` = `anthropic/claude-sonnet-5-subscription,anthropic/claude-sonnet-5-5-subscription` (Sonnet 5 primary: fastest and accurate in the 2026-10-24 benchmark; Sonnet 5.5 backup). A 6 s timeout applies per attempt. Move on when a call fails or validation fails; the template shows instantly and the AI text replaces it when ready. The Manifest gateway returns HTTP 200 with an error message as the content, so check the content, not just the status (see brief 05). The system
+- The request is `chat/completions` with **no `temperature`** (Anthropic 5.x models via Manifest return 400 if it is sent) and `max_tokens: 600` (tested 2026-10-24: Haiku 5.5 needs the room for reasoning). `LLM_MODEL` = `anthropic/claude-sonnet-5-subscription,anthropic/claude-sonnet-5-5-subscription` (Sonnet 5 primary: fastest and accurate in the 2026-10-24 benchmark; Sonnet 5.5 backup). A 6 s timeout applies per attempt. Move on when a call fails or validation fails; the template shows instantly and the AI text replaces it when ready. The Manifest gateway returns HTTP 200 with an error message as the content, so check the content, not just the status (see brief 05). The system
   prompt says: rewrite this structured result for a patient in `<lang>`, change no facts,
   and add nothing.
 - **Cache:** a `Map` keyed by `sha256(JSON(assessment)+lang)`, capped at 500 entries. It
@@ -142,7 +142,7 @@ Respect `prefers-reduced-motion`.
 Visual design comes from `docs/DESIGN.md` (Codex, due 1:30). Until then, use the shadcn
 defaults.
 
-## 7. Scaffold, run by Claude, not Kiro (these are generators, not AI code)
+## 7. Scaffold, run by the lead, not Kiro (these are generators, not AI code)
 
 ```bash
 cd ~/projects/rxgene && git switch dev && git pull --rebase origin dev
@@ -155,7 +155,7 @@ npm install -D vitest @types/node
 
 Next, Kiro runs `.kiro/briefs/mithuna-00-config.md` (model `claude-haiku-4.5`), which
 covers vite.config, tsconfig paths, index.css, the data-copy scripts and .gitignore.
-After that, Claude runs:
+After that, the lead runs:
 
 ```bash
 npx shadcn@latest init        # accept the defaults; it detects Vite + Tailwind v4
@@ -165,7 +165,7 @@ npx vitest run                # 0 tests is fine at this point
 
 Commit `web/` (including `package-lock.json`) to `dev`.
 
-## 8. Vercel setup (Hemnaath + Claude, at the 2:00 gate)
+## 8. Vercel setup (Hemnaath + the lead, at the 2:00 gate)
 
 1. Import `hemnaath04/rxgene` into Hemnaath's Vercel account. Set the Root Directory to
    `web` and the framework preset to Vite.

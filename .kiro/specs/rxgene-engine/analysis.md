@@ -2,7 +2,7 @@
 
 **Spec analyzed:** `.kiro/specs/rxgene-engine/requirements.md` (R1-R56), checked against `.kiro/steering/clinical-rules.md`.
 
-**How it was run:** `kiro-cli chat --mode spec --no-interactive` with Claude Sonnet 5.5 on 2026-10-24, read-only. The IDE's Analyze Requirements button and the `/spec` slash command are not available in headless mode (the CLI said `/spec` is not a documented command), so this is Kiro's spec-mode analysis run by prompt, not the IDE button. Kiro's findings below are verbatim, apart from the added **Decision** lines.
+**How it was run:** `kiro-cli chat --mode spec --no-interactive` with Sonnet 5.5 on 2026-10-24, read-only. The IDE's Analyze Requirements button and the `/spec` slash command are not available in headless mode (the CLI said `/spec` is not a documented command), so this is Kiro's spec-mode analysis run by prompt, not the IDE button. Kiro's findings below are verbatim, apart from the added **Decision** lines.
 
 **Decision key:** `fixed (Rxx changed)`, `not a problem because ...`, `known limitation (README or SCIENCE.md)`, or `OPEN` (needs a decision, usually because the fix changes engine behavior or adds fixed text).
 

@@ -20,4 +20,4 @@ Fix in web/api/_lib/agent.ts and agentTools.ts (server-path rules apply):
    - the returned note uses T-labels only
    - every existing test still passes
 
-Run `npx tsc -b`, `npx vitest run` and `npm run build`. Don't run git. List the files you changed. Claude re-tests Sarah and Dev on the preview right after your push and expects `source: "ai"`.
+Run `npx tsc -b`, `npx vitest run` and `npm run build`. Don't run git. List the files you changed. The lead re-tests Sarah and Dev on the preview right after your push and expects `source: "ai"`.

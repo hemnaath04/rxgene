@@ -83,7 +83,7 @@ export async function callLlm(messages: ChatMessage[], model: string): Promise<s
           'Content-Type': 'application/json',
           Authorization: `Bearer ${config.apiKey}`,
         },
-        // No `temperature`: Anthropic Claude 5.x via Manifest rejects it with HTTP 400.
+        // No `temperature`: Anthropic 5.x models via Manifest rejects it with HTTP 400.
         body: JSON.stringify({ model, messages, max_tokens: MAX_TOKENS }),
         signal: controller.signal,
       });

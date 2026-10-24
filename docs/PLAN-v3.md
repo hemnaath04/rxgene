@@ -293,7 +293,7 @@ Someone opens the actual PDFs at cpicpgx.org and confirms, before anything goes 
 - [x] Allele activity values for every allele in the demo patients *(match the CPIC API; source-matched 2026-10-24)*
 - [x] The 20–30% phenoconversion statistic, read in the source paper, not a summary *(Cicali et al. 2021, PMC8404400; a reported figure citing recent studies; source-matched 2026-10-24)*
 
-*Ticked by Claude on 2026-10-24 after string-matching each source. This is not human verification, except for six FDA inhibitor rows checked by Ananya. See docs/SCIENCE.md.*
+*Ticked by the lead on 2026-10-24 after string-matching each source. This is not human verification, except for six FDA inhibitor rows checked by Ananya. See docs/SCIENCE.md.*
 
 ## After the event
 

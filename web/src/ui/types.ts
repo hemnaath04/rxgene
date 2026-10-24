@@ -90,6 +90,16 @@ export type RxGeneResult = {
   /** Patient explanation sheet content. */
   explanationTitle?: string;
   explanationBody?: string;
+
+  /**
+   * Clinical qualifiers that have no dedicated slot in the scene/verdict band but must stay
+   * visible somewhere (Evidence sheet in a real integration). Backend-agnostic: plain strings,
+   * no UI formatting decisions. All optional; RxGeneUI itself never reads these — a connected
+   * adapter surfaces them via onEvidence/onReviewMedications.
+   */
+  clinicalNotes?: string[];
+  /** Requirement IDs (e.g. "R10", "R21") behind this result, for the evidence sheet. */
+  requirementIds?: string[];
 };
 
 /**

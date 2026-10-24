@@ -1,10 +1,10 @@
-// Standalone UI-only default entry. The former engine/CDS-connected app is preserved, unmounted,
-// in ConnectedApp.tsx for later backend wiring. This default mounts the controlled presentation
-// view (RxGeneUI) via its synthetic demo adapter — no engine, no network, no fetch.
-import RxGeneDemo from '@/ui/RxGeneDemo';
+// Production entry: mounts the real engine/backend-connected adapter for the RxGeneUI
+// desktop presentation view. RxGeneDemo (synthetic fixtures, no engine/network) and
+// ConnectedApp (the prior engine-connected screen) stay in the tree unmounted, for reference.
+import RxGeneConnected from '@/ui/RxGeneConnected';
 
 function App() {
-  return <RxGeneDemo />;
+  return <RxGeneConnected />;
 }
 
 export default App;

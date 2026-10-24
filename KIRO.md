@@ -3,15 +3,23 @@
 RxGene is a pharmacogenomics safety check. A wrong rule can tell a patient a painkiller will
 work when it won't, so we built it the way you'd build clinical software: **rules first, then
 code, then independent checks that the code still matches the rules.** Kiro was the tool at
-every step. Every line of app code in `web/` was written by Kiro. People and a lead agent wrote
-the specs, reviewed every diff and owned the clinical data.
+every step. Kiro wrote the rule engine, the CDS Hooks and summary APIs, the consult agent, the
+tests and the adapter that connects the UI to real data. People and a lead agent wrote the specs,
+reviewed every diff and owned the clinical data.
+
+**Full disclosure: the desktop visual layer was prototyped in OpenAI Codex.** That's the
+presentation component `web/src/ui/RxGeneUI.tsx` with its CSS and view-model types, the molecular
+artwork in `web/public/art/`, `MoleculeStage`, and restyles of several components (PR #6, about
+2,700 lines, 1:52–4:49 PM). It makes no clinical decisions. Kiro then wired it to the real engine,
+API and consult agent (brief 20, `RxGeneConnected.tsx` + `mapAssessment.ts`).
 
 ## Our AI development strategy
 
 | Role | Who | How |
 |---|---|---|
 | Clinical rules (EARS requirements), expected outputs, source checks | Ananya, our genetics teammate | Kiro spec mode, property-based tests, MCP |
-| All app code: engine, API, UI, consult agent | Mithuna | **Kiro CLI**, headless, one scoped brief at a time |
+| Engine, APIs, consult agent, tests, UI integration | Mithuna, plus the lead agent for brief 20 | **Kiro CLI**, headless, one scoped brief at a time |
+| Desktop visual design and presentation layer | Hemnaath | OpenAI Codex (prototype), integrated by Kiro |
 | Planning, writing briefs, reviewing every diff and deploy | A lead agent on each laptop | 23 briefs in [`.kiro/briefs/`](.kiro/briefs/) |
 
 - **Each Kiro task got a written brief:** which files to touch, which requirements apply, which test cases must pass, and what "done" means. Briefs written after a live test quote the exact failure. For example, brief 16 quotes the measured 9.8 s, 1,238-token final call that was timing out.

@@ -23,7 +23,7 @@ import { entryAlert, genotypePhenotypeFor, geneFor, sortBySeverity, speedOf, toV
 type Exchange = { request: OrderSelectRequest; result: CdsExchange | null };
 
 function Divider() {
-  return <span aria-hidden="true" className="hidden h-7 w-px bg-ink/20 sm:block" />;
+  return <span aria-hidden="true" className="hidden h-6 w-px bg-ink/20 sm:block" />;
 }
 
 function App() {
@@ -43,6 +43,9 @@ function App() {
   const [evidenceOpen, setEvidenceOpen] = useState(false);
   const [explainOpen, setExplainOpen] = useState(false);
   const [evidenceKey, setEvidenceKey] = useState<string | null>(null);
+  // Pathway playback for the molecule stage. Owned here so it resets with every new result,
+  // patient or mode change. Particle travel never changes the engine result.
+  const [playing, setPlaying] = useState(false);
 
   // Results that arrive after a patient/mode change, or after their drug was removed, are dropped.
   const epochRef = useRef(0);
@@ -110,6 +113,7 @@ function App() {
     setExchange(null);
     setFallbackError(null);
     setEvidenceKey(null);
+    setPlaying(false);
   };
 
   const updateMeds = (next: string[]) => {
@@ -145,9 +149,25 @@ function App() {
     void runCheck(patient, current, drug, mode);
   };
 
+  /**
+   * Changing the prescription selector before pressing Check must not leave a stale result on
+   * screen that looks like it's about the newly selected drug. If a different drug was already
+   * checked, clear the result and remove its chip; the user re-runs Check for the new drug.
+   */
+  const changePrescription = (next: string) => {
+    setPrescription(next);
+    if (added && added.toLowerCase() !== next.toLowerCase()) {
+      const current = meds.filter(m => m !== added);
+      resetResults();
+      updateMeds(current);
+      setAdded(null);
+    }
+  };
+
   /** After a check, editing the chips re-runs it at once (DESIGN.md section 1). */
   const recheck = (current: string[]) => {
     if (!added) return;
+    setPlaying(false); // a new result: stop any pathway travel so it never outlives it
     epochRef.current++; // only the latest re-check's answer is applied
     void runCheck(patient, current, added, mode);
   };
@@ -194,7 +214,17 @@ function App() {
 
   const showStrip = topAssessment?.phenoconverted === true;
   const verdictDelay = showStrip ? STEP.strip + 3 * STEP.stripStagger : STEP.strip;
-  const nowNote = topAssessment?.adjustedPhenotype === 'not computed' ? 'With medications: not computed (pharmacist review)' : null;
+  // Atomoxetine + strong inhibitor: CPIC/FDA give PM-equivalent dosing, not a computed activity
+  // score. The baseline engine may still return a numeric adjusted score (tracked P13 mismatch),
+  // so we suppress the computed ● current marker and show a guidance note instead of a fake stop.
+  const atomoxetineStrongGuidance =
+    topAssessment?.drug === 'atomoxetine' && topAssessment.inhibitor?.strength === 'strong' && (level ?? 'GREY') !== 'GREY';
+  const gaugeNow = topAssessment && !atomoxetineStrongGuidance ? speedOf(topAssessment.adjustedPhenotype) : null;
+  const nowNote = atomoxetineStrongGuidance
+    ? 'With medications: PM-equivalent dosing (FDA label) — see evidence'
+    : topAssessment?.adjustedPhenotype === 'not computed'
+      ? 'With medications: not computed (pharmacist review)'
+      : null;
   const explainAssessment = topVerdict && !topVerdict.mismatch ? topAssessment : null;
 
   const openEvidence = (key: string | null = null) => {
@@ -202,25 +232,27 @@ function App() {
     setEvidenceOpen(true);
   };
 
+  const togglePlay = () => setPlaying(p => !p);
+
   return (
     <MotionConfig reducedMotion="user">
       <div className="app-bg text-ink">
-        <header className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4 px-6 pt-5 pb-3">
-          <div className="flex items-center gap-4">
-            <p className="text-[32px]/none font-bold tracking-[-0.02em] text-ink">
+        <header className="mx-auto flex min-h-14 max-w-[1400px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-6 py-2">
+          <div className="flex items-center gap-3">
+            <p className="text-[24px]/none font-bold tracking-[-0.02em] text-ink">
               RxGene<span className="text-alert-red">.</span>
             </p>
             <Divider />
-            <p className="text-lg text-ink">Pharmacogenomics</p>
+            <p className="text-sm font-medium text-marine">Pharmacogenomics</p>
           </div>
-          <div className="flex flex-wrap items-center gap-4">
-            <p className="text-sm font-semibold tracking-[0.2em] text-ink-muted">SYNTHETIC DEMO</p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <p className="text-xs font-semibold tracking-[0.18em] text-ink-muted">SYNTHETIC DEMO</p>
             <Divider />
             <ModeToggle mode={mode} onChange={changeMode} />
             <Divider />
             <Button
               variant="ghost"
-              className="press h-10 px-3 text-base font-medium text-ink"
+              className="press h-9 px-3 text-sm font-medium text-ink"
               onClick={() => openEvidence()}
               disabled={cards.length === 0}
             >
@@ -228,26 +260,26 @@ function App() {
             </Button>
             <Button
               variant="ghost"
-              className="press h-10 px-3 text-base font-medium text-ink"
+              className="press h-9 px-3 text-sm font-medium text-ink"
               onClick={() => selectPatient(patient.id)}
             >
-              <RotateCcw aria-hidden="true" className="size-5" strokeWidth={1.5} />
+              <RotateCcw aria-hidden="true" className="size-4" strokeWidth={1.5} />
               Reset
             </Button>
           </div>
         </header>
 
-        <main className="mx-auto flex max-w-[1400px] flex-col gap-5 px-6 pb-8">
-          {/* Control bar: panel rounded-2xl, inputs rounded-lg, padding above 24px */}
+        <main className="mx-auto flex max-w-[1400px] flex-col gap-3 px-6 pb-4">
+          {/* Control bar: frosted pale-blue surface, inputs before results. */}
           <section
             aria-label="Prescription check"
-            className="panel grid grid-cols-1 items-end gap-x-6 gap-y-4 rounded-2xl p-7 md:grid-cols-2 lg:grid-cols-[minmax(13rem,1fr)_minmax(16rem,1.5fr)_minmax(13rem,1.2fr)_auto]"
+            className="panel grid grid-cols-1 items-end gap-x-6 gap-y-3 rounded-[18px] p-4 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1.2fr)_auto]"
           >
             <PatientPicker patients={patients} selectedId={patientId} onSelect={selectPatient} />
             <MedList meds={currentMeds} checking={added} onAdd={addCurrentMed} onRemove={removeCurrentMed} />
-            <PrescriptionPicker value={prescription} onChange={setPrescription} />
+            <PrescriptionPicker value={prescription} onChange={changePrescription} />
             <Button
-              className="press h-12 rounded-lg pr-[18px]! pl-5! text-lg font-semibold"
+              className="press h-11 rounded-lg pr-[18px]! pl-5! text-base font-semibold"
               onClick={checkPrescription}
             >
               Check prescription
@@ -255,11 +287,13 @@ function App() {
             </Button>
           </section>
 
-          <div className="flex flex-col gap-1 pt-2">
-            <h1 className="text-[40px]/[44px] font-bold tracking-[-0.02em] text-ink lg:text-[56px]/[60px]">
+          <div className="flex flex-col gap-0.5">
+            <h1 className="text-[clamp(28px,3.4vw,40px)]/[1.05] font-semibold tracking-[-0.02em] text-ink">
               Same genes. Different response.
             </h1>
-            <p className="text-lg text-ink">See how current medications change this prescription assessment.</p>
+            <p className="text-[15px] text-ink-muted">
+              See how current medications change this prescription assessment.
+            </p>
           </div>
 
           <Status pending={pending > 0} fallbackError={fallbackError} headline={topVerdict?.headline ?? null} />
@@ -273,11 +307,13 @@ function App() {
             assessment={topAssessment}
             level={level}
             pending={pending > 0}
+            playing={playing}
+            onTogglePlay={togglePlay}
           />
 
           <Gauge
             byGenes={speedOf(genotypePhenotype)}
-            now={topAssessment ? speedOf(topAssessment.adjustedPhenotype) : null}
+            now={gaugeNow}
             level={level}
             reducedConfidence={topAssessment?.confidence === 'reduced'}
             nowNote={nowNote}
@@ -294,7 +330,7 @@ function App() {
             </AnimatePresence>
           </div>
 
-          <div className="sticky bottom-4 z-20">
+          <div className="relative z-10">
             <AnimatePresence mode="popLayout" initial={false}>
               {topVerdict ? (
                 <motion.div

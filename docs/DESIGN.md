@@ -1,5 +1,19 @@
 # RxGene design spec
 
+## Implementation refresh — October 24, 2026
+
+Hemnaath authorized Codex to take ownership of the UI build after refining the design in chat. Product source is still authored through Kiro CLI for hackathon provenance. This refresh supersedes the original visual recipes below where they differ; the clinical engine, API behavior, evidence and synthetic-patient contracts are preserved.
+
+The current direction is an atmospheric molecular prescribing workbench: locally served Sora headings and Plus Jakarta Sans body, a quiet pale-blue molecular background, transparent sculptural DNA and enzyme artwork, marine controls, and coral clinical warning accents. Inputs come before the explanation. The main story is one connected canvas with Genetic baseline → Medication effect → Current response, followed by one qualitative ruler and a horizontal verdict strip. Comparison is available on demand instead of occupying permanent space.
+
+The DNA illustration communicates the inherited baseline and remains unchanged. Conceptual drug particles pass through the enzyme, never through DNA. Normal-flow green is an explanatory process motif, not a medication approval. Unknown, unsupported and uncomputed assessments stay neutral; per-drug engine support determines whether inhibition can be illustrated. The enzyme image is conceptual artwork, not an exact CYP2D6 structural reconstruction or a patient scan.
+
+Production artwork lives in `web/public/art/`; see its README for provenance. Keep the center of the background quiet and protect text with a subtle light scrim. Do not replace these assets with a screenshot of the whole interface. Preserve accessible Base UI controls/sheets, the full evidence and patient-summary flows, and CDS/local mode.
+
+Motion is user-controlled with a pathway playback control and respects reduced motion. Clinical results appear independently of playback. Patient/medication/result changes cancel prior playback; static labels always carry the assessment. Browser verification, not an image mockup, determines final spacing and contrast.
+
+The following sections document the original scaffold and its clinical-state requirements; original three-card layouts, Geist-only typography and CSS-only background instructions are historical rather than requirements for this refresh.
+
 Reference mockup (case 1, Sarah): [`docs/design/mockup-case1.webp`](design/mockup-case1.webp).
 Kiro implements this through `.kiro/briefs/mithuna-06-apply-design.md`. All values here are
 exact, so don't approximate them. Stack: Tailwind v4 + shadcn/ui (Base UI) + Motion,

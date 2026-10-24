@@ -77,6 +77,7 @@ cases=[
  ('P21',None,None,[],'codeine','No CYP2D6 result -> insufficient data'),
  ('P22','*1/*1',None,['sertraline'],'codeine','Weak inhibitor (FDA): no activity-score adjustment'),
  ('P23','*10/*10',None,[],'atomoxetine','Discriminates the *10 value: current 0.25 gives AS 0.5 (titration row, YELLOW); the old 0.5 would give AS 1.0 (standard-titration row, GREEN). Phenotype label is IM either way'),
+ ('P24','*1x2/*10',None,[],'codeine','Upper boundary: AS exactly 2.25 (2.0 + 0.25) is NM because the range is inclusive, not UM. Pairs with P09 (1.25, lower boundary)'),
 ]
 rows=[]
 for pid,dip6,dip19,meds,drug,note in cases:

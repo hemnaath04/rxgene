@@ -532,5 +532,28 @@
   "extra_flag": "",
   "confidence": "standard",
   "inhibitor_note": ""
+ },
+ {
+  "id": "P24",
+  "cyp2d6": "*1x2/*10",
+  "cyp2c19": "",
+  "current_meds": "",
+  "new_drug": "codeine",
+  "alerted_drug": "codeine",
+  "population": "adult",
+  "genotype_AS": 2.25,
+  "genotype_phenotype": "Normal Metabolizer",
+  "inhibitor": "",
+  "adjusted_AS": 2.25,
+  "adjusted_phenotype": "Normal Metabolizer",
+  "phenoconverted": "no",
+  "alert": "GREEN",
+  "cpic_recommendation": "Use codeine label recommended age- or weight-specific dosing.",
+  "cpic_strength": "Strong",
+  "source": "CPIC opioid guideline 2021, CYP2D6 normal-metabolizer codeine recommendation.",
+  "note": "Upper boundary: AS exactly 2.25 (2.0 + 0.25) is NM because the range is inclusive, not UM. Pairs with P09 (1.25, lower boundary)",
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  }
 ]

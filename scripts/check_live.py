@@ -76,6 +76,19 @@ for name, meds, added, dip, indicator, phrase in cases:
     ok = ok and "safe" not in blob.replace("not the same as safe", "")
     check(name, ok, f"HTTP {status}, indicator={card.get('indicator')}")
 
+# The public CDS Hooks sandbox sends DSTU2 MedicationOrder, not R4 MedicationRequest.
+dstu2 = order_select([], "codeine")
+for e in dstu2["context"]["draftOrders"]["entry"]:
+    e["resource"]["resourceType"] = "MedicationOrder"
+    e["resource"]["medicationCodeableConcept"]["text"] = "Codeine sulfate 30 MG Oral Tablet"
+dstu2["context"]["selections"] = ["MedicationOrder/codeine"]
+status, _, text = curl("POST", "/cds-services/rxgene-order-select", dstu2)
+try:
+    cards = json.loads(text).get("cards", [])
+except json.JSONDecodeError:
+    cards = []
+check("DSTU2 MedicationOrder (sandbox shape) -> 1 info card", status == 200 and len(cards) == 1 and cards[0].get("indicator") == "info", f"HTTP {status}, cards={len(cards)}")
+
 status, _, text = curl("GET", "/api/summary.test")
 check("test files are not deployed as endpoints", status == 404, f"HTTP {status}")
 

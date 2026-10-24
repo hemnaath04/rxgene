@@ -64,7 +64,7 @@ Build order follows the commit history. Hashes are matched from commit messages;
   - `hasStar10Allele` (`*10`, `*10xN`, `*36+*10`) and `lookupAtomoxetineStar10` (curated `1.0 (*10 present)`, text from key `0.75`, YELLOW); without `*10`, the standard 1.0 row (fixtures P15, P25).
   - `ATOMOXETINE_AS1_CONTROVERSY_NOTE` shown in the evidence sheet for activity score 1.0.
 
-- [x] 18. Omeprazole–clopidogrel label note (R28) — **partly done in 1423791 (note on the card itself); brand names removed in 7953d82; reverse case fixed in pending: the reverse-case filter in `checkOrder` also keeps a re-checked assessment that carries `labelNote`, so adding omeprazole to a patient already on clopidogrel shows the note**
+- [x] 18. Omeprazole–clopidogrel label note (R28) — **partly done in 1423791 (note on the card itself); brand names removed in 7953d82; reverse case fixed in 9f38c27: the reverse-case filter in `checkOrder` also keeps a re-checked assessment that carries `labelNote`, so adding omeprazole to a patient already on clopidogrel shows the note**
   - `OMEPRAZOLE_CLOPIDOGREL_LABEL_NOTE` set when omeprazole is on the list; shown in `AlertCard`, the story row and the evidence sheet; no CYP2C19 phenoconversion (fixture P19).
   - Reverse-case tests in `edge-cases.test.ts` (omeprazole added to `*1/*1` on clopidogrel; P19 shape; sertraline added to codeine still gives no re-check card). Esomeprazole is not an engine-known drug, so it is not tested.
 

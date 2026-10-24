@@ -364,7 +364,7 @@ function getEvidence(ctx: ToolContext, args: { drug?: unknown }): ToolResult {
 
 // ---- Executor ----
 
-export function runTool(name: string, args: Record<string, unknown>, ctx: ToolContext): ToolResult {
+export function runTool(name: string, args: Record<string, unknown>, ctx: ToolContext, label?: string): ToolResult {
   switch (name) {
     case 'get_patient':
       return getPatient(ctx);

@@ -57,12 +57,12 @@ describe('POST /api/consult', () => {
                   content: null,
                   tool_calls: [
                     {
-                      id: 'call_1',
+                      id: 'call_provider_1',
                       type: 'function',
                       function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
                     },
                     {
-                      id: 'call_2',
+                      id: 'call_provider_2',
                       type: 'function',
                       function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'fluoxetine' }) }
                     }
@@ -74,7 +74,7 @@ describe('POST /api/consult', () => {
           })
         );
       } else {
-        // Second call: model returns the note.
+        // Second call: model returns the note using T-labels.
         const note = {
           sections: [
             {
@@ -82,7 +82,7 @@ describe('POST /api/consult', () => {
               sentences: [
                 {
                   text: 'Reviewed both medications against patient pharmacogenomic results.',
-                  cites: ['call_1', 'call_2']
+                  cites: ['T1', 'T2']
                 }
               ]
             },
@@ -91,11 +91,11 @@ describe('POST /api/consult', () => {
               sentences: [
                 {
                   text: 'Codeine: RED alert. Avoid codeine. Intermediate Metabolizer by genotype, phenoconverted to Poor Metabolizer due to fluoxetine (strong CYP2D6 inhibitor).',
-                  cites: ['call_1']
+                  cites: ['T1']
                 },
                 {
                   text: 'Fluoxetine: GREY alert. Fluoxetine is a CYP2D6 inhibitor (strong class, FDA). No independent pharmacogenomic assessment for this medication. This medication is a strong CYP2D6 inhibitor and may affect other drugs metabolized by CYP2D6.',
-                  cites: ['call_2']
+                  cites: ['T2']
                 }
               ]
             }
@@ -122,8 +122,10 @@ describe('POST /api/consult', () => {
     expect(data.trace).toHaveLength(2);
     expect(data.trace[0].tool).toBe('check_drug');
     expect(data.trace[0].args.drug).toBe('codeine');
+    expect(data.trace[0].id).toBe('T1');
     expect(data.trace[1].tool).toBe('check_drug');
     expect(data.trace[1].args.drug).toBe('fluoxetine');
+    expect(data.trace[1].id).toBe('T2');
     expect(data.note.sections).toHaveLength(2);
     // Every cite should resolve to a trace entry.
     for (const section of data.note.sections) {
@@ -156,7 +158,7 @@ describe('POST /api/consult', () => {
 
     const request = new Request('http://localhost/api/consult', {
       method: 'POST',
-      body: JSON.stringify({ patient })
+      body: JSON.stringify({ patient: { ...patient, meds: ['codeine'] } })
     });
     const response = await POST(request);
     expect(response.status).toBe(200);
@@ -179,7 +181,7 @@ describe('POST /api/consult', () => {
                   content: null,
                   tool_calls: [
                     {
-                      id: 'call_1',
+                      id: 'call_xyz',
                       type: 'function',
                       function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
                     }
@@ -197,8 +199,8 @@ describe('POST /api/consult', () => {
             {
               heading: 'Findings',
               sentences: [
-                { text: 'Codeine: RED alert. Avoid.', cites: ['call_1'] },
-                { text: 'Also consider morphine.', cites: ['call_1'] } // morphine not on list!
+                { text: 'Codeine: RED alert. Avoid.', cites: ['T1'] },
+                { text: 'Also consider morphine.', cites: ['T1'] } // morphine not on list!
               ]
             }
           ]
@@ -237,7 +239,7 @@ describe('POST /api/consult', () => {
                   content: null,
                   tool_calls: [
                     {
-                      id: 'call_1',
+                      id: 'call_xyz',
                       type: 'function',
                       function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
                     }
@@ -251,7 +253,7 @@ describe('POST /api/consult', () => {
       } else {
         // Skip codeine in the note.
         const note = {
-          sections: [{ heading: 'Findings', sentences: [{ text: 'All medications reviewed.', cites: ['call_1'] }] }]
+          sections: [{ heading: 'Findings', sentences: [{ text: 'All medications reviewed.', cites: ['T1'] }] }]
         };
         return new Response(
           JSON.stringify({
@@ -287,7 +289,7 @@ describe('POST /api/consult', () => {
                   content: null,
                   tool_calls: [
                     {
-                      id: 'call_1',
+                      id: 'call_xyz',
                       type: 'function',
                       function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'fluoxetine' }) }
                     }
@@ -301,7 +303,7 @@ describe('POST /api/consult', () => {
       } else {
         const note = {
           sections: [
-            { heading: 'Findings', sentences: [{ text: 'Fluoxetine is safe to use.', cites: ['call_1'] }] } // says "safe"!
+            { heading: 'Findings', sentences: [{ text: 'Fluoxetine is safe to use.', cites: ['T1'] }] } // says "safe"!
           ]
         };
         return new Response(
@@ -480,14 +482,14 @@ describe('POST /api/consult', () => {
           sections: [
             {
               heading: 'Pharmacogenomic summary',
-              sentences: [{ text: 'Reviewed codeine against patient pharmacogenomic results.', cites: ['call_1'] }]
+              sentences: [{ text: 'Reviewed codeine against patient pharmacogenomic results.', cites: ['T1'] }]
             },
             {
               heading: 'Medication-specific findings',
               sentences: [
                 {
                   text: 'Codeine: RED alert. Avoid codeine. Intermediate Metabolizer by genotype, phenoconverted to Poor Metabolizer due to a strong CYP2D6 inhibitor.',
-                  cites: ['call_1']
+                  cites: ['T1']
                 }
               ]
             }
@@ -549,7 +551,7 @@ describe('POST /api/consult', () => {
                   content: null,
                   tool_calls: [
                     {
-                      id: 'call_1',
+                      id: 'call_xyz_1',
                       type: 'function',
                       function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
                     }
@@ -586,7 +588,7 @@ describe('POST /api/consult', () => {
                   content: null,
                   tool_calls: [
                     {
-                      id: 'call_2',
+                      id: 'call_xyz_2',
                       type: 'function',
                       function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
                     }
@@ -683,6 +685,354 @@ describe('POST /api/consult', () => {
         }
       }
     }
+  });
+
+  it('citation resolution: T-label resolves', async () => {
+    let callCount = 0;
+    const mockFetch = async (url: string, init?: RequestInit) => {
+      callCount++;
+      if (callCount === 1) {
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  role: 'assistant',
+                  content: null,
+                  tool_calls: [
+                    {
+                      id: 'call_xyz',
+                      type: 'function',
+                      function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
+                    }
+                  ]
+                },
+                finish_reason: 'tool_calls'
+              }
+            ]
+          })
+        );
+      } else {
+        // Model returns T1 citation (injected by the agent).
+        const note = {
+          sections: [
+            {
+              heading: 'Findings',
+              sentences: [{ text: 'Codeine: YELLOW alert. Adjust dose per CPIC guidance.', cites: ['T1'] }]
+            }
+          ]
+        };
+        return new Response(
+          JSON.stringify({
+            choices: [{ message: { role: 'assistant', content: JSON.stringify(note) }, finish_reason: 'stop' }]
+          })
+        );
+      }
+    };
+
+    global.fetch = mockFetch as typeof fetch;
+
+    const request = new Request('http://localhost/api/consult', {
+      method: 'POST',
+      body: JSON.stringify({ patient: { ...patient, meds: ['codeine'] } })
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const data = (await response.json()) as AgentResult;
+    expect(data.source).toBe('ai');
+    expect(data.note.sections[0].sentences[0].cites).toEqual(['T1']);
+  });
+
+  it('citation resolution: check_drug(codeine) resolves', async () => {
+    let callCount = 0;
+    const mockFetch = async (url: string, init?: RequestInit) => {
+      callCount++;
+      if (callCount === 1) {
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  role: 'assistant',
+                  content: null,
+                  tool_calls: [
+                    {
+                      id: 'call_xyz',
+                      type: 'function',
+                      function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
+                    }
+                  ]
+                },
+                finish_reason: 'tool_calls'
+              }
+            ]
+          })
+        );
+      } else {
+        // Model returns tool(arg) citation.
+        const note = {
+          sections: [
+            {
+              heading: 'Findings',
+              sentences: [{ text: 'Codeine: YELLOW alert. Adjust dose per CPIC guidance.', cites: ['check_drug(codeine)'] }]
+            }
+          ]
+        };
+        return new Response(
+          JSON.stringify({
+            choices: [{ message: { role: 'assistant', content: JSON.stringify(note) }, finish_reason: 'stop' }]
+          })
+        );
+      }
+    };
+
+    global.fetch = mockFetch as typeof fetch;
+
+    const request = new Request('http://localhost/api/consult', {
+      method: 'POST',
+      body: JSON.stringify({ patient: { ...patient, meds: ['codeine'] } })
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const data = (await response.json()) as AgentResult;
+    expect(data.source).toBe('ai');
+    // Citation should be normalized to T1.
+    expect(data.note.sections[0].sentences[0].cites).toEqual(['T1']);
+  });
+
+  it('citation resolution: tool_call_id resolves', async () => {
+    let callCount = 0;
+    const mockFetch = async (url: string, init?: RequestInit) => {
+      callCount++;
+      if (callCount === 1) {
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  role: 'assistant',
+                  content: null,
+                  tool_calls: [
+                    {
+                      id: 'call_xyz_123',
+                      type: 'function',
+                      function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
+                    }
+                  ]
+                },
+                finish_reason: 'tool_calls'
+              }
+            ]
+          })
+        );
+      } else {
+        // Model returns the provider id.
+        const note = {
+          sections: [
+            {
+              heading: 'Findings',
+              sentences: [{ text: 'Codeine: YELLOW alert. Adjust dose per CPIC guidance.', cites: ['call_xyz_123'] }]
+            }
+          ]
+        };
+        return new Response(
+          JSON.stringify({
+            choices: [{ message: { role: 'assistant', content: JSON.stringify(note) }, finish_reason: 'stop' }]
+          })
+        );
+      }
+    };
+
+    global.fetch = mockFetch as typeof fetch;
+
+    const request = new Request('http://localhost/api/consult', {
+      method: 'POST',
+      body: JSON.stringify({ patient: { ...patient, meds: ['codeine'] } })
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const data = (await response.json()) as AgentResult;
+    expect(data.source).toBe('ai');
+    // Citation should be normalized to T1.
+    expect(data.note.sections[0].sentences[0].cites).toEqual(['T1']);
+  });
+
+  it('citation resolution: check_drug(ibuprofen) when no such call fails', async () => {
+    let callCount = 0;
+    const mockFetch = async (url: string, init?: RequestInit) => {
+      callCount++;
+      if (callCount === 1) {
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  role: 'assistant',
+                  content: null,
+                  tool_calls: [
+                    {
+                      id: 'call_xyz',
+                      type: 'function',
+                      function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
+                    }
+                  ]
+                },
+                finish_reason: 'tool_calls'
+              }
+            ]
+          })
+        );
+      } else {
+        // Model cites a drug that wasn't called.
+        const note = {
+          sections: [
+            {
+              heading: 'Findings',
+              sentences: [{ text: 'Codeine: RED alert.', cites: ['check_drug(ibuprofen)'] }]
+            }
+          ]
+        };
+        return new Response(
+          JSON.stringify({
+            choices: [{ message: { role: 'assistant', content: JSON.stringify(note) }, finish_reason: 'stop' }]
+          })
+        );
+      }
+    };
+
+    global.fetch = mockFetch as typeof fetch;
+
+    const request = new Request('http://localhost/api/consult', {
+      method: 'POST',
+      body: JSON.stringify({ patient: { ...patient, meds: ['codeine'] } })
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const data = (await response.json()) as AgentResult;
+    expect(data.source).toBe('template');
+    expect(data.reason).toContain('R47');
+  });
+
+  it('citation resolution: T99 when no such label fails', async () => {
+    let callCount = 0;
+    const mockFetch = async (url: string, init?: RequestInit) => {
+      callCount++;
+      if (callCount === 1) {
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  role: 'assistant',
+                  content: null,
+                  tool_calls: [
+                    {
+                      id: 'call_xyz',
+                      type: 'function',
+                      function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
+                    }
+                  ]
+                },
+                finish_reason: 'tool_calls'
+              }
+            ]
+          })
+        );
+      } else {
+        // Model cites a label that doesn't exist.
+        const note = {
+          sections: [
+            {
+              heading: 'Findings',
+              sentences: [{ text: 'Codeine: RED alert.', cites: ['T99'] }]
+            }
+          ]
+        };
+        return new Response(
+          JSON.stringify({
+            choices: [{ message: { role: 'assistant', content: JSON.stringify(note) }, finish_reason: 'stop' }]
+          })
+        );
+      }
+    };
+
+    global.fetch = mockFetch as typeof fetch;
+
+    const request = new Request('http://localhost/api/consult', {
+      method: 'POST',
+      body: JSON.stringify({ patient: { ...patient, meds: ['codeine'] } })
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const data = (await response.json()) as AgentResult;
+    expect(data.source).toBe('template');
+    expect(data.reason).toContain('R47');
+  });
+
+  it('returned note uses T-labels only after normalization', async () => {
+    let callCount = 0;
+    const mockFetch = async (url: string, init?: RequestInit) => {
+      callCount++;
+      if (callCount === 1) {
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  role: 'assistant',
+                  content: null,
+                  tool_calls: [
+                    {
+                      id: 'provider_xyz_123',
+                      type: 'function',
+                      function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
+                    },
+                    {
+                      id: 'provider_abc_456',
+                      type: 'function',
+                      function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'fluoxetine' }) }
+                    }
+                  ]
+                },
+                finish_reason: 'tool_calls'
+              }
+            ]
+          })
+        );
+      } else {
+        // Model uses mixed citation formats.
+        const note = {
+          sections: [
+            {
+              heading: 'Findings',
+              sentences: [
+                { text: 'Codeine: RED alert. Avoid codeine. Intermediate Metabolizer by genotype, phenoconverted to Poor Metabolizer due to fluoxetine (strong CYP2D6 inhibitor).', cites: ['check_drug(codeine)'] },
+                { text: 'Fluoxetine: GREY alert. Fluoxetine is a CYP2D6 inhibitor (strong class, FDA). No independent pharmacogenomic assessment for this medication. This medication is a strong CYP2D6 inhibitor and may affect other drugs metabolized by CYP2D6.', cites: ['provider_abc_456'] }
+              ]
+            }
+          ]
+        };
+        return new Response(
+          JSON.stringify({
+            choices: [{ message: { role: 'assistant', content: JSON.stringify(note) }, finish_reason: 'stop' }]
+          })
+        );
+      }
+    };
+
+    global.fetch = mockFetch as typeof fetch;
+
+    const request = new Request('http://localhost/api/consult', {
+      method: 'POST',
+      body: JSON.stringify({ patient })
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const data = (await response.json()) as AgentResult;
+    expect(data.source).toBe('ai');
+    // All citations should be normalized to T-labels.
+    expect(data.note.sections[0].sentences[0].cites).toEqual(['T1']);
+    expect(data.note.sections[0].sentences[1].cites).toEqual(['T2']);
   });
 
   it('markdown code fence wrapped JSON is parsed successfully', async () => {

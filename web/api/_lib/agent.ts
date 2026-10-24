@@ -33,6 +33,7 @@ export type TraceEntry = {
   summary: string;
   ms: number;
   providerId?: string; // Optional: the real provider's tool call id for citation matching
+  result?: unknown; // The full result data for R50 number validation
 };
 
 export type NoteSentence = {
@@ -97,13 +98,16 @@ function buildSystemPrompt(): string {
   return [
     "You are drafting a pharmacogenomics consult note for a pharmacist to review.",
     "Call check_drug for every medication on the list and for the added drug if there is one.",
-    "Every sentence that states a recommendation, alert level, phenotype, activity score, inhibitor class or any other clinical fact must cite the exact tool_call id string you received for that tool call, copied in full without shortening or abbreviation.",
+    "Every tool result includes a cite_as label (e.g., T1, T2, T3). Every sentence that states a recommendation, alert level, phenotype, activity score, inhibitor class or any other clinical fact must cite the cite_as label of the tool result it came from.",
+    "Cite each fact with the cite_as label, e.g. [\"T3\"]. Never cite tool_call ids.",
     "State only what the tools returned. Keep each drug's action exactly (RED: avoid; YELLOW: the dose/titration plan; GREY: not assessed, pharmacist review; GREEN: no supported alert, not the same as safe).",
     "Never call anything safe.",
     "Do not add drugs, doses or numbers that are not in tool results.",
     "Keep every dose and time from the recommendation text.",
+    "If a tool result includes an inhibitorNote, labelNote, discrepancyFlag or population field, copy that exact text verbatim into your note wherever you mention that finding - do not paraphrase, reword, or summarize those specific fields.",
+    "If a tool result's confidence field is \"reduced\", include the exact phrase \"reduced confidence\" in your note for that drug.",
     "Be concise: one sentence per medication finding (plus required qualifiers), at most 2 sentences in other sections.",
-    'Output only JSON in this format: { "sections": [ { "heading": string, "sentences": [ { "text": string, "cites": [tool_call_id, ...] } ] } ] }. Do not wrap it in a markdown code fence or any other text.',
+    'Output only JSON in this format: { "sections": [ { "heading": string, "sentences": [ { "text": string, "cites": [cite_as_label, ...] } ] } ] }. Do not wrap it in a markdown code fence or any other text.',
     'Suggested headings: "Pharmacogenomic summary", "Medication-specific findings", "Drug–drug–gene interactions", "Recommendations for prescriber".'
   ].join(' ');
 }
@@ -185,7 +189,7 @@ export async function runConsultAgent(ctx: ToolContext, deps: AgentDeps): Promis
 
   let modelIndex = 0;
   let model = deps.models[modelIndex];
-  let toolCallCounter = 0; // Counter for generating short sequential IDs (call_1, call_2, etc.)
+  let toolCallCounter = 0; // Counter for generating sequential T-labels
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
     const elapsed = deps.now() - startMs;
@@ -250,6 +254,7 @@ export async function runConsultAgent(ctx: ToolContext, deps: AgentDeps): Promis
         const assessments = [...ctx.assessments.values()];
         const validation = validateNote(note, trace, assessments);
         if (!validation.ok) {
+          console.warn('[agent] rejected note:', JSON.stringify(note));
           console.warn(`[agent] validation failed: ${validation.reason}`);
           console.warn('[agent] trace ids:', trace.map(t => t.id));
           return templateFallback(ctx, trace, `validation: ${validation.reason}`, deps.now() - startMs);
@@ -262,28 +267,23 @@ export async function runConsultAgent(ctx: ToolContext, deps: AgentDeps): Promis
     }
 
     // Tool calls: execute them.
-    // Map provider IDs to our short sequential IDs so the model sees and must cite the short ones.
-    const providerIdToShortId = new Map<string, string>();
-    const shortToolCalls = toolCalls.map(tc => {
+    // Use simple T-labels (T1, T2, ...) in the trace and in results sent to the model.
+    const toolCallBatch: Array<{ tc: typeof toolCalls[number]; label: string }> = toolCalls.map(tc => {
       toolCallCounter++;
-      const shortId = `call_${toolCallCounter}`;
-      providerIdToShortId.set(tc.id ?? '', shortId);
-      return {
-        id: shortId,
-        type: 'function',
-        function: { name: tc.function?.name ?? '', arguments: tc.function?.arguments ?? '{}' }
-      };
+      return { tc, label: `T${toolCallCounter}` };
     });
 
     messages.push({
       role: 'assistant',
       content: content || '',
-      tool_calls: shortToolCalls
+      tool_calls: toolCalls.map(tc => ({
+        id: tc.id ?? '',
+        type: 'function' as const,
+        function: { name: tc.function?.name ?? '', arguments: tc.function?.arguments ?? '{}' }
+      }))
     });
 
-    for (let i = 0; i < toolCalls.length; i++) {
-      const tc = toolCalls[i];
-      const shortId = providerIdToShortId.get(tc.id ?? '') ?? `call_${i + 1}`;
+    for (const { tc, label } of toolCallBatch) {
       const callStart = deps.now();
       const toolName = tc.function?.name ?? '';
       let args: Record<string, unknown> = {};
@@ -293,36 +293,40 @@ export async function runConsultAgent(ctx: ToolContext, deps: AgentDeps): Promis
         args = {};
       }
 
-      const result = runTool(toolName, args, ctx);
+      const result = runTool(toolName, args, ctx, label);
       const callMs = deps.now() - callStart;
 
       if (result.ok) {
+        // Inject cite_as into the result object sent to the model.
+        const resultWithLabel = { cite_as: label, ...result.result as object };
         trace.push({
-          id: shortId,
+          id: label,
           tool: toolName,
           args,
           summary: makeTraceSummary(toolName, args, result.result),
           ms: callMs,
-          providerId: tc.id
+          providerId: tc.id,
+          result: result.result
         });
         messages.push({
           role: 'tool',
-          tool_call_id: shortId,
-          content: JSON.stringify(result.result)
+          tool_call_id: tc.id ?? '',
+          content: JSON.stringify(resultWithLabel)
         });
       } else {
         trace.push({
-          id: shortId,
+          id: label,
           tool: toolName,
           args,
           summary: `${toolName}(${JSON.stringify(args)}) → error: ${result.error}`,
           ms: callMs,
-          providerId: tc.id
+          providerId: tc.id,
+          result: { error: result.error }
         });
         messages.push({
           role: 'tool',
-          tool_call_id: shortId,
-          content: JSON.stringify({ error: result.error })
+          tool_call_id: tc.id ?? '',
+          content: JSON.stringify({ cite_as: label, error: result.error })
         });
       }
     }
@@ -357,9 +361,9 @@ type ValidationResult = { ok: true } | { ok: false; reason: string };
 const CLINICAL_TERMS = /\b(red|yellow|avoid|adjust|titrat|dose|dosing|phenotype|activity score|inhibitor|metabolizer|recommendation)\b/i;
 
 /** Numbers that are NOT part of gene/allele/requirement IDs. */
-const STANDALONE_NUMBER = /(?<![A-Za-z*R])\d+(?:\.\d+)?(?![A-Za-z*])/g;
+const STANDALONE_NUMBER = /(?<![A-Za-z0-9*])\d+(?:\.\d+)?(?![A-Za-z0-9*])/g;
 
-function extractNumbers(text: string): Set<number> {
+export function extractNumbers(text: string): Set<number> {
   const matches = text.match(STANDALONE_NUMBER) ?? [];
   return new Set(matches.map(m => parseFloat(m)));
 }
@@ -372,15 +376,48 @@ function containsSubstring(text: string, substr: string): boolean {
   return normalize(text).includes(normalize(substr));
 }
 
-export function validateNote(note: ConsultNote, trace: TraceEntry[], assessments: DrugAssessment[]): ValidationResult {
-  // Build set of valid citation IDs: both short ids and provider ids (if present)
-  const traceIds = new Set<string>();
-  for (const t of trace) {
-    traceIds.add(t.id);
-    if (t.providerId) {
-      traceIds.add(t.providerId);
+/**
+ * Resolve a citation to its T-label. Returns null if it doesn't resolve.
+ * Accepts:
+ * - T-labels (T1, T2, ...)
+ * - tool(arg) format, e.g. check_drug(codeine)
+ * - tool_call_id or providerId
+ */
+function resolveCitation(cite: string, trace: TraceEntry[]): string | null {
+  // Direct T-label match.
+  const directMatch = trace.find(t => t.id === cite);
+  if (directMatch) return directMatch.id;
+
+  // Provider id match.
+  const providerMatch = trace.find(t => t.providerId === cite);
+  if (providerMatch) return providerMatch.id;
+
+  // tool(arg) format: match tool name and drug argument (case-insensitive).
+  const funcMatch = cite.match(/^([a-z_]+)\(([^)]*)\)$/i);
+  if (funcMatch) {
+    const [, toolName, arg] = funcMatch;
+    const toolNameLower = toolName.toLowerCase();
+    const argLower = arg.trim().toLowerCase();
+
+    // For tools with no arguments, match by tool name alone.
+    if (argLower === '') {
+      const match = trace.find(t => t.tool === toolNameLower);
+      if (match) return match.id;
     }
+
+    // For tools with a drug argument, match tool name + drug.
+    const match = trace.find(t => {
+      if (t.tool !== toolNameLower) return false;
+      const drugArg = t.args.drug;
+      return typeof drugArg === 'string' && drugArg.toLowerCase() === argLower;
+    });
+    if (match) return match.id;
   }
+
+  return null;
+}
+
+export function validateNote(note: ConsultNote, trace: TraceEntry[], assessments: DrugAssessment[]): ValidationResult {
   const noteText = JSON.stringify(note);
   const normalizedNote = normalize(noteText);
 
@@ -389,24 +426,28 @@ export function validateNote(note: ConsultNote, trace: TraceEntry[], assessments
     .map(sec => [sec.heading, ...sec.sentences.map(s => s.text)].join(' '))
     .join(' ');
 
-  // Collect all tool results as text.
-  const toolResultsText = JSON.stringify(trace.map(t => {
-    const entry = trace.find(e => e.id === t.id);
-    return entry ? entry.summary : '';
-  }));
+  // Collect all tool results as text (use full result data for complete number extraction).
+  const toolResultsText = JSON.stringify(trace.map(t => t.result));
 
   // R47: every sentence with a clinical fact must cite a valid tool call.
+  // Normalize all citations to T-labels.
   for (const section of note.sections) {
     for (const sentence of section.sentences) {
       if (CLINICAL_TERMS.test(sentence.text)) {
         if (sentence.cites.length === 0) {
           return { ok: false, reason: 'R47: clinical sentence without citation' };
         }
+        const normalizedCites: string[] = [];
         for (const cite of sentence.cites) {
-          if (!traceIds.has(cite)) {
+          const resolved = resolveCitation(cite, trace);
+          if (!resolved) {
+            console.warn(`[agent] R47 failed: invalid citation "${cite}"`);
             return { ok: false, reason: `R47: invalid citation ${cite}` };
           }
+          normalizedCites.push(resolved);
         }
+        // Replace the original cites with normalized T-labels.
+        sentence.cites = normalizedCites;
       }
     }
   }

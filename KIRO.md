@@ -48,6 +48,8 @@ API and consult agent (brief 20, `RxGeneConnected.tsx` + `mapAssessment.ts`).
 - The most important one was a real clinical conflict we had missed. **R18** (atomoxetine + a moderate inhibitor gives "not assessed") could hide the alert **R21** requires for a patient who is already a poor metabolizer by genotype.
 - Resolution: R18 now defers to R21. We added fixture P26, and the engine was fixed (commit 7af163b).
 
+**Engine design and tasks ([`design.md`](.kiro/specs/rxgene-engine/design.md), [`tasks.md`](.kiro/specs/rxgene-engine/tasks.md))** complete the engine's requirements → design → tasks flow: architecture, data model and correctness properties, then 24 tasks traced to requirement IDs and commits.
+
 **[`.kiro/specs/consult-agent/`](.kiro/specs/consult-agent/): the full requirements → design → tasks flow** for the pharmacist consult agent.
 - Each of the 8 tasks lists the requirements it satisfies (R45–R56).
 - Our genetics teammate ticked the tasks against the first agent commit: **5 done, 3 partly done**, each with the gap written down. Those gaps drove the next briefs.

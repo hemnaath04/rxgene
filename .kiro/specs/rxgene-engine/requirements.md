@@ -23,9 +23,9 @@ are deterministic rules that the AI component never modifies.
 
 **R6:** WHEN the computed CYP2D6 activity score is greater than 2.25, THE SYSTEM SHALL assign the phenotype "Ultrarapid Metabolizer".
 
-**R7:** WHEN a patient's CYP2D6 genotype contains one or more alleles with no activity value in the reference data, THE SYSTEM SHALL assign the phenotype "Indeterminate (Not assessed)" AND SHALL issue a GREY-level alert AND SHALL NOT default to normal metabolizer.
+**R7:** WHEN a patient's CYP2D6 genotype contains one or more alleles with no activity value in the reference data, THE SYSTEM SHALL assign the phenotype "Indeterminate" AND SHALL issue a GREY-level alert AND SHALL NOT default to normal metabolizer AND SHALL show this exact fixed text on the card: "Indeterminate: this gene result includes a variant we cannot interpret, so no pharmacogenomic check was done for this drug. Ask a pharmacist."
 
-**R8:** WHEN a patient's CYP2D6 gene result is missing or not provided, THE SYSTEM SHALL assign the status "Insufficient data" AND SHALL issue a GREY-level alert.
+**R8:** WHEN a patient's CYP2D6 gene result is missing or not provided, THE SYSTEM SHALL assign the status "Insufficient data" AND SHALL issue a GREY-level alert AND SHALL show this exact fixed text on the card: "Insufficient data: there is no CYP2D6 result on file, so no pharmacogenomic check was done for this drug."
 
 ---
 
@@ -47,9 +47,9 @@ are deterministic rules that the AI component never modifies.
 
 **R16:** WHEN computing phenoconversion for tramadol, THE SYSTEM SHALL apply the inhibitor adjustment rules (R10–R14).
 
-**R17:** WHEN computing phenoconversion for atomoxetine AND a strong CYP2D6 inhibitor is present (excluding atomoxetine itself), THE SYSTEM SHALL apply the strong-inhibitor adjustment (adjusted activity score 0, adjusted phenotype Poor Metabolizer) AND SHALL use the poor-metabolizer-equivalent recommendation from CPIC atomoxetine 2019.
+**R17:** WHEN computing phenoconversion for atomoxetine AND a strong CYP2D6 inhibitor is present (excluding atomoxetine itself), THE SYSTEM SHALL lead the alert card with the FDA STRATTERA label section 2.5 (adult taking a strong CYP2D6 inhibitor; a longer 4-week titration interval, with its conditions: if ADHD symptoms fail to improve and the initial dosage is well tolerated; starting, target and maximum dosages as in the label's standard adult table) AND SHALL show the CPIC atomoxetine 2019 poor-metabolizer recommendation only as supporting genotype-based context, not as an equally applicable dosing instruction AND SHALL show this fixed text: "Different guidance contexts: FDA labeling directly addresses strong CYP2D6 inhibitor coadministration and recommends a 4-week titration interval. CPIC 2019 provides genotype-based poor-metabolizer guidance with a 2-week response assessment. These recommendations should not be treated as interchangeable." AND SHALL show the adjusted activity score as "n/a" and the phenotype description "Poor-metabolizer-equivalent dosing (FDA label)" AND SHALL NOT apply the ×0 / ×0.5 multiplier AND SHALL keep the adult population label, source links and guideline versions visible.
 
-**R18:** WHEN computing phenoconversion for atomoxetine AND a moderate CYP2D6 inhibitor is present (excluding atomoxetine itself) AND no strong inhibitor is present, THE SYSTEM SHALL assign the status "not computed" AND SHALL issue a GREY-level alert with the text "pharmacist review" AND SHALL NOT compute an adjusted activity score.
+**R18:** WHEN computing phenoconversion for atomoxetine AND a moderate CYP2D6 inhibitor is present (excluding atomoxetine itself) AND no strong inhibitor is present, THE SYSTEM SHALL assign the status "Not assessed" AND SHALL issue a GREY-level alert AND SHALL NOT compute an adjusted activity score AND SHALL show this exact fixed text on the card: "Not assessed: a moderate CYP2D6 inhibitor is present and CPIC states no adjustment for atomoxetine, so RxGene does not compute this. Pharmacist review needed."
 
 **R19:** WHEN assessing any CYP2D6 drug, THE SYSTEM SHALL ALWAYS emit both the genotype phenotype and the adjusted (converted) phenotype AND SHALL ALWAYS display them side by side in the alert details, even when no phenoconversion occurred (for example a patient who is already a poor metabolizer by genotype, or a patient with no inhibitor present); WHEN no inhibitor is present, the adjusted phenotype SHALL equal the genotype phenotype.
 
@@ -57,7 +57,7 @@ are deterministic rules that the AI component never modifies.
 
 ## Edge Cases: Confidence and De-escalation
 
-**R20:** WHEN a patient's genotype phenotype is "Ultrarapid Metabolizer" AND a strong CYP2D6 inhibitor is present, THE SYSTEM SHALL compute the adjusted phenotype per R10 and R14 AND SHALL flag the result with "reduced confidence" AND SHALL include a note that ultrarapid metabolizers may not phenoconvert to the same extent.
+**R20:** WHEN a patient's genotype phenotype is "Ultrarapid Metabolizer" AND a strong CYP2D6 inhibitor is present, THE SYSTEM SHALL compute the adjusted phenotype per R10 and R14 AND SHALL flag the result with "reduced confidence" AND SHALL show BOTH the converted (adjusted phenotype) recommendation and the genotype (Ultrarapid Metabolizer) recommendation, together with the caveat that ultrarapid metabolizers may not phenoconvert completely.
 
 **R21:** WHEN a patient's genotype activity score is 0 (poor metabolizer by genotype) AND any CYP2D6 inhibitor is present, THE SYSTEM SHALL still issue the drug-level alert for that phenotype AND SHALL include an inhibitor note stating "adds no further effect — this patient was already a poor metabolizer by genotype."
 
@@ -69,23 +69,23 @@ are deterministic rules that the AI component never modifies.
 
 ## Recommendation Lookup and Alert Levels
 
-**R24:** WHEN looking up a CPIC recommendation for codeine, THE SYSTEM SHALL use the activity score (genotype or adjusted) as the lookup key, not the phenotype label.
+**R24:** WHEN looking up a CPIC recommendation for codeine, THE SYSTEM SHALL look up the recommendation by PHENOTYPE (mapped from the genotype or adjusted activity score using R3–R6) AND SHALL NOT use an exact activity-score key, because adjusted scores such as 0.625 (1.25 × 0.5) have no row in the CPIC data.
 
-**R25:** WHEN looking up a CPIC recommendation for tramadol, THE SYSTEM SHALL use the activity score (genotype or adjusted) as the lookup key, not the phenotype label.
+**R25:** WHEN looking up a CPIC recommendation for tramadol, THE SYSTEM SHALL look up the recommendation by PHENOTYPE (mapped from the genotype or adjusted activity score using R3–R6) AND SHALL NOT use an exact activity-score key, because adjusted scores such as 0.625 (1.25 × 0.5) have no row in the CPIC data.
 
-**R26:** WHEN looking up a CPIC recommendation for atomoxetine in the absence of moderate inhibitors, THE SYSTEM SHALL use the activity score (genotype or adjusted) as the lookup key AND SHALL use the "adults" population.
+**R26:** WHEN looking up a CPIC recommendation for atomoxetine, THE SYSTEM SHALL use the activity score (genotype or adjusted) as the lookup key AND SHALL use the "adults" population, because atomoxetine recommendations differ inside the intermediate phenotype (activity score 1.0 differs from 0.25–0.75); moderate-inhibitor scores are never computed for atomoxetine (R18), so only quarter-step scores occur; the alert card SHALL state the population used (adults) for atomoxetine.
 
 **R27:** WHEN looking up a CPIC recommendation for clopidogrel, THE SYSTEM SHALL use the CYP2C19 phenotype (mapped directly from diplotype, without activity score computation) AND SHALL use the "CVI ACS PCI" population.
 
 **R28:** WHEN a patient taking clopidogrel is also taking omeprazole, THE SYSTEM SHALL include a separate label-level note for the omeprazole–clopidogrel interaction AND SHALL NOT compute CYP2C19 phenoconversion.
 
-**R29:** WHEN a CPIC recommendation begins with the word "Avoid", THE SYSTEM SHALL assign a RED-level alert.
+**R29:** THE SYSTEM SHALL take the alert level (RED, YELLOW, GREEN or GREY) from the curated alertLevel field in `data/alert_levels.json` for the matched recommendation.
 
-**R30:** WHEN a CPIC recommendation includes a dose adjustment, titration instruction, or the phrase "if no response, consider", THE SYSTEM SHALL assign a YELLOW-level alert.
+**R30:** THE SYSTEM SHALL NOT infer an alert level from the wording of the recommendation text (for example by checking whether it starts with 'Avoid'); WHEN no alertLevel entry exists for a matched recommendation, THE SYSTEM SHALL assign GREY and report a data error, and SHALL NOT default to GREEN.
 
 **R31:** WHEN a CPIC recommendation indicates standard dosing with no special precautions, THE SYSTEM SHALL assign a GREEN-level alert AND SHALL display the message "No supported PGx alert (not the same as safe)".
 
-**R32:** WHEN no CPIC recommendation is available for a given drug–phenotype combination, OR the phenotype is "Indeterminate (Not assessed)", OR the status is "Insufficient data", THE SYSTEM SHALL assign a GREY-level alert.
+**R32:** WHEN no CPIC recommendation is available for a given drug–phenotype combination, OR the drug is one the engine does not compute or cover (for example atomoxetine with a moderate inhibitor), THE SYSTEM SHALL label the result "Not assessed"; WHEN the phenotype is "Indeterminate" it SHALL be labelled "Indeterminate", AND WHEN the status is "Insufficient data" it SHALL be labelled "Insufficient data"; these three states are separate and distinctly labelled, AND THE SYSTEM SHALL assign a GREY-level alert for each of them, and also WHEN no alertLevel entry exists for the matched recommendation; none of the three GREY texts (R7, R8, R18) may reuse any wording of the GREEN text "No supported PGx alert (not the same as safe)".
 
 **R33:** THE SYSTEM SHALL NOT describe any drug, result or alert as safe ('safe' or 'seguro'); the only permitted use of the word is the fixed disclaimer 'not the same as safe' in R31.
 
@@ -115,9 +115,9 @@ are deterministic rules that the AI component never modifies.
 
 ## Scope and Limitations
 
-**R41:** THE SYSTEM SHALL apply computed phenoconversion by activity score multiplier (strong inhibitor ×0, moderate inhibitor ×0.5) only to codeine and tramadol, per CPIC opioids 2021, AND SHALL handle atomoxetine with a strong CYP2D6 inhibitor per R17.
+**R41:** THE SYSTEM SHALL apply multiplier-based phenoconversion (strong inhibitor ×0, moderate inhibitor ×0.5) only to codeine and tramadol, per CPIC opioids 2021; atomoxetine with a strong inhibitor follows the label-based rule in R17 with no multiplier.
 
-**R42:** THE SYSTEM SHALL NOT compute CYP2C19 phenoconversion, as no CPIC-stated rule exists for this gene.
+**R42:** THE SYSTEM SHALL NOT compute CYP2C19 phenoconversion, as no CPIC-stated rule exists for this gene; FDA lists fluoxetine as a strong CYP2C19 inhibitor, so CYP2C19 phenoconversion is a known limitation that the README states.
 
 **R43:** THE SYSTEM SHALL assume steady-state conditions for all inhibitors AND SHALL NOT model inhibitor onset or washout timing.
 

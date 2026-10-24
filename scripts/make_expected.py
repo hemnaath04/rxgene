@@ -15,6 +15,9 @@ R={'codeine':recs('codeine','general'),'tramadol':recs('tramadol','general'),
    'atomoxetine':recs('atomoxetine','adults'),'clopidogrel':recs('clopidogrel','CVI ACS PCI ')}
 _INH=json.loads((pathlib.Path(__file__).resolve().parent.parent/'data'/'inhibitors.json').read_text())['CYP2D6']
 STRONG=set(_INH['strong']); MODERATE=set(_INH['moderate']); WEAK=set(_INH['weak'])
+# Alert levels are curated by a person in data/alert_levels.json; never inferred from the recommendation text.
+LEVELS=json.loads((pathlib.Path(__file__).resolve().parent.parent/'data'/'alert_levels.json').read_text())
+def alert_for(drug,pop,key): return LEVELS[drug][pop.strip()][key]['alertLevel']
 def allele_as(a):
     if 'x' in a:
         base,n=a.split('x'); return AV[base]*int(n)
@@ -32,20 +35,24 @@ def askey(s):
 def lookup_as(drug,s):
     k=f"{round(s*4)/4:.2f}".rstrip('0');  k=k+'0' if k.endswith('.') else k
     t=R[drug]
-    if k in t: return t[k]
+    if k in t: return t[k]+(k,)
     for g in ('≥6.0','≥5.0','≥4.0','≥3.75','≥3.5','≥3.25','≥3.0'):
-        if g in t and s>=float(g[1:]): return t[g]
+        if g in t and s>=float(g[1:]): return t[g]+(g,)
     raise KeyError(k)
-def level(txt):
-    t=txt.lower()
-    if t.startswith('no recommendation'): return 'GREY'
-    if t.startswith('avoid'): return 'RED'
-    if 'if no response' in t or 'plasma concentration' in t and '40 mg/day and if no' in t: return 'YELLOW'
-    if 'if no clinical response and in the absence of adverse events after 2 weeks increase' in t or '40 mg/day and if no clinical response' in t: return 'YELLOW'
-    return 'GREEN'
+def lookup_pheno(drug,ph):
+    # codeine and tramadol: one recommendation per phenotype, so look up by phenotype, never by an exact score key.
+    for phenos,txt,cls in R[drug].values():
+        if list(phenos.values())[0]==ph: return phenos,txt,cls
+    raise KeyError(ph)
 C19P={('Normal function','Normal function'):'Normal Metabolizer',('Increased function','Normal function'):'Rapid Metabolizer',
       ('Increased function','Increased function'):'Ultrarapid Metabolizer',('No function','Normal function'):'Intermediate Metabolizer',
       ('Increased function','No function'):'Intermediate Metabolizer',('No function','No function'):'Poor Metabolizer'}
+# Approved GREY labels: three separate states, none sharing wording with the GREEN "No supported PGx alert (not the same as safe)".
+GREY_TEXT={
+ 'Indeterminate':'Indeterminate: this gene result includes a variant we cannot interpret, so no pharmacogenomic check was done for this drug. Ask a pharmacist.',
+ 'Insufficient data':'Insufficient data: there is no CYP2D6 result on file, so no pharmacogenomic check was done for this drug.',
+ 'Not assessed':'Not assessed: a moderate CYP2D6 inhibitor is present and CPIC states no adjustment for atomoxetine, so RxGene does not compute this. Pharmacist review needed.',
+}
 cases=[
  ('P01','*1/*1',None,['fluoxetine'],'codeine','Demo case 1: genotype says normal, fluoxetine makes them a poor metabolizer'),
  ('P02','*4/*4',None,['fluoxetine'],'codeine','Already PM by genotype; inhibitor adds no further change (alert de-escalation)'),
@@ -69,6 +76,7 @@ cases=[
  ('P20','*1/*999',None,[],'codeine','Unsupported allele -> Indeterminate / not assessed'),
  ('P21',None,None,[],'codeine','No CYP2D6 result -> insufficient data'),
  ('P22','*1/*1',None,['sertraline'],'codeine','Weak inhibitor (FDA): no activity-score adjustment'),
+ ('P23','*10/*10',None,[],'atomoxetine','Discriminates the *10 value: current 0.25 gives AS 0.5 (titration row, YELLOW); the old 0.5 would give AS 1.0 (standard-titration row, GREEN). Phenotype label is IM either way'),
 ]
 rows=[]
 for pid,dip6,dip19,meds,drug,note in cases:
@@ -80,7 +88,7 @@ for pid,dip6,dip19,meds,drug,note in cases:
         f=[C19[a] for a in dip19.split('/')]
         p=C19P.get(tuple(f)) or C19P.get(tuple(f[::-1]))
         ph,txt,cls=R['clopidogrel'][p]
-        r.update(genotype_AS='n/a (CYP2C19 has no activity score)',genotype_phenotype=p,inhibitor='',adjusted_AS='',adjusted_phenotype=p,phenoconverted='no',alert=level(txt),cpic_recommendation=txt,cpic_strength=cls,source='CPIC clopidogrel 2022 (ACS/PCI)')
+        r.update(genotype_AS='n/a (CYP2C19 has no activity score)',genotype_phenotype=p,inhibitor='',adjusted_AS='',adjusted_phenotype=p,phenoconverted='no',alert=alert_for('clopidogrel','CVI ACS PCI ',p),cpic_recommendation=txt,cpic_strength=cls,source='CPIC clopidogrel 2022 (ACS/PCI)')
         if 'omeprazole' in meds: r['extra_flag']='Label interaction: clopidogrel + omeprazole (verify against FDA label). Shown separately from genotype result.'
     else:
         s,p=d6(dip6)
@@ -88,20 +96,37 @@ for pid,dip6,dip19,meds,drug,note in cases:
         strength='strong' if inh and inh.split(' ')[0] in STRONG else 'moderate' if inh else ''
         r.update(genotype_AS='' if s is None else s,genotype_phenotype=p,inhibitor=f"{inh} ({strength})" if inh else '')
         if s is None:
-            r.update(adjusted_AS='',adjusted_phenotype=p,phenoconverted='n/a',alert='GREY',cpic_recommendation='Not assessed. No supported PGx alert can be given.',cpic_strength='',source='')
+            r.update(adjusted_AS='',adjusted_phenotype=p,phenoconverted='n/a',alert='GREY',cpic_recommendation=GREY_TEXT['Indeterminate'] if p.startswith('Indeterminate') else GREY_TEXT['Insufficient data'],cpic_strength='',source='')
         else:
             adj=s
             if strength=='strong': adj=0.0
             elif strength=='moderate': adj=s*0.5
             if drug=='atomoxetine' and strength=='moderate':
                 r.update(adjusted_AS='not computed',adjusted_phenotype='not computed',phenoconverted='unknown',alert='GREY',
-                    cpic_recommendation='Moderate CYP2D6 inhibitor present; no CPIC-stated adjustment for atomoxetine. Refer to pharmacist.',cpic_strength='',source='CPIC atomoxetine 2019 (narrative only)')
+                    cpic_recommendation=GREY_TEXT['Not assessed'],cpic_strength='',source='CPIC atomoxetine 2019 (narrative only)')
             else:
-                ph,txt,cls=lookup_as(drug,adj)
+                if drug in('codeine','tramadol'):
+                    ph,txt,cls=lookup_pheno(drug,pheno(adj)); akey=pheno(adj); pop='general'
+                else:
+                    ph,txt,cls,akey=lookup_as(drug,adj); pop='adults'
                 src='CPIC opioids 2021 (phenoconversion rule stated in guideline)' if drug in('codeine','tramadol') else 'CPIC atomoxetine 2019 recs by AS; inhibitor handling per FDA label + CPIC atomoxetine narrative'
-                r.update(adjusted_AS=adj,adjusted_phenotype=pheno(adj),phenoconverted='yes' if pheno(adj)!=p else 'no',alert=level(txt),cpic_recommendation=txt,cpic_strength=cls,source=src)
-                if strength=='strong' and p=='Ultrarapid Metabolizer': r['confidence']='reduced (UMs may not fully phenoconvert, CPIC 2023)'
-                if inh and s==0: r['inhibitor_note']=f"{inh.split(' ')[0]} adds no further effect: already a poor metabolizer by genotype. The drug-level alert still applies."
+                r.update(adjusted_AS=adj,adjusted_phenotype=pheno(adj),phenoconverted='yes' if pheno(adj)!=p else 'no',alert=alert_for(drug,pop,akey),cpic_recommendation=txt,cpic_strength=cls,source=src)
+                if strength=='strong' and p=='Ultrarapid Metabolizer':
+                    r['confidence']='reduced (UMs may not fully phenoconvert, CPIC 2023)'
+                    if drug in('codeine','tramadol'):
+                        # Show both: the converted recommendation and the genotype one, since the conversion may be incomplete.
+                        r['genotype_recommendation']=lookup_pheno(drug,p)[1]
+                        r['inhibitor_note']=f"Caveat: CPIC 2023 notes ultrarapid metabolizers may not phenoconvert with {inh.split(' ')[0]}. Both recommendations are shown (converted and genotype); both say avoid {drug}."
+                if drug=='atomoxetine' and strength=='strong':
+                    # Label-based handling, not the opioid x0 rule: FDA STRATTERA label section 2.5 treats a strong CYP2D6 inhibitor like a poor metabolizer (4-week titration interval).
+                    r.update(adjusted_AS='n/a (label-based, no score computed)',adjusted_phenotype='Poor-metabolizer-equivalent dosing (FDA label)',phenoconverted='yes' if p!='Poor Metabolizer' else 'no',
+                             source='FDA STRATTERA label section 2.5 (strong CYP2D6 inhibitor handled like a poor metabolizer); CPIC atomoxetine 2019 poor-metabolizer text')
+                    # Lead with the FDA label (it directly addresses strong-inhibitor coadministration); CPIC 2019 PM text is supporting genotype-based context only.
+                    r['label_recommendation']='FDA STRATTERA label, section 2.5 (adult, concomitant strong CYP2D6 inhibitor): "a longer titration interval of 4 weeks is recommended", "if ADHD symptoms fail to improve and the initial STRATTERA dosage is well tolerated". Starting, target and maximum dosages are the same as the label\'s standard adult table (40 mg/day start, 80 mg/day target, 100 mg/day maximum).'
+                    r['cpic_role']='Supporting genotype-based context only (CPIC 2019 poor-metabolizer guidance); not an equally applicable dosing instruction for inhibitor-induced phenoconversion.'
+                    r['discrepancy_flag']='Different guidance contexts: FDA labeling directly addresses strong CYP2D6 inhibitor coadministration and recommends a 4-week titration interval. CPIC 2019 provides genotype-based poor-metabolizer guidance with a 2-week response assessment. These recommendations should not be treated as interchangeable.'
+                    r['source_links']='FDA STRATTERA label, DailyMed set id 309de576-c318-404a-bc15-660c2b1876fb, version 69 (2026-07-23): https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=309de576-c318-404a-bc15-660c2b1876fb | CPIC atomoxetine guideline 2019 (Brown et al.): https://pmc.ncbi.nlm.nih.gov/articles/PMC6612570/'
+                if inh and s==0 and drug!='atomoxetine': r['inhibitor_note']=f"{inh.split(' ')[0]} adds no further effect: already a poor metabolizer by genotype. The drug-level alert still applies."
                 if not strength and any(m in WEAK for m in meds): r['inhibitor_note']='Weak CYP2D6 inhibitor present: no activity-score adjustment (CPIC adjusts strong and moderate only).'
     r['note']=note; r.setdefault('extra_flag',''); r.setdefault('confidence','standard'); r.setdefault('inhibitor_note','')
     rows.append(r)

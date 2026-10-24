@@ -104,10 +104,10 @@ taken word for word from the CPIC API.
 
 - **Synthetic data only.** No real patients, no real lab results.
 - **Steady-state model.** Inhibitor onset and washout are not modeled; a medication is either on the list or not.
-- **Phenoconversion is computed only where CPIC states the rule** (codeine and tramadol, CPIC opioids 2021). Atomoxetine with a strong inhibitor uses the poor-metabolizer recommendation (FDA label); with a moderate inhibitor it is flagged for pharmacist review, not computed.
+- **Phenoconversion is computed only where CPIC states the rule** (codeine and tramadol, CPIC opioids 2021). Atomoxetine with a strong inhibitor is handled like a poor metabolizer because the FDA label says so (section 2.5), with no activity-score multiplier; with a moderate inhibitor it is "Not assessed" and flagged for pharmacist review.
 - **Several inhibitors on the list: the strongest one is applied.** This is a project design choice, not a CPIC rule.
 - **Ultrarapid metabolizers on a strong inhibitor are flagged "reduced confidence"**, because they may not phenoconvert to the same extent (CPIC 2023).
-- **CYP2C19 phenoconversion is not modeled.** Omeprazole with clopidogrel is shown as a label-level note only.
+- **CYP2C19 phenoconversion is not modeled.** CPIC states no adjustment rule for CYP2C19, so RxGene does not compute one. The FDA interaction table lists fluoxetine as a strong inhibitor of CYP2C19 as well as CYP2D6, so a patient on fluoxetine who is prescribed clopidogrel may respond differently from what their genotype predicts, and RxGene will not flag it. Omeprazole with clopidogrel is shown as a label-level note only.
 - **"No supported alert" is not the same as safe.** It means RxGene has no guideline-backed flag for that combination.
 - **The AI summary never decides anything.** It rewrites the rule engine's output, is validated, and falls back to a fixed template.
 

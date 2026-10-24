@@ -20,6 +20,12 @@ cpSync(resolve(repoRoot, '..', 'data', 'alert_levels.json'), resolve(srcData, 'a
   force: true
 })
 
+// Copy data/openfda to src/data/openfda
+cpSync(resolve(repoRoot, '..', 'data', 'openfda'), resolve(srcData, 'openfda'), {
+  recursive: true,
+  force: true
+})
+
 console.log(
-  'Data synced: data/cpic -> src/data/cpic, data/inhibitors.json -> src/data/inhibitors.json, data/alert_levels.json -> src/data/alert_levels.json'
+  'Data synced: data/cpic -> src/data/cpic, data/inhibitors.json -> src/data/inhibitors.json, data/alert_levels.json -> src/data/alert_levels.json, data/openfda -> src/data/openfda'
 )

@@ -32,11 +32,11 @@ their pain. This is called **phenoconversion**.
   - CYP2C19 and clopidogrel are also covered
 - **One precise alert instead of two blunt ones.** A patient who is already a poor metabolizer still gets the codeine warning, and the note says the inhibitor adds nothing further.
 - **Honest states.** "No supported alert (not the same as safe)", "Not assessed" and "Insufficient data" are kept distinct. A reduced-confidence flag marks cases where the guideline is uncertain (an ultrarapid metabolizer on a strong inhibitor).
-- **Plugs into an EHR.** It's a real CDS Hooks service (`order-select`) that reads standard FHIR genomics Observations. We tested it in the public CDS Hooks sandbox.
+- **Plugs into an EHR.** It's a real CDS Hooks service (`order-select`) that reads standard FHIR genomics Observations. It's registered in the public CDS Hooks sandbox (sandbox.cds-hooks.org), which calls it from its prescribing screen. It accepts both R4 MedicationRequest and the sandbox's DSTU2 MedicationOrder.
 - **An evidence drawer for every alert.** It shows both phenotypes, the activity score before and after, the guideline, the evidence strength and source date, and the requirement IDs that produced the alert.
 - **A plain-language summary for the patient** in English and Spanish. An LLM rewrites the engine's result and is validated (same drug, same action, every dose kept, no new drugs or numbers, never "safe"); if validation fails, a fixed template is shown.
-- **A pharmacist consult agent** **[TO FILL when shipped]**. It calls the rule engine as a tool for every medication and drafts the consult note a pharmacist would file. Every sentence cites a tool result, and it's always labeled "Draft — pharmacist review required."
-- **Real-world context from openFDA** **[TO FILL when shipped]**. The panel shows FAERS report counts for the patient's drug pair, with the caveat that a report is not proof of cause.
+- **A pharmacist consult agent.** It calls the rule engine as a tool for every medication on the list (get_patient, check_drug, list_inhibitors, get_evidence) and drafts the consult note a pharmacist would file. Every sentence cites the tool result it came from ([T3]); a deterministic validator rejects any uncited fact, any drug or number not in the tool results, any dropped qualifier and the word "safe", and falls back to a fixed template. It's always labeled "Draft — pharmacist review required", and it can't change an alert (R54). Live: about 11–14 s per note.
+- **Real-world context from openFDA.** The evidence drawer can show FAERS report counts for the patient's drug pair, as informational context only: a report does not establish cause. Report counts are never compared between pairs and never affect an alert.
 
 ## Who it's for and how it scales
 
@@ -48,8 +48,10 @@ their pain. This is called **phenoconversion**.
 ## Safety by design
 
 - **AI proposes, deterministic code decides.** No AI output can create, change or suppress an alert.
-- 56 numbered EARS requirements, written by our genetics teammate before the code and checked by Kiro's requirements analysis.
-- 25 hand-reviewed expected-output test patients.
+- 56 numbered EARS requirements, written by our genetics teammate before the code. Kiro's requirements analysis returned 42 findings (27 fixed), including one real clinical conflict.
+- 13 property-based tests (300 cases each), generated from the requirements, found 2 engine bugs the example cases had missed. Both are fixed, and all 128 tests pass.
+- Kiro hooks block the coding agent from editing clinical data, expected outputs or secrets.
+- 26 hand-reviewed expected-output test patients.
 - Synthetic data only. This is not a medical device. Phenoconversion is computed only where CPIC states the rule, and limitations are documented in the README.
 
 ## Data sources

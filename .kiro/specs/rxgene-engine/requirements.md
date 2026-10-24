@@ -89,7 +89,7 @@ Indeterminate (R7), Insufficient data (R8) and Not assessed (R18, R32) are three
 
 **R32:** WHEN no CPIC recommendation is available for a given drug–phenotype combination, OR the drug is one the engine does not compute or cover (for example atomoxetine with a moderate inhibitor), THE SYSTEM SHALL label the result "Not assessed"; WHEN the phenotype is "Indeterminate" it SHALL be labelled "Indeterminate", AND WHEN the status is "Insufficient data" it SHALL be labelled "Insufficient data"; these three states are separate and distinctly labelled, AND THE SYSTEM SHALL assign a GREY-level alert for each of them, and also WHEN no alertLevel entry exists for the matched recommendation; none of the three GREY texts (R7, R8, R18) may reuse any wording of the GREEN text "No supported PGx alert (not the same as safe)".
 
-**R33:** THE SYSTEM SHALL NOT describe any drug, result or alert as safe ('safe' or 'seguro'); the only permitted use of the word is the fixed disclaimer 'not the same as safe' in R31.
+**R33:** THE SYSTEM SHALL NOT describe any drug, result or alert as safe ('safe' or 'seguro'); the only permitted use of the word is the fixed disclaimer 'not the same as safe' in R31. This applies to all text the system displays, including AI-written summaries (R35) and consult notes (R45–R56), whether agent-written or "Template".
 
 **R44:** WHEN looking up an atomoxetine recommendation AND the genotype activity score is exactly 1.0 AND the CYP2D6 diplotype contains a *10 allele (*10, *10xN, or a *36 combination that contains *10), THE SYSTEM SHALL use the CPIC atomoxetine 2019 adult-dose table row '1.0 (*10 allele present)' (the titration text with a plasma-concentration check, the same text as activity scores 0.25 to 0.75, alert level YELLOW), AND WHEN the diplotype at activity score 1.0 does not contain a *10 allele THE SYSTEM SHALL use the standard 1.0 row ('1.0 (*10 allele not present)'); the card SHALL keep CPIC's 'controversy remains' note visible in the evidence drawer for activity score 1.0; the data source for this rule is the CPIC PDF because the CPIC API returns only the 'not present' row.
 
@@ -111,7 +111,7 @@ Indeterminate (R7), Insufficient data (R8) and Not assessed (R18, R32) are three
 
 **R38:** WHEN issuing any alert, THE SYSTEM SHALL include the CPIC guideline name, evidence strength classification, guideline URL, and data fetch date, AND the evidence drawer SHALL show the CPIC recommendation text verbatim and in full, keeping every condition in it (for example 'if no contraindication' when prasugrel or ticagrelor are named as alternatives to clopidogrel), and that the recommendation wording differs between CYP2C19 poor metabolizers ('Avoid clopidogrel if possible.') and intermediate metabolizers ('Avoid standard dose (75 mg) clopidogrel if possible.'), a difference that SHALL be preserved exactly in the evidence drawer, AND SHALL NOT shorten or paraphrase the recommendation.
 
-**R39:** WHEN issuing any alert, THE SYSTEM SHALL identify which numbered requirement (R1–R44) triggered the alert so the clinician can trace the decision path.
+**R39:** WHEN issuing any alert, THE SYSTEM SHALL identify which numbered requirement (R1–R56) triggered the alert so the clinician can trace the decision path.
 
 **R40:** WHEN a patient's case involves activity score thresholds that differ from those in the 2019 CPIC atomoxetine supplement, THE SYSTEM SHALL display a note that the current standardized thresholds are used and the older convention differs.
 
@@ -124,6 +124,36 @@ Indeterminate (R7), Insufficient data (R8) and Not assessed (R18, R32) are three
 **R42:** THE SYSTEM SHALL NOT compute CYP2C19 phenoconversion, because no CPIC-stated adjustment rule for this gene was identified in the sources checked; FDA lists fluoxetine as a strong CYP2C19 inhibitor, so CYP2C19 phenoconversion is a known limitation that the README states.
 
 **R43:** THE SYSTEM SHALL assume steady-state conditions for all inhibitors AND SHALL NOT model inhibitor onset or washout timing.
+
+---
+
+## Consult Agent
+
+The consult agent automates the manual phenoconversion consult note a PGx pharmacist writes into the chart (PLAN-v3). The rule engine still decides everything; the agent only gathers tool results and writes them up (R34 applies to the agent).
+
+**R45:** WHEN the pharmacist requests a medication-list review, THE SYSTEM SHALL run the consult agent over every medication on the patient's list, plus the drug being added if there is one.
+
+**R46:** THE consult agent SHALL obtain clinical facts only by calling deterministic tools (get_patient, check_drug, list_inhibitors, get_evidence). check_drug SHALL return the rule engine's assessment unchanged. THE SYSTEM SHALL NOT give the agent any tool that creates, changes or suppresses an alert.
+
+**R47:** WHEN the consult note states a recommendation, alert level, phenotype, activity score or inhibitor class, THE SYSTEM SHALL require that sentence to cite at least one tool call from the same run. A sentence that states such a fact without a valid citation SHALL fail validation. A citation is valid only if it refers to a tool call from the same run AND that call's result contains the fact stated. Citations SHALL be checked by deterministic code, not by a model.
+
+**R48:** THE consult note SHALL address every drug the engine assessed as RED or YELLOW, keeping the engine's action for that drug ("avoid" for RED; a dose or titration adjustment for YELLOW).
+
+**R49:** THE consult note SHALL NOT name any drug that is not on the medication list, is not the drug being added, and doesn't appear in a returned CPIC or FDA recommendation text.
+
+**R50:** THE consult note SHALL NOT contain any number that does not appear in a tool result from the same run. Citation markers (trace step numbers) and digits that are part of gene, allele or requirement identifiers (for example CYP2D6, *4, R10) are not counted as numbers for this rule.
+
+**R51:** WHEN the note fails validation (R33, R47–R50, R55–R56), OR the model call fails, OR the agent exceeds 8 tool-call rounds, OR the run exceeds 25 seconds, THE SYSTEM SHALL show a deterministic consult note built directly from the engine's assessments, labeled "Template". The Template note SHALL itself satisfy R33, R48, R52, R55 and R56.
+
+**R52:** THE SYSTEM SHALL label every consult note "Draft — pharmacist review required" and SHALL NOT offer any action that sends, signs or files the note.
+
+**R53:** THE SYSTEM SHALL display the agent's tool-call trace (tool name, arguments, short result) next to the note, and each citation SHALL link to the trace step it cites. The trace SHALL also be shown when the run fell back to the Template note (R51), up to the point of failure.
+
+**R54:** THE consult agent SHALL NOT change, suppress or reorder the engine's alerts. THE alerts shown in the main view SHALL be identical whether or not the agent has run.
+
+**R55:** THE consult note SHALL list every medication reviewed (R45) together with the engine's result for it, AND a medication with no check_drug result from the same run SHALL fail validation. WHEN the engine's result is GREY, THE note SHALL state the matching fixed text of R7, R8 or R18 unchanged AND SHALL NOT omit the drug. WHEN the engine's result is GREEN, THE note SHALL use the wording "No supported PGx alert (not the same as safe)", SHALL label it a genotype result only (R31), AND SHALL NOT state or imply that the medication list as a whole has been cleared.
+
+**R56:** WHEN the engine's result for a drug carries a qualifier, THE consult note SHALL keep it: the genotype phenotype and the adjusted phenotype side by side (R19); the "reduced confidence" flag with both recommendations (R20); the inhibitor note for a patient who is already a poor metabolizer (R21); the FDA/CPIC "Different guidance contexts" text for atomoxetine (R17); the omeprazole–clopidogrel label note (R28); and the population used for atomoxetine and clopidogrel (R26, R27).
 
 ---
 

@@ -1,0 +1,258 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-heading: var(--font-sans);
+    --font-sans: 'Geist Variable', sans-serif;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* RxGene design tokens (docs/DESIGN.md section 2). Exact values; don't approximate. */
+@theme {
+    --color-ink: oklch(0.24 0.06 255);
+    --color-ink-muted: oklch(0.42 0.05 250);
+    --color-panel: oklch(0.98 0.01 230 / 0.78);
+    --color-panel-solid: oklch(0.98 0.01 230);
+    --color-verdict: oklch(0.30 0.06 230);
+    --color-verdict-muted: oklch(0.85 0.02 230);
+    --color-alert-red: oklch(0.62 0.21 35);
+    --color-alert-red-text: oklch(0.50 0.19 33);
+    --color-alert-amber: oklch(0.72 0.15 75);
+    --color-alert-neutral: oklch(0.60 0.03 240);
+    --color-alert-grey: oklch(0.55 0.01 250);
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+:root {
+    --background: oklch(0.97 0.02 210);
+    --foreground: oklch(0.24 0.06 255);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.24 0.06 255);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.24 0.06 255);
+    /* --color-primary (DESIGN.md): the shadcn theme maps --color-primary to this variable. */
+    --primary: oklch(0.32 0.09 255);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.95 0.01 230);
+    --muted-foreground: oklch(0.42 0.05 250);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --radius: 0.625rem;
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+}
+
+/* Frosted surface for the control bar, story columns, gauge and strip (DESIGN.md section 2). */
+@utility panel {
+  background-color: var(--color-panel);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid oklch(1 0 0 / 0.6);
+}
+
+/*
+ * Background: layered radial gradients plus soft CSS bokeh at opacity 0.35.
+ * No photographic image behind text (DESIGN.md section 5).
+ */
+.app-bg {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  background:
+    radial-gradient(120% 80% at 0% 0%, oklch(0.93 0.04 220), transparent 70%),
+    radial-gradient(90% 70% at 100% 100%, oklch(0.93 0.04 220), transparent 70%),
+    oklch(0.97 0.02 210);
+}
+
+.app-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.35;
+  background:
+    radial-gradient(circle 90px at 6% 30%, oklch(0.86 0.07 220), transparent),
+    radial-gradient(circle 60px at 18% 78%, oklch(0.90 0.06 70), transparent),
+    radial-gradient(circle 120px at 42% 12%, oklch(0.88 0.05 210), transparent),
+    radial-gradient(circle 70px at 64% 70%, oklch(0.90 0.06 60), transparent),
+    radial-gradient(circle 110px at 86% 22%, oklch(0.86 0.07 225), transparent),
+    radial-gradient(circle 80px at 95% 84%, oklch(0.90 0.06 70), transparent),
+    radial-gradient(circle 50px at 32% 52%, oklch(0.90 0.05 200), transparent);
+}
+
+/*
+ * Buttons (DESIGN.md section 4, "Controls"): press = scale 0.96 over 150 ms --ease-out, never
+ * when disabled; hover changes background-color only, over 150 ms ease. Unlayered, so it
+ * overrides the shadcn button's transition-all and translate-y press.
+ */
+.press {
+  transition:
+    background-color 150ms ease,
+    transform 150ms var(--ease-out);
+}
+.press:active:not(:disabled):not([data-disabled]) {
+  transform: scale(0.96);
+  translate: none;
+}
+
+/*
+ * Particle flow in story column 02 (DESIGN.md section 4). Predetermined constant motion, so it
+ * is a CSS animation on transform only. Each dot is a wrapper as wide as its track that moves
+ * translateX(0% -> 100%); the visible dot sits at the wrapper's left edge.
+ */
+.flow-track {
+  position: relative;
+  height: 16px;
+  overflow: hidden;
+}
+.flow-line {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  border-top: 2px solid currentColor;
+  transform: translateY(-50%);
+  opacity: 0.6;
+}
+.flow-line[data-dashed='true'] {
+  border-top-style: dashed;
+}
+.flow-dot {
+  position: absolute;
+  inset: 0;
+  animation: rx-flow 2.4s linear infinite;
+  animation-delay: calc(var(--i) * -0.48s);
+}
+.flow-dot::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+}
+.flow-track[data-dim='true'] .flow-dot {
+  opacity: 0.25;
+}
+@keyframes rx-flow {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flow-dot {
+    animation: none;
+    transform: translateX(var(--rest));
+  }
+}

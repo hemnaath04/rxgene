@@ -12,6 +12,8 @@
 - Never put API keys in the repo. They go in `.env` only.
 - **Submit by 7:30 PM.** Submissions lock at 8:00.
 
+**Vercel:** project `rxgene` (Hemnaath's projects). Root `web`, production branch `main` (public URL for judges), pushes to `dev` give login-protected previews. LLM env vars are set for Production and Preview.
+
 **Gates**
 
 | Time | Gate |
@@ -44,6 +46,7 @@ Kiro models:
 - [ ] **All 22 fixtures pass.** Push to `dev`.
 
 ### 2:30–4:30: Layer 2
+- [ ] Order of briefs: 06 (design) → 04 (EHR mode + URL) → 05 (summary, once the LLM details arrive).
 - [ ] Apply the frontend design. Gauge with two markers, evidence drawer, comparison strip.
 - [ ] Reverse case (Lena), UM reduced confidence (Dev), atomoxetine (Jordan).
 - [ ] `POST /api/summary`: OpenAI-compatible call, the validator (spec §6), and the EN/ES

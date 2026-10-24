@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "name": "Engine fixture tests",
+  "description": "Run the 22 fixtures when engine files are saved",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["web/src/engine/**"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Run cd web && npx vitest run and report any failing fixture."
+  }
+}

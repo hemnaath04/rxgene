@@ -87,8 +87,7 @@ and [CYP2D6 PharmVar example](https://hl7.org/implement/standards/fhir/uv/genomi
 - `code`: LOINC `84413-4` (match on the code, not the display text, which differs between
   versions).
 - `component[]`: one with code LOINC `48018-6` (gene studied) and
-  `valueCodeableConcept.coding[].code` = `HGNC:2625` (CYP2D6) or `HGNC:2621` (CYP2C19).
-  **Verify the CYP2C19 HGNC ID before using it.**
+  `valueCodeableConcept.coding[].code` = `HGNC:2625` (CYP2D6) or `HGNC:2621` (CYP2C19). Both IDs verified against the HGNC REST API on 2026-10-24.
 - The diplotype is read from `valueCodeableConcept.text`, `valueString`, or the first
   `coding.display`. Strip any `CYP2D6` prefix and PharmVar suballele suffixes
   (`*1.001` → `*1`).
@@ -116,7 +115,7 @@ in `prefetch.medications`.
 
 - Env vars: `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`. These are server-only; never add
   a `VITE_` prefix.
-- The request is `chat/completions` with `temperature: 0` and `max_tokens: 220`. The system
+- The request is `chat/completions` with **no `temperature`** (Claude 5.x via Manifest returns 400 if it is sent) and `max_tokens: 600` (tested 2026-10-24: Haiku 5.5 needs the room for reasoning). `LLM_MODEL` = `anthropic/claude-sonnet-5-subscription,anthropic/claude-sonnet-5-5-subscription` (Sonnet 5 primary: fastest and accurate in the 2026-10-24 benchmark; Sonnet 5.5 backup). A 6 s timeout applies per attempt. Move on when a call fails or validation fails; the template shows instantly and the AI text replaces it when ready. The Manifest gateway returns HTTP 200 with an error message as the content, so check the content, not just the status (see brief 05). The system
   prompt says: rewrite this structured result for a patient in `<lang>`, change no facts,
   and add nothing.
 - **Cache:** a `Map` keyed by `sha256(JSON(assessment)+lang)`, capped at 500 entries. It

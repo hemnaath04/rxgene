@@ -63,15 +63,18 @@ describe('flowStateFor', () => {
     );
   });
 
-  it('maps a valid non-GREY opioid result with a non-speed phenotype to guidance (not notAssessed)', () => {
-    // e.g. a correctly-sourced PM-equivalent dosing label with a null adjusted score.
-    const nonSpeed = make({
-      drug: 'codeine',
+  it('maps the atomoxetine strong-inhibitor FDA-label case (null adjusted score) to guidance', () => {
+    // CPIC/FDA give PM-equivalent dosing, not a computed activity score. Atomoxetine is a
+    // non-animated drug, so this is static guidance — never reduced throughput.
+    const atomoxetineLabel = make({
+      drug: 'atomoxetine',
+      gene: 'CYP2D6',
       alert: 'YELLOW',
       adjustedPhenotype: 'Poor-metabolizer-equivalent dosing (FDA label)',
       adjustedActivityScore: null,
+      inhibitor: { drug: 'paroxetine', strength: 'strong' },
     });
-    expect(flowStateFor(nonSpeed, true)).toBe('guidance');
+    expect(flowStateFor(atomoxetineLabel, true)).toBe('guidance');
   });
 
   it('is inhibited ONLY for a supported opioid phenoconverted by a STRONG inhibitor', () => {

@@ -10,6 +10,12 @@ import type { DrugAssessment } from '@/engine/types';
 /** Drugs where CPIC states a phenoconversion rule and we animate metabolic throughput. */
 const ANIMATED_DRUGS = new Set(['codeine', 'tramadol']);
 
+/** Phenotypes that mean "no readable clinical result" — never guidance or throughput. */
+function isUnknownPhenotype(phenotype: string | null | undefined): boolean {
+  if (!phenotype) return true;
+  return phenotype.startsWith('Indeterminate') || phenotype.startsWith('Insufficient');
+}
+
 /**
  * Conceptual pathway state for stage 02. Animated metabolic throughput (green pass / coral
  * block / constrained travel) is restricted to the supported, computed opioids codeine and
@@ -37,6 +43,11 @@ export function flowStateFor(a: DrugAssessment | null, checked: boolean, pending
 
   // Not assessed / data error (GREY) and uncomputed are neutral regardless of any phenotype.
   if (a.alert === 'GREY' || a.adjustedPhenotype === 'not computed') return 'notAssessed';
+
+  // Missing/unknown clinical data stays neutral: an Indeterminate or Insufficient-data
+  // phenotype (on either the adjusted or the baseline phenotype) can never become apparent
+  // guidance or green throughput, even if a stale/inconsistent alert field is non-GREY.
+  if (isUnknownPhenotype(a.adjustedPhenotype) || isUnknownPhenotype(a.genotypePhenotype)) return 'notAssessed';
 
   const nowSpeed = speedOf(a.adjustedPhenotype);
 

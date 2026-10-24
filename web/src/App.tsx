@@ -207,12 +207,19 @@ function App() {
   const genotypePhenotype = topAssessment?.genotypePhenotype ?? genotypePhenotypeFor(patient, gene);
 
   // The same drug against the genotype alone, from the engine, for the comparison strip.
-  const geneOnly = useMemo(() => {
-    if (!topAssessment?.phenoconverted) return null;
-    return checkOrder({ ...patient, meds: [] }, topAssessment.drug).find(x => x.drug === topAssessment.drug) ?? null;
-  }, [patient, topAssessment]);
+  // Only the computed opioid phenoconversion drugs (codeine/tramadol) use the qualitative
+  // "right now" scale; atomoxetine/FDA-equivalent and CYP2C19 are not a computed scale.
+  const isComputedPhenoconversion =
+    topAssessment?.phenoconverted === true &&
+    (topAssessment.drug === 'codeine' || topAssessment.drug === 'tramadol') &&
+    speedOf(topAssessment.adjustedPhenotype) !== null;
 
-  const showStrip = topAssessment?.phenoconverted === true;
+  const geneOnly = useMemo(() => {
+    if (!isComputedPhenoconversion || !topAssessment) return null;
+    return checkOrder({ ...patient, meds: [] }, topAssessment.drug).find(x => x.drug === topAssessment.drug) ?? null;
+  }, [patient, topAssessment, isComputedPhenoconversion]);
+
+  const showStrip = isComputedPhenoconversion;
   const verdictDelay = showStrip ? STEP.strip + 3 * STEP.stripStagger : STEP.strip;
   // Atomoxetine + strong inhibitor: CPIC/FDA give PM-equivalent dosing, not a computed activity
   // score. The baseline engine may still return a numeric adjusted score (tracked P13 mismatch),

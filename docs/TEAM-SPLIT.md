@@ -145,3 +145,8 @@ checklist ticked.
 - Brief 14 verified: the clinical-data and secrets guards block with exit 2 (via the `--agent rxgene` profile, since CLI 2.34 ignores .kiroignore and standalone hooks).
 - Ananya's property tests found the R18/R21 bug and a second R17/R21 gap. **Mithuna's order: 16 → 17 → 13 → 15.**
 
+## After the event (decided 3:50 PM: keep the current key for today)
+
+- [ ] **Rotate the Manifest API key.** It was pasted in chat and read by Kiro before the secrets guard existed. Update `LLM_API_KEY` in Vercel (Production + Preview) and in every teammate's `web/.env`.
+- [ ] Rotate the X API keys (pasted in chat on Oct 23).
+

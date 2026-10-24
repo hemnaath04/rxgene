@@ -1,6 +1,6 @@
 # Team split: who does what today
 
-**Read this first.** It's the short version of the build spec. Details:
+**Read this first.** It's the short version of the build spec. **What to paste into your agent:** [AGENT-PROMPTS.md](AGENT-PROMPTS.md). Details:
 - Build spec (source of truth): [`.plans/rxgene-build-spec.md`](../.plans/rxgene-build-spec.md)
 - Strategy and pitch: [`docs/PLAN-v3.md`](PLAN-v3.md)
 - Clinical rules Kiro must follow: [`.kiro/steering/clinical-rules.md`](../.kiro/steering/clinical-rules.md)

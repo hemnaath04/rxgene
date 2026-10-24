@@ -11,7 +11,7 @@ but takes fluoxetine behaves like a poor metabolizer, so codeine won't relieve t
 > Built at Hackachusetts 2026 (Biotech & Healthcare track). Synthetic data only.
 > RxGene supports clinicians and pharmacists. It does not replace them.
 
-**Team docs:** [Who does what](docs/TEAM-SPLIT.md) · [Build spec](.plans/rxgene-build-spec.md) · [Plan v3](docs/PLAN-v3.md) · [Clinical rules](.kiro/steering/clinical-rules.md)
+**Team docs:** [Agent prompts (start here)](docs/AGENT-PROMPTS.md) · [Who does what](docs/TEAM-SPLIT.md) · [Build spec](.plans/rxgene-build-spec.md) · [Plan v3](docs/PLAN-v3.md) · [Clinical rules](.kiro/steering/clinical-rules.md)
 
 ## The problem
 

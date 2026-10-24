@@ -7,7 +7,9 @@ import { DRUG_NAMES_ES, NOT_SAME_AS_SAFE } from '../../src/engine/templates';
 import type { SummaryLang } from '../../src/engine/templates';
 import type { DrugAssessment } from '../../src/engine/types';
 
+/** Per model attempt (R36). */
 export const LLM_TIMEOUT_MS = 6000;
+export const MAX_TOKENS = 600;
 export const MAX_WORDS = 90;
 export const CACHE_MAX = 500;
 export const RATE_LIMIT = 20;
@@ -15,22 +17,51 @@ export const RATE_WINDOW_MS = 60_000;
 
 export type ChatMessage = { role: 'system' | 'user' | 'assistant'; content: string };
 
-export type LlmConfig = { baseUrl: string; apiKey: string; model: string };
+export type LlmConfig = { baseUrl: string; apiKey: string; models: string[] };
 
-/** LLM settings from the server environment, or null when any are missing. */
+/**
+ * LLM settings from the server environment, or null when any are missing.
+ * LLM_MODEL is a comma-separated fallback list, tried in order.
+ */
 export function llmConfig(): LlmConfig | null {
   const baseUrl = process.env.LLM_BASE_URL?.trim();
   const apiKey = process.env.LLM_API_KEY?.trim();
-  const model = process.env.LLM_MODEL?.trim();
-  if (!baseUrl || !apiKey || !model) return null;
-  return { baseUrl: baseUrl.replace(/\/+$/, ''), apiKey, model };
+  const models = (process.env.LLM_MODEL ?? '')
+    .split(',')
+    .map(m => m.trim())
+    .filter(Boolean);
+  if (!baseUrl || !apiKey || models.length === 0) return null;
+  return { baseUrl: baseUrl.replace(/\/+$/, ''), apiKey, models };
 }
 
 /**
- * POST to the OpenAI-compatible chat/completions endpoint. Throws on a missing config,
- * a non-2xx response, an empty answer or the 6 s timeout.
+ * The gateway (Manifest) answers some failures with HTTP 200 and the error as the content,
+ * e.g. "[🦚 Manifest M102] anthropic subscription credentials could not be refreshed…".
  */
-export async function callLlm(messages: ChatMessage[]): Promise<string> {
+function isGatewayError(content: string): boolean {
+  return content.trimStart().startsWith('[🦚 Manifest') || content.includes('Manifest M1');
+}
+
+/** Remove Markdown emphasis and heading marks (`**`, `*`, `#`) and tidy the whitespace. */
+export function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*+/g, '')
+    .replace(/#+/g, '')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/ *\n */g, '\n')
+    .trim();
+}
+
+type ChatCompletion = {
+  choices?: Array<{ message?: { content?: unknown }; finish_reason?: unknown }>;
+};
+
+/**
+ * One POST to the OpenAI-compatible chat/completions endpoint for one model. Throws on a
+ * non-2xx status, an empty or null answer, finish_reason "length", a gateway error passed
+ * through as content, or the 6 s timeout. Returns the text with Markdown stripped.
+ */
+export async function callLlm(messages: ChatMessage[], model: string): Promise<string> {
   const config = llmConfig();
   if (!config) throw new Error('LLM not configured');
 
@@ -52,19 +83,49 @@ export async function callLlm(messages: ChatMessage[]): Promise<string> {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${config.apiKey}`,
         },
-        body: JSON.stringify({ model: config.model, messages, temperature: 0, max_tokens: 220 }),
+        // No `temperature`: Anthropic Claude 5.x via Manifest rejects it with HTTP 400.
+        body: JSON.stringify({ model, messages, max_tokens: MAX_TOKENS }),
         signal: controller.signal,
       });
       if (!res.ok) throw new Error(`LLM HTTP ${res.status}`);
-      const data = (await res.json()) as { choices?: Array<{ message?: { content?: unknown } }> };
-      const content = data.choices?.[0]?.message?.content;
+      const data = (await res.json()) as ChatCompletion;
+      const choice = data.choices?.[0];
+      const content = choice?.message?.content;
       if (typeof content !== 'string' || content.trim() === '') throw new Error('LLM empty response');
-      return content.trim().replace(/^["“]|["”]$/g, '').trim();
+      if (choice?.finish_reason === 'length') throw new Error('LLM truncated (finish_reason length)');
+      if (isGatewayError(content)) throw new Error('LLM gateway error');
+      return stripMarkdown(content).replace(/^["“]|["”]$/g, '').trim();
     })();
     return await Promise.race([request, timeout]);
   } finally {
     clearTimeout(timer);
   }
+}
+
+/**
+ * Try each model in LLM_MODEL order. Move to the next one when the call fails or the text
+ * fails validation. Returns null when every model failed (the caller uses the template).
+ * Logs only the model position and the reason: never the key or the prompt.
+ */
+export async function summarizeWithFallback(
+  assessment: DrugAssessment,
+  lang: SummaryLang
+): Promise<string | null> {
+  const config = llmConfig();
+  if (!config) return null;
+  const messages = buildMessages(assessment, lang);
+  for (const [i, model] of config.models.entries()) {
+    const label = `model ${i + 1}/${config.models.length}`;
+    try {
+      const text = await callLlm(messages, model);
+      const result = validate(text, assessment, lang);
+      if (result.ok) return text;
+      console.warn(`[summary] ${label}: AI text rejected (${result.reason})`);
+    } catch (err) {
+      console.warn(`[summary] ${label}: call failed (${err instanceof Error ? err.message : 'unknown'})`);
+    }
+  }
+  return null;
 }
 
 // ---- Prompt ----
@@ -100,6 +161,8 @@ export function buildMessages(a: DrugAssessment, lang: SummaryLang): ChatMessage
     'Name the drug. Keep the action: for alert RED, say the drug should be avoided or is not recommended; for YELLOW, describe the dosing plan and never say avoid; for GREY, say it was not assessed and a pharmacist should review it.',
     `Never call any drug or result safe. For GREEN, say there is no supported alert and that this is "${NOT_SAME_AS_SAFE[lang]}".`,
     'Mention no drug and no number that is not in the input.',
+    'Keep every dose and time from the recommendation exactly.',
+    'Plain text only, no Markdown.',
     `At most ${MAX_WORDS} words. Output only the summary text.`,
   ].join(' ');
   return [
@@ -192,6 +255,13 @@ function numbersIn(s: string): number[] {
   return (s.match(NUMBER) ?? []).map(n => Number(n.replace(',', '.')));
 }
 
+/** Standalone numbers only: skips digits inside names such as "CYP2D6". */
+const STANDALONE_NUMBER = /(?<![A-Za-z\d.,])\d+(?:[.,]\d+)?/g;
+
+function standaloneNumbersIn(s: string): number[] {
+  return (s.match(STANDALONE_NUMBER) ?? []).map(n => Number(n.replace(',', '.')));
+}
+
 export type ValidationResult = { ok: true } | { ok: false; reason: string };
 
 /**
@@ -245,6 +315,12 @@ export function validate(text: string, assessment: DrugAssessment, lang: Summary
   // No number outside the assessment
   const allowed = new Set(numbersIn(JSON.stringify(assessment)));
   if (numbersIn(text).some(n => !allowed.has(n))) return { ok: false, reason: 'new number' };
+
+  // Every dose/time number in the CPIC recommendation must survive (a text that drops "80 mg" fails)
+  const inText = new Set(numbersIn(text));
+  if (standaloneNumbersIn(assessment.recommendation).some(n => !inText.has(n))) {
+    return { ok: false, reason: 'recommendation number missing' };
+  }
 
   return { ok: true };
 }

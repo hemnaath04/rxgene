@@ -7,15 +7,13 @@ import { renderTemplate } from '../src/engine/templates';
 import type { SummaryLang } from '../src/engine/templates';
 import type { Alert, DrugAssessment } from '../src/engine/types';
 import {
-  buildMessages,
   cacheGet,
   cacheKey,
   cacheSet,
-  callLlm,
   clientIp,
   isRateLimited,
   llmConfig,
-  validate
+  summarizeWithFallback
 } from './_lib/llm';
 
 export type SummaryResponse = { text: string; source: 'ai' | 'template'; rateLimited?: boolean };
@@ -71,18 +69,9 @@ export async function POST(request: Request): Promise<Response> {
   const cached = cacheGet(key);
   if (cached) return Response.json({ text: cached, source: 'ai' } satisfies SummaryResponse);
 
-  try {
-    const text = await callLlm(buildMessages(assessment, lang));
-    const result = validate(text, assessment, lang);
-    if (!result.ok) {
-      console.warn(`[summary] AI text rejected (${result.reason}); using template`);
-      return template();
-    }
-    cacheSet(key, text);
-    return Response.json({ text, source: 'ai' } satisfies SummaryResponse);
-  } catch (err) {
-    // Message only (e.g. "LLM timeout", "LLM HTTP 500"); never the key or the prompt.
-    console.warn(`[summary] LLM call failed (${err instanceof Error ? err.message : 'unknown'}); using template`);
-    return template();
-  }
+  // Each model in LLM_MODEL in order; null when every model failed or was rejected.
+  const text = await summarizeWithFallback(assessment, lang);
+  if (!text) return template();
+  cacheSet(key, text);
+  return Response.json({ text, source: 'ai' } satisfies SummaryResponse);
 }

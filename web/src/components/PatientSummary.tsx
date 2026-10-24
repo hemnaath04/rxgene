@@ -44,6 +44,10 @@ type PatientSummaryProps = {
 export function PatientSummary({ assessment, initialLang = 'en' }: PatientSummaryProps) {
   const [lang, setLang] = useState<SummaryLang>(initialLang);
   const [answers, setAnswers] = useState<Record<string, Summary>>(() => Object.fromEntries(answerCache));
+  // Requests that ended without a usable answer (network error, non-2xx): stop "Writing…".
+  const [failed, setFailed] = useState<Set<string>>(() => new Set());
+  // Answers already cached when this component mounted appear without a fade.
+  const [preloaded] = useState(() => new Set(answerCache.keys()));
 
   const assessmentJson = useMemo(() => JSON.stringify(assessment), [assessment]);
   const answerKey = `${lang}:${assessmentJson}`;
@@ -52,6 +56,7 @@ export function PatientSummary({ assessment, initialLang = 'en' }: PatientSummar
     const key = `${lang}:${assessmentJson}`;
     if (answerCache.has(key)) return;
     const controller = new AbortController();
+    const markFailed = () => setFailed(prev => new Set(prev).add(key));
     fetch('/api/summary', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -60,18 +65,22 @@ export function PatientSummary({ assessment, initialLang = 'en' }: PatientSummar
     })
       .then(res => (res.ok ? res.json() : null))
       .then((data: unknown) => {
-        if (!isSummary(data)) return;
+        if (!isSummary(data)) return markFailed();
         answerCache.set(key, data);
         setAnswers(prev => ({ ...prev, [key]: data }));
       })
       .catch(() => {
-        // Network error or abort: the local template stays on screen.
+        // Network error: the local template stays on screen. Abort: the component moved on.
+        if (!controller.signal.aborted) markFailed();
       });
     return () => controller.abort();
   }, [lang, assessmentJson]);
 
-  const shown: Summary = answers[answerKey] ??
-    answerCache.get(answerKey) ?? { text: renderTemplate(assessment, lang), source: 'template' };
+  const answer: Summary | undefined = answers[answerKey] ?? answerCache.get(answerKey);
+  const templateText = renderTemplate(assessment, lang);
+  const aiText = answer?.source === 'ai' ? answer.text : null;
+  const pending = !answer && !failed.has(answerKey);
+  const fade = aiText !== null && !preloaded.has(answerKey);
 
   return (
     <Tabs value={lang} onValueChange={value => setLang(value === 'es' ? 'es' : 'en')}>
@@ -86,16 +95,33 @@ export function PatientSummary({ assessment, initialLang = 'en' }: PatientSummar
         <TabsContent key={l.value} value={l.value}>
           {l.value === lang && (
             <div aria-live="polite" className="flex flex-col gap-3 pt-2">
-              <p lang={lang} className="text-lg/7 text-ink">
-                {shown.text}
-              </p>
+              {/* Template and AI text share one grid cell, so the swap doesn't shift the layout. */}
+              <div className="grid">
+                <p
+                  lang={lang}
+                  aria-hidden={aiText !== null}
+                  className={`col-start-1 row-start-1 text-lg/7 text-ink transition-opacity duration-200 motion-reduce:transition-none ${aiText !== null ? 'opacity-0' : 'opacity-100'}`}
+                >
+                  {templateText}
+                </p>
+                {aiText !== null && (
+                  <p
+                    key={answerKey}
+                    lang={lang}
+                    className={`col-start-1 row-start-1 text-lg/7 text-ink ${fade ? 'animate-in fade-in duration-200 motion-reduce:animate-none' : ''}`}
+                  >
+                    {aiText}
+                  </p>
+                )}
+              </div>
               <p className="flex flex-wrap items-center gap-2 text-sm text-ink-muted">
                 <Badge variant="outline" className="h-6 px-2.5">
-                  {SOURCE_LABEL[shown.source]}
+                  {SOURCE_LABEL[aiText !== null ? 'ai' : 'template']}
                 </Badge>
-                {shown.rateLimited && 'AI summary limit reached; showing the template.'}
+                {pending && <span>Writing a plain-language version…</span>}
+                {answer?.rateLimited && 'AI summary limit reached; showing the template.'}
               </p>
-              {lang === 'es' && shown.source === 'ai' && (
+              {lang === 'es' && aiText !== null && (
                 <p role="note" className="text-sm font-medium text-ink">
                   {MACHINE_TRANSLATED}
                 </p>

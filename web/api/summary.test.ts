@@ -1,7 +1,7 @@
 // /api/summary tests with a mocked fetch (build spec section 6, R33-R37).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { POST } from './summary';
-import { LLM_TIMEOUT_MS, RATE_LIMIT, resetLlmState, validate } from './_lib/llm';
+import { LLM_TIMEOUT_MS, MAX_TOKENS, RATE_LIMIT, resetLlmState, validate } from './_lib/llm';
 import { checkOrder } from '../src/engine/index';
 import type { DrugAssessment, Patient } from '../src/engine/index';
 import { renderTemplate } from '../src/engine/templates';
@@ -70,7 +70,9 @@ describe('POST /api/summary', () => {
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe('https://llm.example.test/v1/chat/completions');
     expect(new Headers(init.headers).get('Authorization')).toBe('Bearer test-key');
-    expect(JSON.parse(init.body as string)).toMatchObject({ model: 'test-model', temperature: 0, max_tokens: 220 });
+    const sent = JSON.parse(init.body as string);
+    expect(sent).toMatchObject({ model: 'test-model', max_tokens: MAX_TOKENS });
+    expect(sent).not.toHaveProperty('temperature');
   });
 
   it('serves a repeat request from the cache', async () => {
@@ -154,9 +156,78 @@ describe('POST /api/summary', () => {
   });
 });
 
+const MODELS = 'anthropic/claude-sonnet-5-subscription,anthropic/claude-sonnet-5-5-subscription';
+
+/** P14: *4/*4, atomoxetine YELLOW; the recommendation contains 40, 2, 80, 4, 200 and 400. */
+function atomoxetineAssessment(): DrugAssessment {
+  const patient: Patient = { id: 'P14', name: 'P14', cyp2d6: '*4/*4', meds: [] };
+  const a = checkOrder(patient, 'atomoxetine').find(x => x.drug === 'atomoxetine');
+  if (!a) throw new Error('no atomoxetine assessment');
+  return a;
+}
+
+const VALID_ATOMOXETINE =
+  'For atomoxetine, your prescriber will start with a dose of 40 mg a day. If it does not help after 2 weeks and you have no bad effects, the dose may go up to 80 mg a day. If it still does not help after 2 weeks, a blood test 2 to 4 hours after a dose can check the level. If the level is under 200 ng/mL, the dose may be raised to get near 400 ng/mL.';
+const MISSING_80 = VALID_ATOMOXETINE.replace('up to 80 mg a day', 'up');
+const MANIFEST_ERROR = '[🦚 Manifest M102] anthropic subscription credentials could not be refreshed…';
+
+/** One mocked LLM answer per call, in order. */
+function mockSequence(...contents: string[]) {
+  const fetchMock = vi.fn();
+  for (const c of contents) fetchMock.mockImplementationOnce(() => Promise.resolve(llmResponse(c)));
+  vi.stubGlobal('fetch', fetchMock);
+  return fetchMock;
+}
+
+function sentBody(fetchMock: ReturnType<typeof vi.fn>, call: number): Record<string, unknown> {
+  const init = fetchMock.mock.calls[call][1] as RequestInit;
+  return JSON.parse(init.body as string) as Record<string, unknown>;
+}
+
+describe('model fallback list', () => {
+  beforeEach(() => vi.stubEnv('LLM_MODEL', MODELS));
+
+  it('sends no temperature to any model', async () => {
+    const fetchMock = mockSequence(MANIFEST_ERROR, VALID_RED);
+    await summarize(redAssessment());
+    for (const call of [0, 1]) expect(sentBody(fetchMock, call)).not.toHaveProperty('temperature');
+  });
+
+  it('uses the second model when the first returns a Manifest error with HTTP 200', async () => {
+    const fetchMock = mockSequence(MANIFEST_ERROR, VALID_RED);
+    expect(await summarize(redAssessment())).toEqual({ text: VALID_RED, source: 'ai' });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(sentBody(fetchMock, 0).model).toBe('anthropic/claude-sonnet-5-subscription');
+    expect(sentBody(fetchMock, 1).model).toBe('anthropic/claude-sonnet-5-5-subscription');
+  });
+
+  it('moves on to the next model when the text drops "80" from the recommendation', async () => {
+    const a = atomoxetineAssessment();
+    expect(validate(MISSING_80, a, 'en')).toEqual({ ok: false, reason: 'recommendation number missing' });
+    expect(validate(VALID_ATOMOXETINE, a, 'en')).toEqual({ ok: true });
+
+    const fetchMock = mockSequence(MISSING_80, VALID_ATOMOXETINE);
+    expect(await summarize(a)).toEqual({ text: VALID_ATOMOXETINE, source: 'ai' });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('strips Markdown before validating', async () => {
+    mockSequence(`**${VALID_RED}**`);
+    expect((await summarize(redAssessment())).text).toBe(VALID_RED);
+  });
+
+  it('returns the template when both models fail', async () => {
+    const fetchMock = mockSequence(MANIFEST_ERROR, MISSING_80);
+    const a = atomoxetineAssessment();
+    expect(await summarize(a)).toEqual({ text: renderTemplate(a, 'en'), source: 'template' });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+});
+
 describe('templates', () => {
   // Every engine output for the 22 fixtures, in both languages, must pass the same validator
-  // the AI text goes through.
+  // the AI text goes through. Exception: the templates deliberately carry no numbers, so the
+  // "keep every recommendation number" rule (AI text only) is allowed to fail here.
   const assessments = expectedOutputs.flatMap(fixture => {
     const patient: Patient = {
       id: fixture.id,
@@ -172,11 +243,13 @@ describe('templates', () => {
     it(`pass validation for every fixture assessment (${lang})`, () => {
       for (const { id, a } of assessments) {
         const text = renderTemplate(a, lang);
-        expect({ id, drug: a.drug, alert: a.alert, result: validate(text, a, lang) }).toEqual({
+        const result = validate(text, a, lang);
+        const ok = result.ok || result.reason === 'recommendation number missing';
+        expect({ id, drug: a.drug, alert: a.alert, ok, result }).toMatchObject({
           id,
           drug: a.drug,
           alert: a.alert,
-          result: { ok: true }
+          ok: true
         });
       }
     });

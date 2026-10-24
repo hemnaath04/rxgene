@@ -37,7 +37,7 @@ API and consult agent (brief 20, `RxGeneConnected.tsx` + `mapAssessment.ts`).
 
 ## Spec-driven development
 
-**[`.kiro/specs/rxgene-engine/requirements.md`](.kiro/specs/rxgene-engine/requirements.md): 56 EARS requirements (R1–R56).**
+**[`.kiro/specs/rxgene-engine/requirements.md`](.kiro/specs/rxgene-engine/requirements.md): 55 active EARS requirements (R1–R56; R23 was removed in review).**
 - Our genetics teammate wrote them before any engine code existed.
 - Example: *"WHEN a patient's genotype activity score is 0 AND any CYP2D6 inhibitor is present, THE SYSTEM SHALL still issue the drug-level alert … AND SHALL include an inhibitor note."*
 - Every alert in the app shows the requirement IDs that produced it (R39), so a clinician can trace any warning back to a rule they can read.
@@ -128,7 +128,7 @@ The pharmacist consult agent shows the strategy end to end.
 | | |
 |---|---|
 | Kiro briefs | 23 |
-| EARS requirements | 56 |
+| EARS requirements | 55 active (R1–R56, R23 removed) |
 | Expected-output test patients | 26 |
 | Automated tests | 128, including 13 property tests × 300 cases |
 | Kiro requirements-analysis findings | 42 (27 fixed) |

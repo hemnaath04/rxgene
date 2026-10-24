@@ -11,7 +11,7 @@ but takes fluoxetine behaves like a poor metabolizer, so codeine won't relieve t
 > Built at Hackachusetts 2026 (Biotech & Healthcare track). Synthetic data only.
 > RxGene supports clinicians and pharmacists. It does not replace them.
 
-**Team docs:** [Agent prompts (start here)](docs/AGENT-PROMPTS.md) · [Who does what](docs/TEAM-SPLIT.md) · [Build spec](.plans/rxgene-build-spec.md) · [Plan v3](docs/PLAN-v3.md) · [Clinical rules](.kiro/steering/clinical-rules.md)
+**Submission docs:** [How we used Kiro](KIRO.md) · [Project description](docs/SUBMISSION.md) · **Team docs:** [Agent prompts](docs/AGENT-PROMPTS.md) · [Who does what](docs/TEAM-SPLIT.md) · [Build spec](.plans/rxgene-build-spec.md) · [Plan v3](docs/PLAN-v3.md) · [Clinical rules](.kiro/steering/clinical-rules.md)
 
 ## The problem
 
@@ -86,14 +86,34 @@ docs/             TEAM-SPLIT (who does what), PLAN-v3 (strategy + pitch), verifi
 .plans/           build spec (source of truth for what we build)
 ```
 
-## Getting started
+## Try it
 
-1. Open this folder in **Kiro**. The rules in `.kiro/steering/` load automatically.
-2. Scaffold the app in `web/` (React + Vite + TypeScript). If the tool warns that the
-   folder isn't empty, choose to ignore the existing files.
-3. `cp .env.example .env` and add your LLM key. Never commit `.env`.
-4. Refresh the data if needed: `python3 scripts/fetch_cpic.py`.
-5. Build the engine against `tests/fixtures/expected_outputs.json` first, then the UI.
+**Live demo (no login):** https://rxgene.vercel.app
+
+- Sarah, the main case (fluoxetine + codeine → "Avoid codeine"): https://rxgene.vercel.app/?patient=sarah&add=codeine
+- Marcus, already a poor metabolizer (one precise alert, not two): https://rxgene.vercel.app/?patient=marcus&add=codeine
+- Lena, the reverse case (adding fluoxetine re-alerts the codeine she already takes): https://rxgene.vercel.app/?patient=lena&add=fluoxetine
+- The CDS Hooks service an EHR calls: https://rxgene.vercel.app/cds-services
+
+All patients are synthetic.
+
+## Run it locally
+
+Requirements: Node.js 22 or later, npm, and Python 3 (only for the data scripts).
+
+```bash
+git clone https://github.com/hemnaath04/rxgene && cd rxgene/web
+npm ci
+npm run dev        # UI + API on http://localhost:5173 (copies ../data into src/data first)
+```
+
+- **Tests:** `npm test` (expected-output fixtures, edge cases, API handlers).
+- **Production build:** `npm run build`.
+- **AI patient summary (optional):** `cp .env.example .env` in `web/` and set `LLM_BASE_URL`, `LLM_API_KEY` (any OpenAI-compatible endpoint) and `LLM_MODEL`. Without them the app still works and shows the fixed template.
+- **Check a deployment end to end:** `python3 scripts/check_live.py https://rxgene.vercel.app` from the repo root.
+- **Refresh the data snapshots:** `python3 scripts/fetch_cpic.py` and `python3 scripts/fetch_openfda.py`.
+
+How Kiro was used to build it: [KIRO.md](KIRO.md).
 
 ## Git workflow
 

@@ -125,3 +125,12 @@ checklist ticked.
 - **Mithuna:** brief 15 (Evidence-sheet panel) runs only if brief 12 is done before 6:00. Order: 13 → 14 → 12 → (15).
 - **Pitch / SundAI card:** challenge **H4** ("hard to translate"). We use the portal's FHIR guidance (standard shapes, not private JSON) and its openFDA API.
 
+## Added at 3:25 PM: official rules and judging criteria (Rules & Project Submittal doc)
+
+- **Judged on:** Potential Value · **Implementation (how widely and deeply we used Kiro)** · Quality & Design (incl. **unique public datasets**). Best Use of Kiro bonus prize. "Insufficient use of Kiro will result in disqualification."
+- **Submission must have:** a text description, a **video under 3 min on YouTube or Vimeo (public), with no third-party trademarks**, a public GitHub repo with run instructions, `.kiro/` committed, a Kiro write-up (tools, specs, hooks, steering, MCP, PBT, Powers).
+- **Sunday:** finalist pitches are **in person**, 11:45 AM–1:15 PM at WHOOP HQ.
+- **Mithuna order:** 13 → 14 → **15 (now required)** → 12.
+- **Ananya:** `ananya-04-pbt-mcp-trademarks.md`: trademark cleanup, property-based tests in the **Kiro IDE**, one real MCP use.
+- **Claude:** KIRO.md, the submission text, README run instructions.
+

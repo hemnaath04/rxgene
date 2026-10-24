@@ -128,6 +128,9 @@ for pid,dip6,dip19,meds,drug,note in cases:
                     r['source_links']='FDA STRATTERA label, DailyMed set id 309de576-c318-404a-bc15-660c2b1876fb, version 69 (2026-07-23): https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=309de576-c318-404a-bc15-660c2b1876fb | CPIC atomoxetine guideline 2019 (Brown et al.): https://pmc.ncbi.nlm.nih.gov/articles/PMC6612570/'
                 if inh and s==0 and drug!='atomoxetine': r['inhibitor_note']=f"{inh.split(' ')[0]} adds no further effect: already a poor metabolizer by genotype. The drug-level alert still applies."
                 if not strength and any(m in WEAK for m in meds): r['inhibitor_note']='Weak CYP2D6 inhibitor present: no activity-score adjustment (CPIC adjusts strong and moderate only).'
+    if drug in ('codeine','tramadol') and not orig_meds and r.get('genotype_AS')!='':
+        # Genotype-only case (no medications, so no inhibitor): cite the phenotype recommendation, not the phenoconversion rule.
+        r['source']=f"CPIC opioid guideline 2021, CYP2D6 {r['genotype_phenotype'].lower().replace(' metabolizer','-metabolizer')} {drug} recommendation."
     r['note']=note; r.setdefault('extra_flag',''); r.setdefault('confidence','standard'); r.setdefault('inhibitor_note','')
     rows.append(r)
 cols=list(dict.fromkeys(k for r in rows for k in r)); cols=[c for c in cols if c not in('note','extra_flag')]+['extra_flag','note']

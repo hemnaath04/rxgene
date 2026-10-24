@@ -9,14 +9,13 @@ type ModeToggleProps = {
 /** On = EHR mode (the UI calls our CDS Hooks service). Off = Local (engine in the browser). */
 export function ModeToggle({ mode, onChange }: ModeToggleProps) {
   return (
-    <div className="flex items-center gap-2">
-      <span aria-hidden="true">Local</span>
+    <label className="flex cursor-pointer items-center gap-2.5 text-base font-medium text-ink">
       <Switch
         checked={mode === 'ehr'}
         onCheckedChange={checked => onChange(checked ? 'ehr' : 'local')}
         aria-label="EHR mode (CDS Hooks)"
       />
       <span aria-hidden="true">EHR mode (CDS Hooks)</span>
-    </div>
+    </label>
   );
 }

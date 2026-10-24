@@ -1,10 +1,4 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { PresetPatient } from '@/data/patients';
 
 type PatientPickerProps = {
@@ -13,21 +7,21 @@ type PatientPickerProps = {
   onSelect: (id: string) => void;
 };
 
-/** "Sarah · CYP2D6 *1/*1". Name and gene results only; the internal demo notes stay hidden. */
-function patientLabel(p: PresetPatient): string {
-  const genes = [
-    p.cyp2d6 ? `CYP2D6 ${p.cyp2d6}` : null,
-    p.cyp2c19 ? `CYP2C19 ${p.cyp2c19}` : null,
-  ].filter(Boolean);
-  return [p.name, ...(genes.length ? genes : ['no gene result'])].join(' · ');
+/** "CYP2D6 *1/*1". Gene results only; the internal demo notes stay hidden. */
+function geneSummary(p: PresetPatient): string {
+  const genes = [p.cyp2d6 ? `CYP2D6 ${p.cyp2d6}` : null, p.cyp2c19 ? `CYP2C19 ${p.cyp2c19}` : null].filter(Boolean);
+  return genes.length ? genes.join(' · ') : 'no gene result';
 }
 
 export function PatientPicker({ patients, selectedId, onSelect }: PatientPickerProps) {
-  const items = patients.map(p => ({ value: p.id, label: patientLabel(p) }));
+  // Trigger shows "Sarah · P01" (DESIGN.md section 1); the list adds the gene result.
+  const items = patients.map(p => ({ value: p.id, label: `${p.name} · ${p.id}` }));
 
   return (
-    <div>
-      <label id="patient-picker-label">Patient (synthetic preset)</label>
+    <div className="flex min-w-0 flex-col gap-1.5">
+      <span id="patient-picker-label" className="text-sm font-medium text-ink-muted">
+        Patient
+      </span>
       <Select
         items={items}
         value={selectedId}
@@ -35,13 +29,19 @@ export function PatientPicker({ patients, selectedId, onSelect }: PatientPickerP
           if (typeof value === 'string') onSelect(value);
         }}
       >
-        <SelectTrigger aria-labelledby="patient-picker-label">
+        <SelectTrigger
+          aria-labelledby="patient-picker-label"
+          className="h-12! w-full min-w-52 rounded-lg border-ink/20 bg-panel-solid px-3 text-lg font-semibold text-ink"
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {items.map(item => (
-            <SelectItem key={item.value} value={item.value}>
-              {item.label}
+          {patients.map(p => (
+            <SelectItem key={p.id} value={p.id} className="py-2">
+              <span className="font-semibold">
+                {p.name} · {p.id}
+              </span>
+              <span className="text-muted-foreground">{geneSummary(p)}</span>
             </SelectItem>
           ))}
         </SelectContent>

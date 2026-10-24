@@ -122,6 +122,12 @@ export type Verdict = {
   sentence: string;
   /** CPIC text verbatim, shown in the bar when the plain sentence doesn't carry it. */
   quote: string | null;
+  /** R17: FDA label recommendation, shown FIRST for atomoxetine + strong inhibitor. */
+  labelRecommendation: string | null;
+  /** R17: "Different guidance contexts" flag. */
+  discrepancyFlag: string | null;
+  /** R20: the genotype (e.g. ultrarapid) recommendation, shown alongside the converted one. */
+  genotypeRecommendation: string | null;
   notes: string[];
   source: string | null;
   mismatch: string | null;
@@ -225,6 +231,9 @@ export function toVerdict(entry: CardEntry): Verdict {
       qualifier: level === 'GREEN' && !mismatch ? '(not the same as safe)' : null,
       sentence,
       quote,
+      labelRecommendation: a.labelRecommendation ?? null,
+      discrepancyFlag: a.discrepancyFlag ?? null,
+      genotypeRecommendation: a.genotypeRecommendation ?? null,
       notes: notesFor(a),
       source: sourceLine(a),
       mismatch,
@@ -243,6 +252,9 @@ export function toVerdict(entry: CardEntry): Verdict {
       qualifier: null,
       sentence: 'Returned by the CDS Hooks service only.',
       quote: null,
+      labelRecommendation: null,
+      discrepancyFlag: null,
+      genotypeRecommendation: null,
       notes: [],
       source: entry.card.source.label ? `CPIC ${entry.card.source.label}` : null,
       mismatch: entry.mismatch,
@@ -260,6 +272,9 @@ export function toVerdict(entry: CardEntry): Verdict {
     qualifier: null,
     sentence: `RxGene has no CPIC guideline for ${drug}.`,
     quote: null,
+    labelRecommendation: null,
+    discrepancyFlag: null,
+    genotypeRecommendation: null,
     notes: [],
     source: null,
     mismatch: null,

@@ -5,8 +5,17 @@ import type { Patient, DrugAssessment } from './types';
 import { getActivityScore } from './activityScore';
 import { activityScoreToPhenotype, cyp2c19DiplotypeToPhenotype } from './phenotype';
 import { applyPhenoconversion } from './phenoconversion';
-import { lookupByActivityScore, lookupByPhenotype, atomoxetineModerateInhibitorRec } from './recommend';
+import { lookupByActivityScore, lookupByPhenotype, greyFixedResult, type RecommendationResult } from './recommend';
 import { drugToGene } from './data';
+import {
+  INDETERMINATE_TEXT,
+  insufficientDataText,
+  ATOMOXETINE_MODERATE_NOT_ASSESSED_TEXT,
+  ATOMOXETINE_LABEL_RECOMMENDATION,
+  ATOMOXETINE_CPIC_ROLE,
+  ATOMOXETINE_DISCREPANCY_FLAG,
+  ATOMOXETINE_SOURCE_LINKS
+} from './fixedTexts';
 
 /**
  * Check if a drug needs a PGx alert
@@ -40,9 +49,9 @@ function assessDrug(
   if (gene === 'CYP2D6') {
     // Step 1: Compute activity score
     const asResult = getActivityScore(genotype);
-    
+
     let genotypePhenotype = asResult.phenotype;
-    let genotypeAS = asResult.activityScore;
+    const genotypeAS = asResult.activityScore;
 
     // If we have a valid AS, map to phenotype
     if (genotypeAS !== null && !genotypePhenotype) {
@@ -57,23 +66,8 @@ function assessDrug(
       allMedications
     );
 
-    // Step 3: Look up recommendation
-    let recResult;
-    
-    // Special case: atomoxetine + moderate inhibitor
-    if (
-      drugLower === 'atomoxetine' &&
-      phenoResult.inhibitor?.strength === 'moderate'
-    ) {
-      recResult = atomoxetineModerateInhibitorRec();
-    } else {
-      // Use adjusted AS for lookup
-      const lookupAS = phenoResult.adjustedActivityScore;
-      recResult = lookupByActivityScore(drugLower, lookupAS);
-    }
-
-    // Step 4: Build assessment
-    const assessment: DrugAssessment = {
+    // Fields shared by every CYP2D6 outcome.
+    const base = {
       drug,
       triggeredBy,
       gene,
@@ -85,10 +79,55 @@ function assessDrug(
       adjustedPhenotype: phenoResult.adjustedPhenotype,
       phenoconverted: phenoResult.phenoconverted,
       confidence: phenoResult.confidence,
+      inhibitorNote: phenoResult.inhibitorNote
+    };
+
+    // Step 3: Look up the recommendation and alert level.
+    let recResult: RecommendationResult;
+    let genotypeRecommendation: string | undefined;
+    const labelFields: Partial<DrugAssessment> = {};
+
+    if (genotypeAS === null) {
+      // R7 (Indeterminate) / R8 (Insufficient data): GREY with the fixed text, no computation.
+      const isInsufficient = genotypePhenotype.startsWith('Insufficient data');
+      recResult = greyFixedResult(
+        drugLower,
+        isInsufficient ? insufficientDataText('CYP2D6') : INDETERMINATE_TEXT
+      );
+    } else if (drugLower === 'atomoxetine' && phenoResult.inhibitor?.strength === 'moderate') {
+      // R18: moderate inhibitor + atomoxetine -> GREY "Not assessed", not computed.
+      recResult = greyFixedResult('atomoxetine', ATOMOXETINE_MODERATE_NOT_ASSESSED_TEXT);
+    } else if (drugLower === 'atomoxetine' && phenoResult.inhibitor?.strength === 'strong') {
+      // R17: FDA label-based handling. The recommendation/alert come from the PM-equivalent
+      // activity score (0), while the reported adjusted score is null ("n/a") and the adjusted
+      // phenotype is the fixed FDA-label description (set in phenoconversion).
+      recResult = lookupByActivityScore('atomoxetine', 0);
+      labelFields.labelRecommendation = ATOMOXETINE_LABEL_RECOMMENDATION;
+      labelFields.cpicRole = ATOMOXETINE_CPIC_ROLE;
+      labelFields.discrepancyFlag = ATOMOXETINE_DISCREPANCY_FLAG;
+      labelFields.sourceLinks = ATOMOXETINE_SOURCE_LINKS;
+    } else if (drugLower === 'codeine' || drugLower === 'tramadol') {
+      // R24/R25: look up by phenotype (mapped from the adjusted activity score).
+      const lookupPhenotype = activityScoreToPhenotype(phenoResult.adjustedActivityScore as number);
+      recResult = lookupByPhenotype(drugLower, lookupPhenotype);
+      // R20: UM + strong inhibitor -> also show the genotype (UM) recommendation.
+      if (phenoResult.confidence === 'reduced') {
+        genotypeRecommendation = lookupByPhenotype(drugLower, genotypePhenotype).recommendation;
+      }
+    } else {
+      // Atomoxetine with no inhibitor or a weak inhibitor: look up by activity score (R26).
+      recResult = lookupByActivityScore(drugLower, phenoResult.adjustedActivityScore);
+    }
+
+    // Step 4: Build assessment
+    const assessment: DrugAssessment = {
+      ...base,
       alert: recResult.alert,
       recommendation: recResult.recommendation,
       strength: recResult.strength,
-      inhibitorNote: phenoResult.inhibitorNote,
+      ...(genotypeRecommendation ? { genotypeRecommendation } : {}),
+      ...labelFields,
+      ...(recResult.dataError ? { dataError: recResult.dataError } : {}),
       source: recResult.source
     };
 
@@ -98,6 +137,7 @@ function assessDrug(
   // Handle CYP2C19 drugs (clopidogrel)
   if (gene === 'CYP2C19') {
     if (!genotype || genotype === '') {
+      const grey = greyFixedResult(drugLower, insufficientDataText('CYP2C19'));
       return {
         drug,
         triggeredBy,
@@ -110,10 +150,10 @@ function assessDrug(
         adjustedPhenotype: 'Insufficient data (no CYP2C19 result)',
         phenoconverted: null,
         confidence: 'standard',
-        alert: 'GREY',
-        recommendation: 'Not assessed. No supported PGx alert can be given.',
-        strength: '',
-        source: { guideline: '', url: '', fetched: '' }
+        alert: grey.alert,
+        recommendation: grey.recommendation,
+        strength: grey.strength,
+        source: grey.source
       };
     }
 
@@ -148,6 +188,7 @@ function assessDrug(
       recommendation: recResult.recommendation,
       strength: recResult.strength,
       labelNote,
+      ...(recResult.dataError ? { dataError: recResult.dataError } : {}),
       source: recResult.source
     };
   }

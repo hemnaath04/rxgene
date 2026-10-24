@@ -40,8 +40,24 @@ export function VerdictBar({ verdict: v, moreCount, onInspect, onMore, onExplain
 
         <div className="flex min-w-0 flex-1 flex-col gap-2 lg:border-l lg:border-white/20 lg:pl-8">
           {v.mismatch && <MismatchWarning text={v.mismatch} className="rounded-lg bg-white/10 px-3 py-2 text-white" />}
+          {/* R17: FDA label recommendation applies directly; show it first. */}
+          {v.labelRecommendation && (
+            <div className="rounded-lg bg-white/10 px-3 py-2">
+              <p className="text-sm font-semibold text-white">FDA label (applies directly)</p>
+              <p className="text-base text-white/90">{v.labelRecommendation}</p>
+            </div>
+          )}
           <p className="text-lg/7">{v.sentence}</p>
           {v.quote && <blockquote className="border-l-2 border-white/30 pl-3 text-base text-white/90">{v.quote}</blockquote>}
+          {/* R20: show the genotype (unconverted) recommendation alongside the converted one. */}
+          {v.genotypeRecommendation && (
+            <blockquote className="border-l-2 border-white/30 pl-3 text-base text-white/90">
+              <span className="font-semibold">Genotype recommendation: </span>
+              {v.genotypeRecommendation}
+            </blockquote>
+          )}
+          {/* R17: the two guidance contexts are not interchangeable. */}
+          {v.discrepancyFlag && <p className="text-sm text-verdict-muted">{v.discrepancyFlag}</p>}
           {v.notes.map(note => (
             <p key={note} className="text-base text-white/90">
               {note}

@@ -18,7 +18,6 @@
   inhibitor (R18): do **not** compute; GREY "Not assessed" with the R18 fixed text.
 - UM + strong inhibitor on codeine/tramadol (R20): reduced confidence, and show **both** the
   converted and the genotype (UM) recommendation, with the caveat that UMs may not fully phenoconvert.
-- Fluoxetine stopped < 3 months ago counts as active.
 - Show the genotype phenotype and the adjusted phenotype **side by side**.
 
 ## Lookups

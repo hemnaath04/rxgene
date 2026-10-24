@@ -10,7 +10,8 @@ import atomoxetineRecsData from '../data/cpic/recommendations/atomoxetine.json';
 import clopidogrelRecsData from '../data/cpic/recommendations/clopidogrel.json';
 import guidelinesData from '../data/cpic/guidelines.json';
 import inhibitorsData from '../data/inhibitors.json';
-import type { AlleleData, Recommendation, GuidelineInfo } from './types';
+import alertLevelsData from '../data/alert_levels.json';
+import type { AlleleData, Recommendation, GuidelineInfo, Alert } from './types';
 
 /**
  * Parse a CPIC activity value or activity-score key.
@@ -107,3 +108,31 @@ export const drugToPopulation: Record<string, string> = {
   atomoxetine: 'adults',
   clopidogrel: 'CVI ACS PCI '  // Note: trailing space in the data
 };
+
+// Curated alert levels (R29, R30). Read the level from data/alert_levels.json for the
+// matched recommendation; never infer it from the recommendation text.
+// codeine/tramadol/clopidogrel are keyed by phenotype; atomoxetine is keyed by activity-score key.
+type CuratedAlertEntry = { alertLevel: string; recommendation_starts?: string; curatedNote?: string };
+type CuratedAlertLevels = Record<string, Record<string, Record<string, CuratedAlertEntry>>>;
+
+// The JSON also holds "_note"/"_status"/"_levels" metadata keys; drug lookups by name skip them.
+const alertLevelsTyped = alertLevelsData as unknown as CuratedAlertLevels;
+
+const VALID_ALERTS = new Set<Alert>(['RED', 'YELLOW', 'GREEN', 'GREY']);
+
+/**
+ * Curated alert level for a matched recommendation, or null when there is no entry
+ * (R30: a missing entry means GREY plus a data error — never GREEN).
+ * @param drug       drug name (case-insensitive)
+ * @param population alert_levels population key ('general', 'adults', 'CVI ACS PCI'); trailing space tolerated
+ * @param key        phenotype (codeine/tramadol/clopidogrel) or activity-score key (atomoxetine)
+ */
+export function curatedAlertLevel(drug: string, population: string, key: string): Alert | null {
+  const byPopulation = alertLevelsTyped[drug.toLowerCase()];
+  if (!byPopulation) return null;
+  const byKey = byPopulation[population.trim()];
+  if (!byKey) return null;
+  const entry = byKey[key];
+  if (!entry || !entry.alertLevel) return null;
+  return VALID_ALERTS.has(entry.alertLevel as Alert) ? (entry.alertLevel as Alert) : null;
+}

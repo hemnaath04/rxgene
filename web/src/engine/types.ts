@@ -27,6 +27,15 @@ export type DrugAssessment = {
   strength: string;                       // CPIC classification
   inhibitorNote?: string;                 // de-escalation / weak-inhibitor note
   labelNote?: string;                     // e.g. omeprazole + clopidogrel
+  // R20: the genotype (e.g. Ultrarapid) recommendation, shown alongside the converted one.
+  genotypeRecommendation?: string;
+  // R17 (atomoxetine + strong inhibitor): FDA label fields. labelRecommendation is shown FIRST.
+  labelRecommendation?: string;
+  cpicRole?: string;
+  discrepancyFlag?: string;
+  sourceLinks?: string;
+  // R30: set when no curated alert level existed for the matched recommendation (GREY, never GREEN).
+  dataError?: string;
   source: { guideline: string; url: string; fetched: string };
 };
 

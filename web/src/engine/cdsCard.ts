@@ -61,6 +61,16 @@ function createSummary(assessment: DrugAssessment): string {
 function createDetail(assessment: DrugAssessment): string {
   const parts: string[] = [];
 
+  // R17: when an FDA label recommendation applies, lead with it (shown first), followed by the
+  // "different guidance contexts" discrepancy flag.
+  if (assessment.labelRecommendation) {
+    parts.push(`**FDA label (applies directly):** ${assessment.labelRecommendation}`);
+    if (assessment.discrepancyFlag) {
+      parts.push(`*${assessment.discrepancyFlag}*`);
+    }
+    parts.push('');
+  }
+
   // Genotype info
   if (assessment.genotype) {
     parts.push(`**Genotype:** ${assessment.gene} ${assessment.genotype}`);
@@ -104,9 +114,20 @@ function createDetail(assessment: DrugAssessment): string {
   // Recommendation
   parts.push('');
   parts.push(`**Recommendation:** ${assessment.recommendation}`);
-  
+
   if (assessment.strength) {
     parts.push(`**Strength:** ${assessment.strength}`);
+  }
+
+  // R17: the CPIC poor-metabolizer text is supporting genotype-based context only.
+  if (assessment.cpicRole) {
+    parts.push(`*${assessment.cpicRole}*`);
+  }
+
+  // R20: show BOTH the converted recommendation (above) and the genotype recommendation.
+  if (assessment.genotypeRecommendation) {
+    parts.push('');
+    parts.push(`**Genotype (unconverted) recommendation:** ${assessment.genotypeRecommendation}`);
   }
 
   // Notes
@@ -118,6 +139,12 @@ function createDetail(assessment: DrugAssessment): string {
   if (assessment.labelNote) {
     parts.push('');
     parts.push(`*${assessment.labelNote}*`);
+  }
+
+  // R17: FDA label + CPIC source links.
+  if (assessment.sourceLinks) {
+    parts.push('');
+    parts.push(`**Sources:** ${assessment.sourceLinks}`);
   }
 
   return parts.join('\n');

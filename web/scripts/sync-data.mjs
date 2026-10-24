@@ -15,4 +15,11 @@ cpSync(resolve(repoRoot, '..', 'data', 'inhibitors.json'), resolve(srcData, 'inh
   force: true
 })
 
-console.log('Data synced: data/cpic -> src/data/cpic, data/inhibitors.json -> src/data/inhibitors.json')
+// Copy data/alert_levels.json to src/data/alert_levels.json (curated alert levels, R29/R30)
+cpSync(resolve(repoRoot, '..', 'data', 'alert_levels.json'), resolve(srcData, 'alert_levels.json'), {
+  force: true
+})
+
+console.log(
+  'Data synced: data/cpic -> src/data/cpic, data/inhibitors.json -> src/data/inhibitors.json, data/alert_levels.json -> src/data/alert_levels.json'
+)

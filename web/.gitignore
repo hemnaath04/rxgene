@@ -4,6 +4,7 @@ dist-ssr
 *.local
 src/data/cpic/
 src/data/inhibitors.json
+src/data/alert_levels.json
 
 # Editor directories and files
 .vscode/*

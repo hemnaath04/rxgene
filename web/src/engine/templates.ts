@@ -215,6 +215,11 @@ function inhibitorNoteSentence(a: DrugAssessment, lang: SummaryLang): string[] {
       ? ['También toma un medicamento que frena al equipo solo un poco. Eso no basta para cambiar este resultado.']
       : ['You also take a medicine that slows the crew only a little. That is not enough to change this result.'];
   }
+  // R20 caveat (ultrarapid may not fully phenoconvert): the confidence sentence already covers
+  // the uncertainty for the patient, so this note is not repeated here.
+  if (note.startsWith('Caveat')) {
+    return [];
+  }
   // Unrecognized note: no translation available, so point to the clinician.
   return lang === 'es'
     ? ['Su farmacéutico tiene una nota adicional sobre sus medicamentos.']

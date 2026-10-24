@@ -27,13 +27,13 @@ export const REQUIREMENT_TITLES: Record<string, string> = {
   R20: 'Ultrarapid + strong inhibitor → reduced confidence',
   R21: 'Already a poor metabolizer + inhibitor → alert stays, "adds no further effect"',
   R22: 'Adding a drug re-checks the current medications',
-  R24: 'Codeine looked up by activity score',
-  R25: 'Tramadol looked up by activity score',
+  R24: 'Codeine looked up by phenotype (from genotype or adjusted activity score)',
+  R25: 'Tramadol looked up by phenotype (from genotype or adjusted activity score)',
   R26: 'Atomoxetine looked up by activity score (adults)',
   R27: 'Clopidogrel looked up by CYP2C19 phenotype (CVI ACS PCI)',
   R28: 'Omeprazole + clopidogrel → separate label-level note',
-  R29: 'Recommendation starts with "Avoid" → RED',
-  R30: 'Dose change, titration or "if no response" → YELLOW',
+  R29: 'Alert level read from the curated alert_levels.json',
+  R30: 'No curated alert level → GREY + data error (never GREEN)',
   R31: 'Standard dosing → GREEN, "No supported PGx alert (not the same as safe)"',
   R32: 'No recommendation, indeterminate or insufficient data → GREY',
   R33: 'Only the fixed GREEN disclaimer wording is allowed',
@@ -43,8 +43,6 @@ export const REQUIREMENT_TITLES: Record<string, string> = {
   R42: 'No CYP2C19 phenoconversion',
   R43: 'Steady state: inhibitor onset and washout not modeled',
 };
-
-const LEVEL_RULE = { RED: 'R29', YELLOW: 'R30', GREEN: 'R31', GREY: 'R32' } as const;
 
 /** Prefix of the engine's "already a poor metabolizer" note (phenoconversion.ts). */
 const ALREADY_PM_MARKER = ' adds no further effect';
@@ -116,8 +114,16 @@ export function requirementsFor(a: DrugAssessment, meds: string[] = []): string[
   }
 
   if (a.triggeredBy.toLowerCase() !== drug) ids.add('R22');
-  ids.add(LEVEL_RULE[a.alert]);
-  if (a.alert === 'GREEN') ids.add('R33');
+  // R29: every alert level is read from the curated alert_levels.json.
+  ids.add('R29');
+  if (a.alert === 'GREEN') {
+    ids.add('R31');
+    ids.add('R33');
+  }
+  if (a.alert === 'GREY') {
+    // R30 when a curated level was missing (data error); otherwise R32 (not assessed / indeterminate / insufficient).
+    ids.add(a.dataError ? 'R30' : 'R32');
+  }
   if (a.source.guideline && a.strength) ids.add('R38');
 
   return [...ids].sort((x, y) => Number(x.slice(1)) - Number(y.slice(1)));

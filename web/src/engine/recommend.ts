@@ -1,5 +1,12 @@
-// Recommendation lookup and alert level determination
-// Rules from .kiro/steering/clinical-rules.md
+// Recommendation lookup and curated alert levels
+// Rules from .kiro/steering/clinical-rules.md and .kiro/specs/rxgene-engine/requirements.md
+//
+// R24/R25: codeine and tramadol are looked up by PHENOTYPE (mapped from the genotype or the
+//   adjusted activity score with R3–R6). No quarter-step rounding / nearest-lower fallback.
+// R26: atomoxetine is looked up by ACTIVITY SCORE, adults population.
+// R27: clopidogrel is looked up by CYP2C19 phenotype, CVI ACS PCI population.
+// R29/R30: the alert level is read from data/alert_levels.json (curatedAlertLevel). It is never
+//   inferred from the recommendation text. A missing entry gives GREY plus a data error — never GREEN.
 
 import {
   codeineRecs,
@@ -10,7 +17,8 @@ import {
   drugToPopulation,
   recommendationsFetched,
   parseActivityValue,
-  isAtLeastKey
+  isAtLeastKey,
+  curatedAlertLevel
 } from './data';
 import type { Alert, Recommendation } from './types';
 
@@ -18,6 +26,8 @@ export type RecommendationResult = {
   recommendation: string;
   strength: string;
   alert: Alert;
+  /** R30: set when no curated alert level existed for the matched recommendation. */
+  dataError?: string;
   source: { guideline: string; url: string; fetched: string };
 };
 
@@ -44,7 +54,7 @@ function getRecommendations(drug: string): Recommendation[] {
  */
 function getGuidelineInfo(drug: string, fetched: string): { guideline: string; url: string; fetched: string } {
   let guidelineName = '';
-  
+
   switch (drug.toLowerCase()) {
     case 'codeine':
     case 'tramadol':
@@ -59,7 +69,7 @@ function getGuidelineInfo(drug: string, fetched: string): { guideline: string; u
   }
 
   const guideline = guidelines.get(guidelineName);
-  
+
   return {
     guideline: guidelineName,
     url: guideline?.url || '',
@@ -67,71 +77,69 @@ function getGuidelineInfo(drug: string, fetched: string): { guideline: string; u
   };
 }
 
-/**
- * Determine alert level from CPIC recommendation text
- * Mirrors scripts/make_expected.py lines 40-45 exactly
- * RED: starts with "avoid"
- * YELLOW: contains "if no response" OR atomoxetine PM pathway patterns
- * GREEN: all other standard recommendations
- * GREY: starts with "no recommendation"
- */
-function determineAlertLevel(recommendation: string): Alert {
-  const t = recommendation.toLowerCase();
-  
-  if (t.startsWith('no recommendation')) {
-    return 'GREY';
-  }
-  
-  if (t.startsWith('avoid')) {
-    return 'RED';
-  }
-  
-  // YELLOW conditions from Python script
-  if (t.includes('if no response')) {
-    return 'YELLOW';
-  }
-  
-  // Atomoxetine PM pathway patterns
-  if (t.includes('plasma concentration') && t.includes('40 mg/day and if no')) {
-    return 'YELLOW';
-  }
-  
-  if (t.includes('if no clinical response and in the absence of adverse events after 2 weeks increase')) {
-    return 'YELLOW';
-  }
-  
-  if (t.includes('40 mg/day and if no clinical response')) {
-    return 'YELLOW';
-  }
-  
-  return 'GREEN';
+function fetchedFor(drug: string): string {
+  return (recommendationsFetched as Record<string, string>)[drug.toLowerCase()] || '';
 }
 
 /**
- * Look up recommendation by activity score (for CYP2D6 drugs)
- * Recommendations are keyed by activity score in quarter-step increments
+ * Build a GREY result that carries a fixed clinical text (R7/R8/R18/R32) as the recommendation,
+ * with the drug's guideline source attached. The fixed strings themselves live in fixedTexts.ts.
+ */
+export function greyFixedResult(drug: string, recommendation: string): RecommendationResult {
+  return {
+    recommendation,
+    strength: '',
+    alert: 'GREY',
+    source: getGuidelineInfo(drug, fetchedFor(drug))
+  };
+}
+
+/**
+ * Resolve the curated alert level for a matched recommendation (R29/R30).
+ * Returns GREY plus a dataError when no entry exists; never defaults to GREEN.
+ */
+function resolveAlert(
+  drug: string,
+  population: string,
+  key: string
+): { alert: Alert; dataError?: string } {
+  const level = curatedAlertLevel(drug, population, key);
+  if (level === null) {
+    return {
+      alert: 'GREY',
+      dataError: `No curated alert level in alert_levels.json for ${drug} / ${population.trim()} / "${key}".`
+    };
+  }
+  return { alert: level };
+}
+
+/**
+ * R26: look up an atomoxetine recommendation by activity score (adults population).
+ * Codeine and tramadol must NOT use this (they use lookupByPhenotype, R24/R25).
  */
 export function lookupByActivityScore(
   drug: string,
   activityScore: number | null
 ): RecommendationResult {
+  const source = getGuidelineInfo(drug, fetchedFor(drug));
+
   if (activityScore === null) {
     return {
-      recommendation: 'Not assessed. No supported PGx alert can be given.',
+      recommendation: '',
       strength: '',
       alert: 'GREY',
-      source: getGuidelineInfo(drug, '')
+      dataError: `No activity score available to look up ${drug}.`,
+      source
     };
   }
 
   const recs = getRecommendations(drug);
   const population = drugToPopulation[drug.toLowerCase()] || 'general';
-  
-  // Find matching recommendation by activity score
-  // Round to nearest 0.25 for lookup
+
+  // Round to the nearest quarter step for the exact-match pass (atomoxetine keys are quarter steps).
   const roundedAS = Math.round(activityScore * 4) / 4;
-  
-  // First try exact match (numeric keys only; '≥X' keys are handled below)
+
+  // Exact numeric match (non-'≥' keys).
   let match = recs.find(r => {
     if (r.population.trim() !== population.trim()) return false;
     const recAS = r.activityscore?.CYP2D6;
@@ -140,7 +148,7 @@ export function lookupByActivityScore(
     return recASFloat !== null && Math.abs(recASFloat - roundedAS) < 0.01;
   });
 
-  // Then open-ended '≥X' keys: match when AS >= X, preferring the largest X
+  // Open-ended '≥X' keys: match when AS >= X, preferring the largest X.
   if (!match) {
     let bestX = -Infinity;
     for (const r of recs) {
@@ -155,95 +163,65 @@ export function lookupByActivityScore(
     }
   }
 
-  // If no exact match, try to find the closest one or use phenotype-based fallback
-  if (!match) {
-    // For atomoxetine, AS 1.0 is the NM recommendation
-    // For codeine/tramadol, use ranges
-    const sorted = recs
-      .filter(r =>
-        r.population.trim() === population.trim() &&
-        r.activityscore?.CYP2D6 &&
-        !isAtLeastKey(r.activityscore.CYP2D6) &&
-        parseActivityValue(r.activityscore.CYP2D6) !== null
-      )
-      .sort((a, b) =>
-        (parseActivityValue(a.activityscore.CYP2D6) as number) -
-        (parseActivityValue(b.activityscore.CYP2D6) as number)
-      );
-    
-    // Find the appropriate bucket
-    for (let i = sorted.length - 1; i >= 0; i--) {
-      const recAS = parseActivityValue(sorted[i].activityscore.CYP2D6) as number;
-      if (activityScore >= recAS) {
-        match = sorted[i];
-        break;
-      }
-    }
-  }
-
   if (!match) {
     return {
-      recommendation: 'Not assessed. No supported PGx alert can be given.',
+      recommendation: '',
       strength: '',
       alert: 'GREY',
-      source: getGuidelineInfo(drug, '')
+      dataError: `No ${drug} recommendation found for activity score ${activityScore}.`,
+      source
     };
   }
 
-  const alert = determineAlertLevel(match.drugrecommendation);
-  const fetchedDate = (recommendationsFetched as Record<string, string>)[drug.toLowerCase()] || '';
+  // The curated alert level is keyed by the matched recommendation's own activity-score key.
+  const key = match.activityscore.CYP2D6;
+  const { alert, dataError } = resolveAlert(drug, population, key);
 
   return {
     recommendation: match.drugrecommendation,
     strength: match.classification,
     alert,
-    source: getGuidelineInfo(drug, fetchedDate)
+    ...(dataError ? { dataError } : {}),
+    source
   };
 }
 
 /**
- * Look up recommendation by phenotype (for CYP2C19 drugs like clopidogrel)
+ * R24/R25/R27: look up a recommendation by phenotype.
+ * - codeine, tramadol: CYP2D6 phenotype (population 'general')
+ * - clopidogrel: CYP2C19 phenotype (population 'CVI ACS PCI')
  */
 export function lookupByPhenotype(
   drug: string,
   phenotype: string
 ): RecommendationResult {
+  const source = getGuidelineInfo(drug, fetchedFor(drug));
   const recs = getRecommendations(drug);
-  const population = drugToPopulation[drug.toLowerCase()] || '';
-  
+  const population = drugToPopulation[drug.toLowerCase()] || 'general';
+
   const match = recs.find(r => {
-    if (population && r.population.trim() !== population.trim()) return false;
-    return r.phenotypes?.CYP2C19 === phenotype;
+    if (r.population.trim() !== population.trim()) return false;
+    const recPhenotype = r.phenotypes?.CYP2D6 ?? r.phenotypes?.CYP2C19;
+    return recPhenotype === phenotype;
   });
 
   if (!match) {
     return {
-      recommendation: 'Not assessed. No supported PGx alert can be given.',
+      recommendation: '',
       strength: '',
       alert: 'GREY',
-      source: getGuidelineInfo(drug, '')
+      dataError: `No ${drug} recommendation found for phenotype "${phenotype}".`,
+      source
     };
   }
 
-  const alert = determineAlertLevel(match.drugrecommendation);
-  const fetchedDate = (recommendationsFetched as Record<string, string>)[drug.toLowerCase()] || '';
+  const { alert, dataError } = resolveAlert(drug, population, phenotype);
 
   return {
     recommendation: match.drugrecommendation,
     strength: match.classification,
     alert,
-    source: getGuidelineInfo(drug, fetchedDate)
-  };
-}
-
-/**
- * Special case: atomoxetine + moderate inhibitor
- */
-export function atomoxetineModerateInhibitorRec(): RecommendationResult {
-  return {
-    recommendation: 'Moderate CYP2D6 inhibitor present; no CPIC-stated adjustment for atomoxetine. Refer to pharmacist.',
-    strength: '',
-    alert: 'GREY',
-    source: getGuidelineInfo('atomoxetine', recommendationsFetched.atomoxetine)
+    ...(dataError ? { dataError } : {}),
+    source
   };
 }

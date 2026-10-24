@@ -4,6 +4,7 @@
 import { cyp2d6Inhibitors } from './data';
 import type { InhibitorStrength } from './types';
 import { activityScoreToPhenotype } from './phenotype';
+import { ATOMOXETINE_LABEL_ADJUSTED_PHENOTYPE, umReducedConfidenceNote } from './fixedTexts';
 
 export type InhibitorResult = {
   drug: string;
@@ -106,6 +107,21 @@ export function applyPhenoconversion(
     };
   }
 
+  // R17: atomoxetine + strong inhibitor. FDA label-based handling, NOT the opioid ×0 rule.
+  // No multiplier: the adjusted score is reported as null ("n/a") and the adjusted phenotype
+  // is the fixed FDA-label description. The recommendation/alert lookup uses AS 0 (done in
+  // checkOrder). This is checked before R21 so a genotype-PM patient still gets label handling.
+  if (drug === 'atomoxetine' && inhibitor.strength === 'strong') {
+    const isUM = genotypeAS > 2.25;
+    return {
+      inhibitor,
+      adjustedActivityScore: null,
+      adjustedPhenotype: ATOMOXETINE_LABEL_ADJUSTED_PHENOTYPE,
+      phenoconverted: genotypePhenotype !== 'Poor Metabolizer',
+      confidence: isUM ? 'reduced' : 'standard'
+    };
+  }
+
   // R21: already PM by genotype (AS = 0) + ANY inhibitor (strong, moderate or weak).
   // The drug-level alert still fires because the lookup uses AS 0.
   if (genotypeAS === 0) {
@@ -132,37 +148,21 @@ export function applyPhenoconversion(
     };
   }
 
-  // Atomoxetine + strong inhibitor: use AS 0 (PM-equivalent recommendation)
-  if (drug === 'atomoxetine' && inhibitor.strength === 'strong') {
-    const isUM = genotypeAS > 2.25;
-    return {
-      inhibitor,
-      adjustedActivityScore: 0,
-      adjustedPhenotype: 'Poor Metabolizer',
-      phenoconverted: true,
-      confidence: isUM ? 'reduced' : 'standard'
-    };
-  }
-
   // Codeine/tramadol phenoconversion rules (CPIC opioids 2021)
   if (drug === 'codeine' || drug === 'tramadol') {
-    let adjustedAS: number;
-    
-    if (inhibitor.strength === 'strong') {
-      adjustedAS = 0;
-    } else { // moderate
-      adjustedAS = genotypeAS * 0.5;
-    }
-
+    const adjustedAS = inhibitor.strength === 'strong' ? 0 : genotypeAS * 0.5;
     const adjustedPhenotype = activityScoreToPhenotype(adjustedAS);
     const isUM = genotypeAS > 2.25;
-    
+    const reducedConfidence = isUM && inhibitor.strength === 'strong';
+
     return {
       inhibitor,
       adjustedActivityScore: adjustedAS,
       adjustedPhenotype,
       phenoconverted: true,
-      confidence: isUM && inhibitor.strength === 'strong' ? 'reduced' : 'standard'
+      confidence: reducedConfidence ? 'reduced' : 'standard',
+      // R20: show the caveat that UMs may not fully phenoconvert; both recommendations are shown.
+      ...(reducedConfidence ? { inhibitorNote: umReducedConfidenceNote(inhibitor.drug, drug) } : {})
     };
   }
 

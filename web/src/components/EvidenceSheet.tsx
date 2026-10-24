@@ -65,6 +65,16 @@ function AssessmentEvidence({ a, meds }: { a: DrugAssessment; meds: string[] }) 
 
   return (
     <>
+      {/* R17: FDA label recommendation applies directly to strong-inhibitor coadministration; lead with it. */}
+      {a.labelRecommendation && (
+        <Section title="FDA label (applies directly)">
+          <p className="text-base text-ink">{a.labelRecommendation}</p>
+          {a.discrepancyFlag && (
+            <p className="rounded-lg bg-alert-amber/10 px-3 py-2 text-sm text-ink">{a.discrepancyFlag}</p>
+          )}
+        </Section>
+      )}
+
       <Section title="Rule inputs and result">
         <dl>
           <Row term="Gene result (diplotype)">
@@ -108,6 +118,15 @@ function AssessmentEvidence({ a, meds }: { a: DrugAssessment; meds: string[] }) 
 
       <Section title="CPIC recommendation (verbatim)">
         <blockquote className="border-l-4 border-ink/30 pl-3 text-base text-ink">{a.recommendation}</blockquote>
+        {/* R17: the CPIC poor-metabolizer text is supporting genotype-based context only. */}
+        {a.cpicRole && <p className="text-sm text-ink-muted">{a.cpicRole}</p>}
+        {/* R20: the genotype (unconverted) recommendation, shown alongside the converted one. */}
+        {a.genotypeRecommendation && (
+          <>
+            <p className="text-sm font-semibold text-ink">Genotype (unconverted) recommendation</p>
+            <blockquote className="border-l-4 border-ink/30 pl-3 text-base text-ink">{a.genotypeRecommendation}</blockquote>
+          </>
+        )}
         <dl>
           <Row term="Strength">{a.strength || 'None given'}</Row>
           {sourceLine(a) && <Row term="Guideline version">{sourceLine(a)}</Row>}
@@ -132,6 +151,13 @@ function AssessmentEvidence({ a, meds }: { a: DrugAssessment; meds: string[] }) 
           </Row>
           <Row term="Fetched">{a.source.fetched || 'Not available'}</Row>
         </dl>
+        {/* R17: FDA label + CPIC source links. */}
+        {a.sourceLinks && (
+          <p className="text-xs break-words text-ink-muted">
+            <span className="font-semibold">Sources: </span>
+            {a.sourceLinks}
+          </p>
+        )}
       </Section>
 
       {a.gene === 'CYP2D6' && (

@@ -3,7 +3,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { checkOrder } from './checkOrder';
-import { toCdsCard } from './cdsCard';
+import { toCdsCard, GREEN_ALERT_TEXT } from './cdsCard';
 import type { Patient } from './types';
 import expectedOutputs from '../../../tests/fixtures/expected_outputs.json';
 
@@ -41,6 +41,27 @@ describe('RxGene Engine - Fixture Tests', () => {
       // Test 4: CPIC recommendation (exact match)
       expect(assessment.recommendation).toBe(fixture.cpic_recommendation);
 
+      // New curated fields (exact match when the fixture provides them).
+      const fx = fixture as unknown as Record<string, string | undefined>;
+      if (fx.genotype_recommendation) {
+        expect(assessment.genotypeRecommendation).toBe(fx.genotype_recommendation);
+      }
+      if (fx.label_recommendation) {
+        expect(assessment.labelRecommendation).toBe(fx.label_recommendation);
+      }
+      if (fx.discrepancy_flag) {
+        expect(assessment.discrepancyFlag).toBe(fx.discrepancy_flag);
+      }
+      if (fx.cpic_role) {
+        expect(assessment.cpicRole).toBe(fx.cpic_role);
+      }
+
+      // R30/R32/R33: a GREY alert must never reuse the GREEN disclaimer wording.
+      if (assessment.alert === 'GREY') {
+        expect(assessment.recommendation).not.toBe(GREEN_ALERT_TEXT);
+        expect(assessment.recommendation).not.toContain('No supported PGx alert can be given');
+      }
+
       // Test 5: Confidence
       if (fixture.confidence === 'reduced (UMs may not fully phenoconvert, CPIC 2023)') {
         expect(assessment.confidence).toBe('reduced');
@@ -72,10 +93,16 @@ describe('RxGene Engine - Fixture Tests', () => {
       if (
         fixture.adjusted_AS !== '' &&
         fixture.adjusted_AS !== 'not computed' &&
-        fixture.adjusted_AS !== 'n/a (CYP2C19 has no activity score)'
+        fixture.adjusted_AS !== 'n/a (CYP2C19 has no activity score)' &&
+        !Number.isNaN(parseFloat(fixture.adjusted_AS as string))
       ) {
         const expectedAdjustedAS = parseFloat(fixture.adjusted_AS as string);
         expect(assessment.adjustedActivityScore).toBeCloseTo(expectedAdjustedAS, 2);
+      }
+
+      // R17: the label-based atomoxetine case reports a null adjusted score ("n/a").
+      if (typeof fixture.adjusted_AS === 'string' && fixture.adjusted_AS.startsWith('n/a (label-based')) {
+        expect(assessment.adjustedActivityScore).toBeNull();
       }
 
       // Check inhibitor detection

@@ -6,7 +6,7 @@
 - Clinical rules Kiro must follow: [`.kiro/steering/clinical-rules.md`](../.kiro/steering/clinical-rules.md)
 
 **Rules for everyone**
-- All code is written in **Kiro**. That's an event requirement.
+- Everyone runs **Claude Code as the lead** and **Kiro CLI as the coder** (setup: [AGENT-PROMPTS.md](AGENT-PROMPTS.md)). Kiro writes all code, which is an event requirement. Claude follows [`CLAUDE.md`](../CLAUDE.md).
 - Work on the `dev` branch, and push to it often.
 - `main` changes only through a PR from `dev`.
 - Never put API keys in the repo. They go in `.env` only.

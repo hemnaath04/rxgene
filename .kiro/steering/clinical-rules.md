@@ -11,22 +11,29 @@
 - Strong CYP2D6 inhibitor -> AS = 0 (poor metabolizer). Moderate -> AS x 0.5, then re-map.
 - **Apply this only to codeine and tramadol.** CPIC 2023 antidepressants says no consensus
   method exists, so don't generalize.
-- Atomoxetine + strong inhibitor: use the poor-metabolizer recommendation, citing the FDA
-  label and CPIC atomoxetine 2019. Atomoxetine + moderate inhibitor: do **not** compute;
-  show "pharmacist review".
-- UM + paroxetine: still show the result, plus a caveat that UMs may not phenoconvert (CPIC 2023).
+- Atomoxetine + strong inhibitor (R17): **no multiplier**; the adjusted score is null ("n/a") and
+  the adjusted phenotype is "Poor-metabolizer-equivalent dosing (FDA label)". Lead with the FDA
+  STRATTERA label section 2.5 text, show the CPIC 2019 poor-metabolizer text only as supporting
+  context, and show the fixed "Different guidance contexts" flag. Atomoxetine + moderate
+  inhibitor (R18): do **not** compute; GREY "Not assessed" with the R18 fixed text.
+- UM + strong inhibitor on codeine/tramadol (R20): reduced confidence, and show **both** the
+  converted and the genotype (UM) recommendation, with the caveat that UMs may not fully phenoconvert.
 - Fluoxetine stopped < 3 months ago counts as active.
 - Show the genotype phenotype and the adjusted phenotype **side by side**.
 
 ## Lookups
-- Codeine, tramadol and atomoxetine recommendations are keyed by **activity score**, not
-  phenotype label. (Atomoxetine at AS 1.0 = the NM recommendation.)
+- Codeine and tramadol recommendations are keyed by **phenotype** (R24, R25): map the genotype or
+  adjusted activity score to a phenotype first. Adjusted scores like 0.625 have no score row.
+- Atomoxetine stays keyed by **activity score** (R26), because its text differs inside the
+  intermediate range. (Atomoxetine at AS 1.0 = the NM recommendation.)
 - Atomoxetine: use the `adults` population.
 - Clopidogrel: CYP2C19 diplotype -> phenotype directly (no activity score). Use the `CVI ACS PCI` population.
 - Omeprazole + clopidogrel is a separate label-level note. It is not a computed phenoconversion.
 
-## Alert levels
-- RED: the recommendation starts with "Avoid".
-- YELLOW: a dose or titration change, or "if no response, consider…".
-- GREEN: "No supported PGx alert". Never label it "safe".
-- GREY: Not assessed / Insufficient data / No recommendation.
+## Alert levels (R29, R30)
+- Read the level from `data/alert_levels.json` for the matched recommendation. **Never infer it
+  from the text** (no "starts with Avoid" checks).
+- No entry for the matched recommendation = GREY plus a data error. Never default to GREEN.
+- GREEN text: "No supported PGx alert (not the same as safe)". Never call anything "safe".
+- GREY has three separate states with fixed texts: Indeterminate (R7), Insufficient data (R8),
+  Not assessed (R18/R32). None of them reuses the GREEN wording.

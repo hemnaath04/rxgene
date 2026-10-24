@@ -3,7 +3,7 @@
 Paste everything inside the block into Codex once the steps in **Before you start** are done.
 
 ## Before you start (Hemnaath)
-1. The narration is recorded and Claude has written `~/projects/rxgene/media/timing.md` (each section's spoken length).
+1. The narration is recorded and the lead has written `~/projects/rxgene/media/timing.md` (each section's spoken length).
 2. The final UI is merged and live. Run `python3 ~/projects/rxgene/scripts/check_live.py https://rxgene.vercel.app` and confirm 8/8.
 3. Grant Codex **Screen Recording** and **Accessibility** permissions (System Settings → Privacy & Security) for the app Codex controls. Turn on **Do Not Disturb**.
 
@@ -16,7 +16,7 @@ https://sandbox.cds-hooks.org for clip S9.
 
 GOAL: one .mov clip per narration section S1–S11, saved to ~/projects/rxgene/media/clips/
 named S1.mov … S11.mov. Each clip must be at least (spoken length + 3 s) from
-~/projects/rxgene/media/timing.md. The editor (Claude, FilmCraft) trims them to the voice, so
+~/projects/rxgene/media/timing.md. The editor (the lead, FilmCraft) trims them to the voice, so
 extra seconds at the start and end are good; missing seconds are not.
 
 SETUP (once):
@@ -34,7 +34,7 @@ HOW TO RECORD EACH CLIP:
 - Start a background recording of the browser window's region, without sound and with click
   highlights:
     screencapture -v -k -x -V <D+3> -R0,0,1440,900 ~/projects/rxgene/media/clips/S<n>.mov &
-  (If -R isn't honored with -v on this macOS, drop -R and record the full screen; Claude crops it.)
+  (If -R isn't honored with -v on this macOS, drop -R and record the full screen; the lead crops it.)
 - Wait 1 s, then perform the clip's actions at the given offsets (t = seconds after start).
   Move the mouse smoothly; never click outside the app window.
 - Wait until the recording ends (D+3 s), then verify the .mov exists and is non-zero. Re-record

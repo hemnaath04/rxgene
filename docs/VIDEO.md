@@ -195,4 +195,4 @@ quick cuts, about 5 seconds each:
 | The agent shows a **"Template"** note instead of an AI note | That's the safety net working: the AI's note failed a check, so the fixed note is shown. You can say so on camera. If you want the AI version, click "Review full medication list" again. |
 | A page looks wrong or doesn't load | Reload. If it's still wrong, switch to the same case from the patient picker, or use another preset (Priya for the green case, Dev for reduced confidence). Run `scripts/check_live.py` again. |
 | You run over 3:00 | Cut shot 6 (Lena) first, then shorten shot 4. Never cut shot 10 (Kiro) or shot 7 (agent). |
-| A brand drug name appears on screen | Stop. Tell Claude, and it goes into a Kiro brief. Don't upload footage with it. |
+| A brand drug name appears on screen | Stop. Tell the lead, and it goes into a Kiro brief. Don't upload footage with it. |

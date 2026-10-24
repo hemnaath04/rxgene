@@ -1,6 +1,6 @@
 Model: claude-haiku-4.5. **REQUIRED** (no longer optional): the official judging criteria reward "finding and using unique public resources like datasets" under Quality and Design. Run it after brief 14 and BEFORE brief 12, so it ships even if the agent runs late. About 20 min.
 
-Context: the organizers' Healthcare & Biotech data portal (https://hackachusetts2026.vercel.app/#/healthcare) lists the **openFDA drug adverse events API**. Claude saved report counts for our demo drug pairs in `data/openfda/pair_reports.json` (fetched 2026-10-24, from `scripts/fetch_openfda.py`). Example: 609 FAERS reports list both codeine and fluoxetine; 92 are coded "DRUG INTERACTION" and 55 "DRUG INEFFECTIVE".
+Context: the organizers' Healthcare & Biotech data portal (https://hackachusetts2026.vercel.app/#/healthcare) lists the **openFDA drug adverse events API**. The lead saved report counts for our demo drug pairs in `data/openfda/pair_reports.json` (fetched 2026-10-24, from `scripts/fetch_openfda.py`). Example: 609 FAERS reports list both codeine and fluoxetine; 92 are coded "DRUG INTERACTION" and 55 "DRUG INEFFECTIVE".
 
 Goal: a small **"Real-world reports (openFDA)"** panel in the Evidence sheet. It's context only, so it must stay subordinate to the CPIC evidence.
 

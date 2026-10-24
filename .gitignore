@@ -9,3 +9,8 @@ __pycache__/
 
 # Demo video working files (audio, clips, renders): never commit
 media/
+
+# Local agent setup (not part of the submission)
+CLAUDE.md
+docs/AGENT-PROMPTS.md
+docs/TEAM-SPLIT.md

@@ -71,11 +71,11 @@ Your genes don't change. Your prescriptions do. This is RxGene.
 2. **App:** QuickTime Player → **File → New Audio Recording**. Click the arrow next to the record button, pick your mic and set Quality to **Maximum**. Voice Memos also works.
 3. **Do one practice read** out loud, then record **two full takes** back to back. Keep the better one. If you stumble, pause, then restart that *section*; the editor can cut it.
 4. **Pace:** a little slower than normal conversation. Smile on the hook and the close.
-5. **Save it** as `~/projects/rxgene/media/narration.m4a` (or `.wav`), then tell Claude. `media/` is git-ignored, so no audio goes into the public repo.
+5. **Save it** as `~/projects/rxgene/media/narration.m4a` (or `.wav`), then tell the lead. `media/` is git-ignored, so no audio goes into the public repo.
 
 ## What happens next
 
-1. Claude imports `narration.m4a` into FilmCraft, transcribes it (Whisper), removes filler words and long pauses, and writes **`media/timing.md`**: the exact start and end of each section S1–S11.
+1. The lead imports `narration.m4a` into FilmCraft, transcribes it (Whisper), removes filler words and long pauses, and writes **`media/timing.md`**: the exact start and end of each section S1–S11.
 2. Codex records one screen clip per section, each a few seconds longer than its audio (see `docs/CODEX-RECORDING-PROMPT.md`), into `media/clips/`.
-3. Claude assembles the clips in FilmCraft: your voice, each clip trimmed to its section, burned-in captions from the transcript (good for accessibility, which judges score), and an H.264 1080p export to `media/rxgene-demo.mp4`.
+3. The lead assembles the clips in FilmCraft: your voice, each clip trimmed to its section, burned-in captions from the transcript (good for accessibility, which judges score), and an H.264 1080p export to `media/rxgene-demo.mp4`.
 4. You watch it once, upload it to YouTube as **Public**, and paste the link into SundAI.

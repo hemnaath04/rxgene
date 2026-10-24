@@ -86,7 +86,7 @@ data/cpic/        CPIC API snapshots: allele values, recommendations, guideline 
 data/             inhibitors.json, synthetic-reports/
 tests/fixtures/   expected outputs for 25 synthetic test patients
 scripts/          fetch_cpic.py (refresh snapshots), make_expected.py (regenerate fixtures)
-docs/             TEAM-SPLIT (who does what), PLAN-v3 (strategy + pitch), verified answers
+docs/             PLAN-v3 (strategy + pitch), verified answers
 .plans/           build spec (source of truth for what we build)
 ```
 

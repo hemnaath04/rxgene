@@ -72,4 +72,4 @@ On any failure, or when the LLM is unavailable, build `templateConsultNote(asses
 7. A Manifest error-text reply on model 1 → model 2 is used.
 8. R54: checkOrder output for the patient is deep-equal before and after runConsultAgent.
 
-Run `npx tsc -b`, `npm test` and `npm run build`. All must pass. Don't run git. List the files you changed. Claude verifies the live agent on the dev preview after your push.
+Run `npx tsc -b`, `npm test` and `npm run build`. All must pass. Don't run git. List the files you changed. The lead verifies the live agent on the dev preview after your push.

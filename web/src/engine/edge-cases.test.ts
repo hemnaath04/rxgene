@@ -61,7 +61,7 @@ describe('R21 already-poor-metabolizer de-escalation', () => {
     expect(a.genotypePhenotype).toBe('Poor Metabolizer');
     expect(a.adjustedPhenotype).toBe('Poor Metabolizer');
     expect(a.inhibitorNote).toBe(
-      'sertraline adds no further effect — this patient was already a poor metabolizer by genotype.'
+      'sertraline adds no further effect: already a poor metabolizer by genotype. The drug-level alert still applies.'
     );
   });
 

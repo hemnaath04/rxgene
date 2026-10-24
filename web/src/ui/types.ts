@@ -125,6 +125,8 @@ export type RxGeneUIProps = {
   onReset: () => void;
   onEvidence: () => void;
   onExplanation: () => void;
+  /** Open the full medication-list review (pharmacist consult draft). */
+  onReviewMedications: () => void;
   /** Toggle pathway playback. */
   onTogglePlay: () => void;
 };

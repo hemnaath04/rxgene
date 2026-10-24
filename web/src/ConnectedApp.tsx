@@ -1,11 +1,8 @@
-// Preserved connected (engine/CDS-backed) application. This is the former default App — kept
-// here, unmounted, for later reuse once the backend is wired to the new UI-only view in
-// web/src/ui. It is NOT imported by main.tsx. Do not delete: it carries the full clinical
-// orchestration (local engine, CDS Hooks mode, deep links, evidence/explanation sheets).
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, LoaderCircle, RotateCcw } from 'lucide-react';
 import { ComparisonStrip } from '@/components/ComparisonStrip';
+import { ConsultSheet } from '@/components/ConsultSheet';
 import { EvidenceSheet } from '@/components/EvidenceSheet';
 import { Gauge } from '@/components/Gauge';
 import { MedList } from '@/components/MedList';
@@ -26,11 +23,26 @@ import { entryAlert, genotypePhenotypeFor, geneFor, sortBySeverity, speedOf, toV
 
 type Exchange = { request: OrderSelectRequest; result: CdsExchange | null };
 
+// Agent result type (browser can't import from api/ directly).
+type AgentResult = {
+  note: {
+    sections: Array<{
+      heading: string;
+      sentences: Array<{ text: string; cites: string[] }>;
+    }>;
+  };
+  source: 'ai' | 'template';
+  reason?: string;
+  trace: Array<{ id: string; tool: string; args: Record<string, unknown>; summary: string; ms: number }>;
+  model?: string;
+  ms: number;
+};
+
 function Divider() {
-  return <span aria-hidden="true" className="hidden h-6 w-px bg-ink/20 sm:block" />;
+  return <span aria-hidden="true" className="hidden h-7 w-px bg-ink/20 sm:block" />;
 }
 
-function ConnectedApp() {
+function App() {
   // URL -> initial state, once. ?add= both adds the drug and runs the check (below).
   const [initial] = useState(() => resolveUrlState(readUrlState()));
   const [patientId, setPatientId] = useState(initial.patient.id);
@@ -47,9 +59,9 @@ function ConnectedApp() {
   const [evidenceOpen, setEvidenceOpen] = useState(false);
   const [explainOpen, setExplainOpen] = useState(false);
   const [evidenceKey, setEvidenceKey] = useState<string | null>(null);
-  // Pathway playback for the molecule stage. Owned here so it resets with every new result,
-  // patient or mode change. Particle travel never changes the engine result.
-  const [playing, setPlaying] = useState(false);
+  const [consultOpen, setConsultOpen] = useState(false);
+  const [consultResult, setConsultResult] = useState<AgentResult | null>(null);
+  const [consultLoading, setConsultLoading] = useState(false);
 
   // Results that arrive after a patient/mode change, or after their drug was removed, are dropped.
   const epochRef = useRef(0);
@@ -117,7 +129,6 @@ function ConnectedApp() {
     setExchange(null);
     setFallbackError(null);
     setEvidenceKey(null);
-    setPlaying(false);
   };
 
   const updateMeds = (next: string[]) => {
@@ -153,25 +164,9 @@ function ConnectedApp() {
     void runCheck(patient, current, drug, mode);
   };
 
-  /**
-   * Changing the prescription selector before pressing Check must not leave a stale result on
-   * screen that looks like it's about the newly selected drug. If a different drug was already
-   * checked, clear the result and remove its chip; the user re-runs Check for the new drug.
-   */
-  const changePrescription = (next: string) => {
-    setPrescription(next);
-    if (added && added.toLowerCase() !== next.toLowerCase()) {
-      const current = meds.filter(m => m !== added);
-      resetResults();
-      updateMeds(current);
-      setAdded(null);
-    }
-  };
-
   /** After a check, editing the chips re-runs it at once (DESIGN.md section 1). */
   const recheck = (current: string[]) => {
     if (!added) return;
-    setPlaying(false); // a new result: stop any pathway travel so it never outlives it
     epochRef.current++; // only the latest re-check's answer is applied
     void runCheck(patient, current, added, mode);
   };
@@ -211,31 +206,14 @@ function ConnectedApp() {
   const genotypePhenotype = topAssessment?.genotypePhenotype ?? genotypePhenotypeFor(patient, gene);
 
   // The same drug against the genotype alone, from the engine, for the comparison strip.
-  // Only the computed opioid phenoconversion drugs (codeine/tramadol) use the qualitative
-  // "right now" scale; atomoxetine/FDA-equivalent and CYP2C19 are not a computed scale.
-  const isComputedPhenoconversion =
-    topAssessment?.phenoconverted === true &&
-    (topAssessment.drug === 'codeine' || topAssessment.drug === 'tramadol') &&
-    speedOf(topAssessment.adjustedPhenotype) !== null;
-
   const geneOnly = useMemo(() => {
-    if (!isComputedPhenoconversion || !topAssessment) return null;
+    if (!topAssessment?.phenoconverted) return null;
     return checkOrder({ ...patient, meds: [] }, topAssessment.drug).find(x => x.drug === topAssessment.drug) ?? null;
-  }, [patient, topAssessment, isComputedPhenoconversion]);
+  }, [patient, topAssessment]);
 
-  const showStrip = isComputedPhenoconversion;
+  const showStrip = topAssessment?.phenoconverted === true;
   const verdictDelay = showStrip ? STEP.strip + 3 * STEP.stripStagger : STEP.strip;
-  // Atomoxetine + strong inhibitor: CPIC/FDA give PM-equivalent dosing, not a computed activity
-  // score. The baseline engine may still return a numeric adjusted score (tracked P13 mismatch),
-  // so we suppress the computed ● current marker and show a guidance note instead of a fake stop.
-  const atomoxetineStrongGuidance =
-    topAssessment?.drug === 'atomoxetine' && topAssessment.inhibitor?.strength === 'strong' && (level ?? 'GREY') !== 'GREY';
-  const gaugeNow = topAssessment && !atomoxetineStrongGuidance ? speedOf(topAssessment.adjustedPhenotype) : null;
-  const nowNote = atomoxetineStrongGuidance
-    ? 'With medications: PM-equivalent dosing (FDA label) — see evidence'
-    : topAssessment?.adjustedPhenotype === 'not computed'
-      ? 'With medications: not computed (pharmacist review)'
-      : null;
+  const nowNote = topAssessment?.adjustedPhenotype === 'not computed' ? 'With medications: not computed (pharmacist review)' : null;
   const explainAssessment = topVerdict && !topVerdict.mismatch ? topAssessment : null;
 
   const openEvidence = (key: string | null = null) => {
@@ -243,27 +221,61 @@ function ConnectedApp() {
     setEvidenceOpen(true);
   };
 
-  const togglePlay = () => setPlaying(p => !p);
+  const runConsult = async () => {
+    setConsultOpen(true);
+    setConsultLoading(true);
+    setConsultResult(null);
+
+    try {
+      const response = await fetch('/api/consult', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          patient: {
+            id: patient.id,
+            name: patient.name,
+            cyp2d6: patient.cyp2d6,
+            cyp2c19: patient.cyp2c19,
+            meds: currentMeds
+          },
+          addedDrug: added ?? undefined
+        })
+      });
+
+      if (!response.ok) {
+        console.error('[consult] HTTP', response.status);
+        return;
+      }
+
+      const result = (await response.json()) as AgentResult;
+      setConsultResult(result);
+    } catch (err) {
+      console.error('[consult] error:', err);
+    } finally {
+      setConsultLoading(false);
+    }
+  };
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="app-bg text-ink">
-        <header className="mx-auto flex min-h-14 max-w-[1400px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-6 py-2">
-          <div className="flex items-center gap-3">
-            <p className="text-[24px]/none font-bold tracking-[-0.02em] text-ink">
+      {/* overflow-x-clip is a horizontal guard only; the layout itself fits 390px. */}
+      <div className="app-bg overflow-x-clip text-ink">
+        <header className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 pt-5 pb-3 sm:px-6">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
+            <p className="text-[32px]/none font-bold tracking-[-0.02em] text-ink">
               RxGene<span className="text-alert-red">.</span>
             </p>
             <Divider />
-            <p className="text-sm font-medium text-marine">Pharmacogenomics</p>
+            <p className="text-lg text-ink">Pharmacogenomics</p>
           </div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <p className="text-xs font-semibold tracking-[0.18em] text-ink-muted">SYNTHETIC DEMO</p>
+          <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
+            <p className="text-sm font-semibold tracking-[0.2em] text-ink-muted">SYNTHETIC DEMO</p>
             <Divider />
             <ModeToggle mode={mode} onChange={changeMode} />
             <Divider />
             <Button
               variant="ghost"
-              className="press h-9 px-3 text-sm font-medium text-ink"
+              className="press h-10 px-3 text-base font-medium text-ink"
               onClick={() => openEvidence()}
               disabled={cards.length === 0}
             >
@@ -271,26 +283,27 @@ function ConnectedApp() {
             </Button>
             <Button
               variant="ghost"
-              className="press h-9 px-3 text-sm font-medium text-ink"
+              className="press h-10 px-3 text-base font-medium text-ink"
               onClick={() => selectPatient(patient.id)}
             >
-              <RotateCcw aria-hidden="true" className="size-4" strokeWidth={1.5} />
+              <RotateCcw aria-hidden="true" className="size-5" strokeWidth={1.5} />
               Reset
             </Button>
           </div>
         </header>
 
-        <main className="mx-auto flex max-w-[1400px] flex-col gap-3 px-6 pb-4">
-          {/* Control bar: frosted pale-blue surface, inputs before results. */}
+        <main className="mx-auto flex max-w-[1400px] min-w-0 flex-col gap-5 px-4 pb-8 sm:px-6">
+          {/* Control bar: panel rounded-2xl, inputs rounded-lg, padding above 24px (20px on phones).
+              One column on phones, so every control wraps instead of pushing the page sideways. */}
           <section
             aria-label="Prescription check"
-            className="panel grid grid-cols-1 items-end gap-x-6 gap-y-3 rounded-[18px] p-4 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1.2fr)_auto]"
+            className="panel grid min-w-0 grid-cols-1 items-end gap-x-6 gap-y-4 rounded-2xl p-5 sm:p-7 md:grid-cols-2 lg:grid-cols-[minmax(13rem,1fr)_minmax(16rem,1.5fr)_minmax(13rem,1.2fr)_auto]"
           >
             <PatientPicker patients={patients} selectedId={patientId} onSelect={selectPatient} />
             <MedList meds={currentMeds} checking={added} onAdd={addCurrentMed} onRemove={removeCurrentMed} />
-            <PrescriptionPicker value={prescription} onChange={changePrescription} />
+            <PrescriptionPicker value={prescription} onChange={setPrescription} />
             <Button
-              className="press h-11 rounded-lg pr-[18px]! pl-5! text-base font-semibold"
+              className="press h-12 w-full rounded-lg pr-[18px]! pl-5! text-lg font-semibold md:w-auto"
               onClick={checkPrescription}
             >
               Check prescription
@@ -298,13 +311,11 @@ function ConnectedApp() {
             </Button>
           </section>
 
-          <div className="flex flex-col gap-0.5">
-            <h1 className="text-[clamp(28px,3.4vw,40px)]/[1.05] font-semibold tracking-[-0.02em] text-ink">
+          <div className="flex flex-col gap-1 pt-2">
+            <h1 className="text-[32px]/[36px] font-bold tracking-[-0.02em] text-ink sm:text-[40px]/[44px] lg:text-[56px]/[60px]">
               Same genes. Different response.
             </h1>
-            <p className="text-[15px] text-ink-muted">
-              See how current medications change this prescription assessment.
-            </p>
+            <p className="text-lg text-ink">See how current medications change this prescription assessment.</p>
           </div>
 
           <Status pending={pending > 0} fallbackError={fallbackError} headline={topVerdict?.headline ?? null} />
@@ -318,13 +329,11 @@ function ConnectedApp() {
             assessment={topAssessment}
             level={level}
             pending={pending > 0}
-            playing={playing}
-            onTogglePlay={togglePlay}
           />
 
           <Gauge
             byGenes={speedOf(genotypePhenotype)}
-            now={gaugeNow}
+            now={topAssessment ? speedOf(topAssessment.adjustedPhenotype) : null}
             level={level}
             reducedConfidence={topAssessment?.confidence === 'reduced'}
             nowNote={nowNote}
@@ -341,7 +350,9 @@ function ConnectedApp() {
             </AnimatePresence>
           </div>
 
-          <div className="relative z-10">
+          {/* In normal flow after the gauge and comparison strip (not sticky), so it never
+              covers the story's "Slow" result or the gauge on first load. */}
+          <div className="relative">
             <AnimatePresence mode="popLayout" initial={false}>
               {topVerdict ? (
                 <motion.div
@@ -355,6 +366,7 @@ function ConnectedApp() {
                     onMore={() => openEvidence()}
                     onExplain={() => setExplainOpen(true)}
                     explainDisabled={!explainAssessment}
+                    onReviewMeds={() => void runConsult()}
                   />
                 </motion.div>
               ) : (
@@ -381,6 +393,16 @@ function ConnectedApp() {
           onOpenChange={setExplainOpen}
           assessment={explainAssessment}
           initialLang={lang}
+        />
+        <ConsultSheet
+          open={consultOpen}
+          onOpenChange={setConsultOpen}
+          note={consultResult?.note ?? null}
+          source={consultResult?.source ?? null}
+          model={consultResult?.model}
+          trace={consultResult?.trace ?? []}
+          loading={consultLoading}
+          reviewingCount={added ? meds.length : meds.length - (added ? 1 : 0)}
         />
       </div>
     </MotionConfig>
@@ -419,4 +441,4 @@ function Status({ pending, fallbackError, headline }: { pending: boolean; fallba
   );
 }
 
-export default ConnectedApp;
+export default App;

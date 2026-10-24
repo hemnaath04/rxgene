@@ -1,0 +1,62 @@
+{
+  "name": "rxgene",
+  "description": "",
+  "prompt": null,
+  "mcpServers": {},
+  "tools": [
+    "*"
+  ],
+  "toolAliases": {},
+  "allowedTools": [
+    "fs_read",
+    "fs_write",
+    "grep",
+    "glob",
+    "read",
+    "write"
+  ],
+  "resources": [],
+  "toolsSettings": {},
+  "includeMcpJson": true,
+  "model": null,
+  "permissions": {
+    "rules": [
+      {
+        "capability": "fs_write",
+        "match": [
+          "./**"
+        ],
+        "effect": "allow"
+      },
+      {
+        "capability": "fs_read",
+        "match": [
+          "./**"
+        ],
+        "effect": "allow"
+      }
+    ]
+  },
+  "hooks": {
+    "preToolUse": [
+      {
+        "command": "node scripts/kiro-guard-clinical-data.mjs",
+        "matcher": "write"
+      },
+      {
+        "command": "node scripts/kiro-guard-secrets.mjs",
+        "matcher": "read"
+      }
+    ],
+    "stop": [
+      {
+        "command": "cd web && npx vitest run --reporter=dot"
+      }
+    ]
+  },
+  "kiroUpgrade": {
+    "revision": 2,
+    "fingerprint": "sha256:a491e259057c3401142cdb4355e2c5f8503003bce444a444fe1ffe204c5d33bd",
+    "source": "sha256:90c8d9b753489f5ff0de0324ea634ebbf763aeeba6256596de2e8acf349dfa7e"
+  }
+}

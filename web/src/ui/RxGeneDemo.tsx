@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { MotionConfig, useReducedMotion } from 'motion/react';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { ConsultSheet, type ConsultNote, type TraceEntry } from '@/components/ConsultSheet';
+import { OpenFDAPanel } from '@/components/EvidenceSheet';
 import { RxGeneUI } from '@/ui/RxGeneUI';
 import type { RxGeneResult } from '@/ui/types';
 import {
@@ -17,7 +19,7 @@ import {
  * selection to a known fixture when the user presses Check — purely for the synthetic demo. It
  * imports fixture objects ONLY; there is NO engine import and NO network call here. A production
  * integration would replace this adapter with one that calls the backend and supplies its own
- * RxGeneResult to <RxGeneUI/>.
+ * RxGeneResult to <RxGeneUI/>, and a live agent note to <ConsultSheet/>.
  */
 
 type Draft = {
@@ -44,6 +46,53 @@ function resolveFixture(draft: Draft): RxGeneResult {
   return notAssessedPreview(presLabel);
 }
 
+/**
+ * Build a deterministic consult-note PREVIEW from the committed result. This is NOT a live agent:
+ * every sentence reuses text that already exists on the RxGeneResult (evidence body, verdict
+ * rationale, explanation body). No new clinical text, dose or drug is invented. The two trace
+ * entries (T1/T2) are explicit demo-preview fixtures with the ids the citations point to.
+ */
+function buildDemoConsult(result: RxGeneResult): { note: ConsultNote; trace: TraceEntry[] } {
+  const trace: TraceEntry[] = [
+    {
+      id: 'T1',
+      tool: 'Gene result preview',
+      args: { patientGene: result.gene, diplotype: result.diplotype },
+      summary: `Demo preview — ${result.gene} ${result.diplotype}: ${result.baselineLabel}.`,
+      ms: 0,
+    },
+    {
+      id: 'T2',
+      tool: 'Prescription assessment preview',
+      args: { drug: result.drugLabel, level: result.verdict.level },
+      summary: `Demo preview — ${result.drugLabel}: ${result.verdict.rationale}`,
+      ms: 0,
+    },
+  ];
+
+  const sections: ConsultNote['sections'] = [];
+
+  // Assessment section — reuse the verdict rationale and any evidence body verbatim.
+  const assessmentSentences = [{ text: result.verdict.rationale, cites: ['T2'] }];
+  if (result.evidenceBody) {
+    assessmentSentences.push({ text: result.evidenceBody, cites: ['T1', 'T2'] });
+  }
+  sections.push({
+    heading: `${result.drugLabel}: ${result.verdict.headline}`,
+    sentences: assessmentSentences,
+  });
+
+  // Patient-facing section — reuse the existing plain-language explanation body if present.
+  if (result.explanationBody) {
+    sections.push({
+      heading: result.explanationTitle ?? 'For the patient',
+      sentences: [{ text: result.explanationBody, cites: ['T1'] }],
+    });
+  }
+
+  return { note: { sections }, trace };
+}
+
 export default function RxGeneDemo() {
   // The committed view (what the scene/verdict show) starts on the exact Sarah screenshot.
   const [result, setResult] = useState<RxGeneResult | undefined>(SARAH_INHIBITED);
@@ -52,6 +101,7 @@ export default function RxGeneDemo() {
   const [playing, setPlaying] = useState(true); // autoplay explanatory motion in the synthetic demo
   const [evidenceOpen, setEvidenceOpen] = useState(false);
   const [explainOpen, setExplainOpen] = useState(false);
+  const [consultOpen, setConsultOpen] = useState(false);
   const reduceMotion = !!useReducedMotion();
 
   const check = () => {
@@ -59,12 +109,13 @@ export default function RxGeneDemo() {
     setPlaying(true);
   };
 
-  // Editing any draft control clears the committed result and stops playback, so an old
-  // patient's result is never shown against new inputs until Check is pressed again.
+  // Editing any draft control clears the committed result, stops playback, and closes the consult
+  // so an old patient's result or stale note is never shown against new inputs until Check runs.
   const editDraft = (patch: Partial<Draft>) => {
     setDraft(d => ({ ...d, ...patch }));
     setResult(undefined);
     setPlaying(false);
+    setConsultOpen(false);
   };
 
   const reset = () => {
@@ -73,7 +124,12 @@ export default function RxGeneDemo() {
     setPlaying(true);
     setEvidenceOpen(false);
     setExplainOpen(false);
+    setConsultOpen(false);
   };
+
+  // "Review full medication list": open a deterministic, locally-built consult preview from the
+  // committed result. No network, no live agent. Undefined result disables this action in the UI.
+  const consult = result ? buildDemoConsult(result) : null;
 
   return (
     <MotionConfig reducedMotion="user">
@@ -94,14 +150,28 @@ export default function RxGeneDemo() {
         onReset={reset}
         onEvidence={() => setEvidenceOpen(true)}
         onExplanation={() => setExplainOpen(true)}
+        onReviewMedications={() => result && setConsultOpen(true)}
         onTogglePlay={() => setPlaying(p => !p)}
+      />
+
+      {/* Pharmacist consult draft (deterministic demo preview, template source). */}
+      <ConsultSheet
+        open={consultOpen}
+        onOpenChange={setConsultOpen}
+        note={consult?.note ?? null}
+        source="template"
+        trace={consult?.trace ?? []}
+        loading={false}
+        preview
+        reason="Demo preview: built locally from the current result. Connect the backend for a live agent note."
+        reviewingCount={draft.medications.length}
       />
 
       {/* Evidence sheet (demo text) */}
       <Sheet open={evidenceOpen} onOpenChange={setEvidenceOpen}>
         <SheetContent
           side="right"
-          className="overflow-y-auto overscroll-contain bg-panel-solid data-[side=right]:w-[min(480px,100vw)]! data-[side=right]:max-w-none!"
+          className="overflow-y-auto overscroll-contain bg-panel-solid data-[side=right]:w-[min(640px,100vw)]! data-[side=right]:max-w-none!"
         >
           <SheetHeader className="px-6 pt-6">
             <SheetTitle className="text-xl font-semibold text-ink">{result?.evidenceTitle ?? 'Evidence'}</SheetTitle>
@@ -128,6 +198,9 @@ export default function RxGeneDemo() {
                 ))}
               </ul>
             )}
+            {/* Real-world FAERS reports, subordinate to the guideline/source content above.
+                Uses the local openFDA snapshot; no fetch. Renders nothing when no pair matches. */}
+            {result && <OpenFDAPanel drug={result.drugLabel.toLowerCase()} meds={draft.medications} />}
           </div>
         </SheetContent>
       </Sheet>

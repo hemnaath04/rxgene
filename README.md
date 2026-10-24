@@ -11,7 +11,7 @@ but takes fluoxetine behaves like a poor metabolizer, so codeine won't relieve t
 > Built at Hackachusetts 2026 (Biotech & Healthcare track). Synthetic data only.
 > RxGene supports clinicians and pharmacists. It does not replace them.
 
-**Team docs:** [Agent prompts (start here)](docs/AGENT-PROMPTS.md) · [Who does what](docs/TEAM-SPLIT.md) · [Build spec](.plans/rxgene-build-spec.md) · [Plan v3](docs/PLAN-v3.md) · [Clinical rules](.kiro/steering/clinical-rules.md)
+**Submission docs:** [How we used Kiro](KIRO.md) · [Project description](docs/SUBMISSION.md) · [CDS Hooks sandbox proof](docs/proof/cds-hooks-sandbox.jpg) · [Video plan](docs/VIDEO.md) · **Team docs:** [Agent prompts](docs/AGENT-PROMPTS.md) · [Who does what](docs/TEAM-SPLIT.md) · [Build spec](.plans/rxgene-build-spec.md) · [Plan v3](docs/PLAN-v3.md) · [Clinical rules](.kiro/steering/clinical-rules.md)
 
 ## The problem
 
@@ -63,8 +63,11 @@ workflow made the safety rules reviewable *before* any code existed:
 | Kiro feature | How we used it | Where |
 |---|---|---|
 | **Steering** | Product, tech stack, structure, clinical rules and git workflow, loaded into every Kiro session. Each clinical rule cites its source (CPIC opioids 2021, CPIC 2023, FDA inhibitor table). | [`.kiro/steering/`](.kiro/steering/) |
-| **Spec (requirements)** | 42 numbered EARS requirements (R1–R43; R23 was removed in science review), written by our genetics teammate before the engine was built. Every alert shows the requirement IDs that triggered it. | [`.kiro/specs/rxgene-engine/requirements.md`](.kiro/specs/rxgene-engine/requirements.md) |
+| **Spec (requirements)** | 55 active numbered EARS requirements (R1–R56; R23 was removed in science review), written by our genetics teammate before the engine was built. Every alert shows the requirement IDs that triggered it. | [`.kiro/specs/rxgene-engine/requirements.md`](.kiro/specs/rxgene-engine/requirements.md) |
 | **Agent hook** | Saving any engine file runs the expected-output test suite, so a broken rule shows up at once. | [`.kiro/hooks/engine-tests.kiro.hook`](.kiro/hooks/engine-tests.kiro.hook) |
+| **Secrets guard** | The agent cannot read `.env`, `.pem`, `.key` or `.p12` files; confirmed live (it refused to read `web/.env`). Our installed Kiro CLI is 2.x, which predates `.kiroignore` (CLI V3/IDE only), so this runs as a `preToolUse`/`read` hook instead. | [`.kiro/agents/rxgene.json`](.kiro/agents/rxgene.json), [`scripts/kiro-guard-secrets.mjs`](scripts/kiro-guard-secrets.mjs) |
+| **PreToolUse guard** | The agent cannot edit CPIC data, inhibitor rules, or expected outputs—these belong to the genetics reviewer. Confirmed live with the exact block message. | [`.kiro/agents/rxgene.json`](.kiro/agents/rxgene.json), [`scripts/kiro-guard-clinical-data.mjs`](scripts/kiro-guard-clinical-data.mjs) |
+| **Stop hook** | Every Kiro turn ends with the test suite (`npx vitest run`), so a broken rule shows up immediately. | [`.kiro/agents/rxgene.json`](.kiro/agents/rxgene.json) |
 | **Task briefs** | Each feature was handed to Kiro as one scoped brief (files to touch, cases to pass, rules that apply), then reviewed against the fixtures before commit. | [`.kiro/briefs/`](.kiro/briefs/) |
 
 The design rule throughout: **AI proposes, deterministic code decides.** The rule engine is
@@ -80,20 +83,40 @@ web/              React + Vite + TS app (scaffold in Kiro); engine goes in web/s
 server/           small Node endpoint for LLM extraction/explanation
 data/cpic/        CPIC API snapshots: allele values, recommendations, guideline links
 data/             inhibitors.json, synthetic-reports/
-tests/fixtures/   expected outputs for 24 synthetic test patients
+tests/fixtures/   expected outputs for 25 synthetic test patients
 scripts/          fetch_cpic.py (refresh snapshots), make_expected.py (regenerate fixtures)
 docs/             TEAM-SPLIT (who does what), PLAN-v3 (strategy + pitch), verified answers
 .plans/           build spec (source of truth for what we build)
 ```
 
-## Getting started
+## Try it
 
-1. Open this folder in **Kiro**. The rules in `.kiro/steering/` load automatically.
-2. Scaffold the app in `web/` (React + Vite + TypeScript). If the tool warns that the
-   folder isn't empty, choose to ignore the existing files.
-3. `cp .env.example .env` and add your LLM key. Never commit `.env`.
-4. Refresh the data if needed: `python3 scripts/fetch_cpic.py`.
-5. Build the engine against `tests/fixtures/expected_outputs.json` first, then the UI.
+**Live demo (no login):** https://rxgene.vercel.app
+
+- Sarah, the main case (fluoxetine + codeine → "Avoid codeine"): https://rxgene.vercel.app/?patient=sarah&add=codeine
+- Marcus, already a poor metabolizer (one precise alert, not two): https://rxgene.vercel.app/?patient=marcus&add=codeine
+- Lena, the reverse case (adding fluoxetine re-alerts the codeine she already takes): https://rxgene.vercel.app/?patient=lena&add=fluoxetine
+- The CDS Hooks service an EHR calls: https://rxgene.vercel.app/cds-services
+
+All patients are synthetic.
+
+## Run it locally
+
+Requirements: Node.js 22 or later, npm, and Python 3 (only for the data scripts).
+
+```bash
+git clone https://github.com/hemnaath04/rxgene && cd rxgene/web
+npm ci
+npm run dev        # UI + API on http://localhost:5173 (copies ../data into src/data first)
+```
+
+- **Tests:** `npm test` (expected-output fixtures, edge cases, API handlers).
+- **Production build:** `npm run build`.
+- **AI patient summary (optional):** `cp .env.example .env` in `web/` and set `LLM_BASE_URL`, `LLM_API_KEY` (any OpenAI-compatible endpoint) and `LLM_MODEL`. Without them the app still works and shows the fixed template.
+- **Check a deployment end to end:** `python3 scripts/check_live.py https://rxgene.vercel.app` from the repo root.
+- **Refresh the data snapshots:** `python3 scripts/fetch_cpic.py` and `python3 scripts/fetch_openfda.py`.
+
+How Kiro was used to build it: [KIRO.md](KIRO.md).
 
 ## Git workflow
 
@@ -103,11 +126,11 @@ docs/             TEAM-SPLIT (who does what), PLAN-v3 (strategy + pitch), verifi
 
 ## Test patients
 
-24 synthetic cases cover genotype-only alerts, phenoconversion (strong, moderate and weak
+25 synthetic cases cover genotype-only alerts, phenoconversion (strong, moderate and weak
 inhibitors, plus the reverse case where adding an inhibitor re-alerts a drug already on the list), alert de-escalation (a patient who is
 already a poor metabolizer and also takes an inhibitor), threshold traps (`*1/*4`,
 `*1/*10`, `*41`), CYP2C19, unsupported alleles and missing data. Every recommendation is
-taken word for word from the CPIC API.
+taken word for word from the CPIC API, except atomoxetine at activity score 1.0 with a `*10` allele, which comes from the CPIC 2019 PDF because the API has only the other row, and the FDA label sentence shown for atomoxetine with a strong inhibitor.
 
 ## Sources
 
@@ -125,6 +148,7 @@ taken word for word from the CPIC API.
 - **Several inhibitors on the list: the strongest one is applied.** This is a project design choice, not a CPIC rule.
 - **Ultrarapid metabolizers on a strong inhibitor are flagged "reduced confidence"**, because they may not phenoconvert to the same extent (CPIC 2023).
 - **CYP2C19 phenoconversion is not modeled.** No CPIC-stated adjustment rule for CYP2C19 was identified in the sources we checked, so RxGene does not compute one. The FDA interaction table lists fluoxetine as a strong inhibitor of CYP2C19 as well as CYP2D6, so a patient on fluoxetine who is prescribed clopidogrel may respond differently from what their genotype predicts, and RxGene will not flag it. Omeprazole with clopidogrel is shown as a label-level note only.
+- **Clopidogrel indication.** Clopidogrel is modeled for acute coronary syndrome (ACS) and/or percutaneous coronary intervention (PCI) only. CPIC recommendations and recommendation strengths differ for neurovascular and other cardiovascular indications. RxGene does not collect or verify the patient's clinical indication, so its clopidogrel recommendations must not be generalized to all patients taking clopidogrel.
 - **"No supported alert" is not the same as safe.** It means RxGene has no guideline-backed flag for that combination.
 - **The AI summary never decides anything.** It rewrites the rule engine's output, is validated, and falls back to a fixed template.
 

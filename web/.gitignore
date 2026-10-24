@@ -5,6 +5,7 @@ dist-ssr
 src/data/cpic/
 src/data/inhibitors.json
 src/data/alert_levels.json
+src/data/openfda/
 
 # Editor directories and files
 .vscode/*

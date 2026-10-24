@@ -53,14 +53,20 @@ The user signs in once and redeems their own event credit code in Kiro.
 To run a task:
 
 ```bash
-kiro-cli chat --no-interactive --trust-workspace --model <model> \
-  --trust-tools=read,write,glob,grep "$(cat .kiro/briefs/<brief>.md)"
+kiro-cli chat --no-interactive --trust-workspace --agent rxgene --model <model> \
+  --trust-tools=read,write,glob,grep,fs_read,fs_write "$(cat .kiro/briefs/<brief>.md)"
 ```
 
+- **Always pass `--agent rxgene`** (from brief 14 onward). The secrets guard and the
+  clinical-data guard (below) live in `.kiro/agents/rxgene.json` as CLI 2.x-style hooks,
+  not in the default agent — a run without `--agent rxgene` has no guard at all. Our
+  installed Kiro CLI is 2.x (`kiro-cli --version`), which predates `.kiroignore` and
+  standalone `.kiro/hooks/*.json` files (both CLI V3/IDE-only); confirmed by testing
+  both live before relying on them.
 - Add `,shell` to `--trust-tools` **only** when the brief needs Kiro to run commands
   itself. By default, Claude runs the tests and installs. Never use `--trust-all-tools`.
 - To follow up in the same Kiro conversation (it keeps its context):
-  `kiro-cli chat --no-interactive --resume --model <model> --trust-tools=read,write,glob,grep "<follow-up>"`.
+  `kiro-cli chat --no-interactive --resume --agent rxgene --model <model> --trust-tools=read,write,glob,grep,fs_read,fs_write "<follow-up>"`.
 - Kiro can run for several minutes, so run it in the background and wait for it to finish.
 
 **Model per task** (credits are limited; check usage at every gate):
@@ -94,4 +100,4 @@ kiro-cli chat --no-interactive --trust-workspace --model <model> \
   `LLM_MODEL` in `.env` (never with a `VITE_` prefix).
 - If Ananya disagrees with a fixture row, her answer wins. Regenerate with
   `python3 scripts/make_expected.py tests/fixtures/expected_outputs`.
-- Deadlines: test gate 2:00 PM, feature freeze 5:30 PM, submit by 7:30 PM ET.
+- Deadlines (event: submissions close 8:00 PM sharp; window opens 6:00): code freeze 6:30 PM, last merge to main + prod check 6:45, submit by 7:30 PM ET. 5:30 was an internal target and no longer applies.

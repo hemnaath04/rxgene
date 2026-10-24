@@ -24,19 +24,32 @@ off by Ananya.
 | The ×0 / ×0.5 rule is not extended to other drugs, because the antidepressant guideline says no method is agreed | CPIC SSRI/SNRI guideline 2023 (Bousman et al.). https://files.cpicpgx.org/data/guideline/publication/serotonin_reuptake_inhibitor_antidepressants/2023/37032427.pdf | "have not been established" | Source-matched | 2026-10-24 |
 | Ultrarapid metabolizers get a reduced-confidence flag with a strong inhibitor | Same SSRI/SNRI guideline | "may not undergo phenoconversion by paroxetine" | Source-matched | 2026-10-24 |
 | Codeine, CYP2D6 poor metabolizer: avoid codeine | CPIC opioid guideline 2021, Table 2, and the CPIC API recommendation view | "Avoid codeine use because of possibility of diminished analgesia." | Source-matched | 2026-10-24 |
-| Atomoxetine, strong CYP2D6 inhibitor: handled like a poor metabolizer, with a longer titration interval (label-based, not the opioid ×0 rule) | FDA STRATTERA label, section 2.5 (DailyMed set id 309de576-c318-404a-bc15-660c2b1876fb, version 69, published 2026-07-23) | "a longer titration interval of 4 weeks is recommended" | Source-matched (Claude, from the label XML) | 2026-10-24 |
+| Atomoxetine, strong CYP2D6 inhibitor: handled like a poor metabolizer, with a longer titration interval (label-based, not the opioid ×0 rule) | FDA atomoxetine label, section 2.5 (DailyMed set id 309de576-c318-404a-bc15-660c2b1876fb, version 69, published 2026-07-23) | "a longer titration interval of 4 weeks is recommended" | Source-matched (Claude, from the label XML) | 2026-10-24 |
 | Atomoxetine, poor metabolizer: a dosing and plasma-concentration pathway, not "avoid" | CPIC atomoxetine guideline 2019 (Brown et al.). https://pmc.ncbi.nlm.nih.gov/articles/PMC6612570/ | "consider obtaining a plasma concentration 4 h after dosing" | Source-matched | 2026-10-24 |
 | Atomoxetine, adult (40 mg/day) poor-metabolizer recommendation and its strength (Moderate), word for word as in fixture P14 | CPIC atomoxetine guideline 2019 (Brown et al.), original PDF, the fixed-dose table's poor-metabolizer row. https://files.cpicpgx.org/data/guideline/publication/atomoxetine/2019/30801677.pdf (also the CPIC API, population "adults") | "consider obtaining a plasma concentration 2–4 hours after dosing" | Source-matched (Claude, from the PDF text; the table title naming the population was not captured by the extraction) | 2026-10-24 |
 | Atomoxetine, ultrarapid: caution because standard dosing may not reach adequate concentrations (alert level YELLOW) | Same CPIC atomoxetine guideline, ultrarapid row implication, and the CPIC API | "unlikely ultrarapid metabolizers would achieve adequate serum concentrations" | Source-matched | 2026-10-24 |
 | Atomoxetine at activity score 1.0 depends on the `*10` allele (requirement R44). With `*10` present: titration row (YELLOW). Without: standard 1.0 row (GREEN). | Same CPIC atomoxetine guideline, original PDF, adult-dose table, two separate rows. https://files.cpicpgx.org/data/guideline/publication/atomoxetine/2019/30801677.pdf. The CPIC API returns only the "not present" row. | rows "1.0 (*10 allele present)" and "1.0 (*10 allele not present)"; footnote: "allele-dependent, based on the presence of the CYP2D6*10 allele" | Source-matched (Claude, from the PDF text; the API does not have the "present" row) | 2026-10-24 |
-| Atomoxetine phenoconversion is described by CPIC for strong CYP2D6 inhibitors only; CPIC 2019 says nothing about moderate or weak inhibitors, and neither does the FDA STRATTERA label. So RxGene shows "Not assessed" for a moderate inhibitor and does NOT claim that CPIC states no adjustment. | CPIC atomoxetine guideline 2019, narrative on phenoconversion (original PDF); FDA STRATTERA label text searched for "moderate CYP2D6" (0 hits). https://files.cpicpgx.org/data/guideline/publication/atomoxetine/2019/30801677.pdf | "Individuals taking atomoxetine along with a strong CYP2D6 inhibitor" | Source-matched (Claude searched the full PDF and label text); the CPIC supplementary material was NOT opened | 2026-10-24 |
+| Atomoxetine phenoconversion is described by CPIC for strong CYP2D6 inhibitors only; CPIC 2019 says nothing about moderate or weak inhibitors, and neither does the FDA atomoxetine label. So RxGene shows "Not assessed" for a moderate inhibitor and does NOT claim that CPIC states no adjustment. | CPIC atomoxetine guideline 2019, narrative on phenoconversion (original PDF); FDA atomoxetine label text searched for "moderate CYP2D6" (0 hits). https://files.cpicpgx.org/data/guideline/publication/atomoxetine/2019/30801677.pdf | "Individuals taking atomoxetine along with a strong CYP2D6 inhibitor" | Source-matched (Claude searched the full PDF and label text); the CPIC supplementary material was NOT opened | 2026-10-24 |
 | Fluoxetine inhibition can persist after the drug is stopped (not modeled; steady-state limitation, R43) | Same CPIC atomoxetine 2019 narrative | "up to 2–3 months after fluoxetine discontinuation" | Source-matched | 2026-10-24 |
 | Clopidogrel, CYP2C19 poor metabolizer (ACS/PCI): avoid clopidogrel, use prasugrel or ticagrelor (RED, Strong). Intermediate: avoid standard-dose clopidogrel, same alternatives. | CPIC clopidogrel guideline 2022 update (Lee et al.), original PDF. https://files.cpicpgx.org/data/guideline/publication/clopidogrel/2022/35034351.pdf (also the CPIC API, population "CVI ACS PCI") | "Avoid clopidogrel if possible." | Source-matched (Claude, from the PDF text) | 2026-10-24 |
-| Omeprazole with clopidogrel: avoid concomitant use (a label-level note, not a computed phenoconversion) | FDA PLAVIX label, warnings 5.1 and interactions 7.1 (DailyMed set id de8b0b67-eb25-4684-83b5-7ad785314227, version 5, published 2025-06-11) | "Avoid concomitant use of omeprazole or esomeprazole." | Source-matched (Claude, from the label XML) | 2026-10-24 |
+| Omeprazole with clopidogrel: avoid concomitant use (a label-level note, not a computed phenoconversion) | FDA clopidogrel label, warnings 5.1 and interactions 7.1 (DailyMed set id de8b0b67-eb25-4684-83b5-7ad785314227, version 5, published 2025-06-11) | "Avoid concomitant use of omeprazole or esomeprazole." | Source-matched (Claude, from the label XML) | 2026-10-24 |
+| About 99.5% of 487,409 UK Biobank participants "may have an atypical response to at least one drug" (predicted from 14 CPIC pharmacogenes); nearly 24% of participants had been prescribed a drug for which they are predicted to have an atypical response. Both are predictions from genotypes, not measured adverse-event rates. | McInnes et al., "Pharmacogenetics at Scale: An Analysis of the UK Biobank", *Clin Pharmacol Ther* 2021;109(6), DOI 10.1002/cpt.2122. https://pmc.ncbi.nlm.nih.gov/articles/PMC8144239/ | "99.5% of individuals may have an atypical response to at least one drug" | Source-matched (Claude, abstract and text) | 2026-10-24 |
+| The current XELODA (capecitabine) FDA label carries a boxed warning on DPD deficiency and tells prescribers to test for DPYD variants before starting, unless immediate treatment is necessary. The label (DailyMed set id e702d84d-7162-4751-bf37-d724cc7e45a5, version 32, published 2026-02-06) shows patient information revised 10/2025. This is stronger than "consider testing". The 5-FU (fluorouracil) label was NOT opened. | FDA XELODA label, boxed warning and section 5.1. https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=e702d84d-7162-4751-bf37-d724cc7e45a5 | "Test patients for genetic variants of DPYD prior to initiating XELODA" | Source-matched (Claude, from the label XML) | 2026-10-24 |
+| Kiro describes using deterministic checks alongside AI generation (a verifiable alternative to the unverified quote below) | Kiro IDE page. https://kiro.dev/ide/ | "uses deterministic tools such as property-based tests to verify that code is correct" | Source-matched (Claude, from the page text) | 2026-10-24 |
 | Allele activity values for the demo patients: `*1` 1.0, `*2` 1.0, `*4` 0.0, `*5` 0.0, `*9` 0.25, `*10` 0.25, `*17` 0.5, `*41` 0.25 | CPIC API allele table. https://api.cpicpgx.org/v1/allele?genesymbol=eq.CYP2D6 | e.g. `"name":"*10","activityvalue":"0.25"` | Source-matched | 2026-10-24 |
 | About 20–30% of people in settings where CYP2D6 genotype might be used also take a phenoconverting inhibitor (a reported figure, not a measured cohort rate) | Cicali et al., *Clin Pharmacol Ther* 2021;110(3):677-687. https://pmc.ncbi.nlm.nih.gov/articles/PMC8404400/ | "approximately 20–30% of individuals are also taking an enzyme inhibitor" | Source-matched | 2026-10-24 |
 | Five of the ten FDA-classified strong or moderate CYP2D6 inhibitors are on the 2021 Top 300 Drugs list | Same paper | "five of the ten CYP2D6 inhibitors classified by the FDA as strong" | Source-matched | 2026-10-24 |
 | Borges et al. 2010 defined two CYP2D6 inhibitor factors for a composite activity score (the paper behind the method; it does not by itself show our 0 and 0.5 factors) | Borges et al., *J Clin Pharmacol* 2010;50(4):450-458. https://pmc.ncbi.nlm.nih.gov/articles/PMC3816977/ | "Two inhibitor factors were defined: one genotype-independent and one genotype-based." | Source-matched | 2026-10-24 |
+
+## Verified via Kiro MCP (fetch)
+
+Run on 2026-10-24 with the reference `fetch` MCP server (`uvx mcp-server-fetch`, configured in `.kiro/settings/mcp.json`) from Kiro CLI. Kiro used only the MCP fetch tool for the web requests (plus its file-read tool for the local JSON). The fetch server respects robots.txt and was not told to ignore it.
+
+| Claim | URL fetched through MCP | Result | Notes |
+|---|---|---|---|
+| openFDA: 609 FAERS reports list both codeine and fluoxetine (`data/openfda/pair_reports.json`) | `https://api.fda.gov/drug/event.json?search=patient.drug.openfda.generic_name:"CODEINE"+AND+patient.drug.openfda.generic_name:"FLUOXETINE"&limit=1` | **MATCHES** (live `meta.results.total` = 609) | 1 fetch call. openFDA `last_updated` 2026-07-30. |
+| CPIC opioids 2021 (PMC8249478): strong inhibitor "activity score is adjusted to 0", moderate "multiplied by 0.5" | pmc.ncbi.nlm.nih.gov article page; Europe PMC full-text API; NCBI E-utilities efetch | **Not verified via MCP** | PMC returned a bot-check page; Europe PMC returned HTTP 500 for every client (checked with curl too); E-utilities is disallowed by robots.txt for this agent. Not worked around. The phrases were source-matched earlier the same day by Claude (direct download of the article and, separately, the efetch XML). |
+| Cicali 2021 (PMC8404400): "approximately 20–30% of individuals are also taking an enzyme inhibitor that leads to phenoconversion" | same three routes | **Not verified via MCP** | Same three blocks. Source-matched earlier by Claude, as above. |
 
 ## Wording to use
 
@@ -58,10 +71,10 @@ off by Ananya.
 | The exact 0 and 0.5 factors in Borges et al. 2010 | Seen only through Cicali's description of Borges, not in Borges itself. |
 | CPIC thresholds as standardized by Caudle et al. 2020 | Not opened. We cite the 2021 opioid guideline's Table 1 instead. |
 | Supplementary Material S1 of the SSRI/SNRI guideline | Not opened. |
-| 99.5% of 487,409 UK Biobank participants carry a variant that may change drug response (McInnes et al., 2020) | Carried over from the plan; not opened by us. |
-| FDA updated capecitabine and 5-FU labels for DPD deficiency | Not opened. DPYD is not built today, so it only appears as "what's next". |
-| Kiro team's wording "AI proposes, deterministic code decides" | Not opened. Verify before quoting it to Kiro judges. |
-| Fixtures P03–P23 matching all of the above | Walkthrough in progress. Approved so far: P01, P02. |
+| Weak CYP2D6 inhibitors get no adjustment (requirement R12) | Carried over from the repo's `data/inhibitors.json` note. The CPIC opioid guideline's text on weak inhibitors was not opened, so R12 is a design choice and not a quoted CPIC rule. |
+| The 5-FU (fluorouracil) label update for DPD deficiency | Not opened. Only the capecitabine (XELODA) label was checked. DPYD is not built today, so it only appears as "what's next". |
+| The Kiro team post of 2026-10-22 and its wording "AI proposes, deterministic code decides" | Searched the Kiro blog index and the web: not found. UNVERIFIED: do not quote it, and it is excluded from the pitch. Use the Kiro IDE page line above instead. |
+| Fixtures P01–P25 matching all of the above | All 25 approved by Ananya at the expected-output level. This is not independent verification of every source and not clinical validation. |
 
 ## Known discrepancies to be ready for
 
@@ -109,8 +122,8 @@ off by Ananya.
 - The exact 0 and 0.5 factors in Borges et al. 2010 (seen only through Cicali et al.).
 - The table title naming the population "adults" in the CPIC atomoxetine PDF (population taken
   from the CPIC API field).
-- The UK Biobank 99.5% figure, the capecitabine and 5-FU label update, and the Kiro team's
-  "AI proposes, deterministic code decides" wording.
+- The 5-FU (fluorouracil) label, and the Kiro team post of 2026-10-22 with its wording "AI
+  proposes, deterministic code decides" (not found; do not quote it).
 
 **Clinical limitations of the model**
 - Steady state only: no inhibitor onset or washout. Fluoxetine inhibition may last 2 to 3
@@ -124,7 +137,21 @@ off by Ananya.
 - Atomoxetine at activity score 1.0 is marked "controversy remains" by CPIC. The `*10` rule (R44)
   follows the PDF, not the API.
 - Atomoxetine ultrarapid is YELLOW from CPIC's implication text; no fixture covers it.
+- **Clopidogrel indication.** Clopidogrel is modeled for acute coronary syndrome (ACS) and/or percutaneous coronary intervention (PCI) only. CPIC recommendations and recommendation strengths differ for neurovascular and other cardiovascular indications. RxGene does not collect or verify the patient's clinical indication, so its clopidogrel recommendations must not be generalized to all patients taking clopidogrel.
 - Synthetic data only. Not a medical device. "No supported PGx alert" does not mean safe.
+
+**Conclusions kept from the outside source reviews (2026-10-24)**
+- The five CYP2D6 inhibitor classifications (fluoxetine, paroxetine and bupropion strong; duloxetine
+  moderate; sertraline weak) are unchanged. FDA defines strong as at least a 5-fold, moderate as 2-fold
+  to under 5-fold, and weak as 1.25-fold to under 2-fold increase in exposure (AUC) of a sensitive substrate.
+- The x0 and x0.5 phenoconversion conventions are attributed to CPIC (opioid guideline 2021), not to the
+  FDA inhibitor table, which supplies only the strength class.
+- Omeprazole's weak CYP2C19 inhibitor classification in the FDA table does not negate the separate
+  clopidogrel label warning to avoid concomitant use of omeprazole or esomeprazole.
+- Fixture P19 stays GREEN for the genotype result only, with the FDA interaction warning displayed
+  separately.
+- The FDA table also lists clopidogrel as a moderate CYP2C8 inhibitor and a weak CYP2B6 inhibitor. These
+  are outside the current modeled scope.
 
 ## Pitch lines this supports
 
@@ -132,5 +159,10 @@ off by Ananya.
   their genes behave." Supported by Cicali et al., as a reported figure.
 - "The CPIC 2023 antidepressant guideline says there is no agreed method. Only the 2021
   opioid guideline states the rule, so that is all we compute." Supported.
-- "Over 99% of people carry at least one variant that can change drug response." Unverified
-  until the UK Biobank paper is opened.
+- "In a UK Biobank analysis of 487,409 people, 99.5% may have an atypical response to at
+  least one drug, based on 14 CPIC genes." Supported by McInnes et al. 2021. Say "may have" and
+  "predicted": it is a prediction from genotypes, not a measured outcome. (The pitch script does
+  not use it.)
+- "The FDA's capecitabine label now carries a boxed warning to test for DPYD variants before
+  treatment." Supported for capecitabine only (label revised 10/2025), not for 5-FU. Use it for
+  the "what's next" slide.

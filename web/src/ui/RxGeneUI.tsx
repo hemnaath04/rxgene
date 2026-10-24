@@ -450,6 +450,7 @@ export function RxGeneUI({
   onReset,
   onEvidence,
   onExplanation,
+  onReviewMedications,
   onTogglePlay,
 }: RxGeneUIProps) {
   const verdict = result?.verdict;
@@ -537,11 +538,11 @@ export function RxGeneUI({
             {verdict?.source && <p className="rx-v-source rx-v-row">{verdict.source}</p>}
             <button
               type="button"
-              onClick={onEvidence}
+              onClick={onReviewMedications}
               disabled={!result}
               className="rx-v-evidence rx-press rx-v-row flex items-center justify-center gap-2 bg-[#dceff8] font-semibold text-[var(--rx-ink)] hover:bg-white disabled:opacity-40"
             >
-              Inspect evidence
+              Review full medication list
               <ArrowUpRight aria-hidden="true" className="size-5" strokeWidth={2} />
             </button>
             <button

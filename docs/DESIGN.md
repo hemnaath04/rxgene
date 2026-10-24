@@ -1,5 +1,7 @@
 # Exact-reference UI-only handoff (latest direction, 2026-10-24)
 
+Desktop completion adds the existing full-medication consult and FAERS evidence surfaces. The main verdict action emits `onReviewMedications`; Evidence stays in the header. The standalone adapter renders a clearly labelled local consult preview with cited trace steps and Copy note. It makes no agent requests. Backend integration supplies the real consult response to the existing `ConsultSheet`, which also supports loading, fallback reason and error/retry states. The verified FAERS panel is reused below guideline evidence, with its source/date and caveats unchanged. Mobile work is outside this completion pass at the user's request.
+
 The user supplied a final screenshot and explicitly requested only the UI, with backend integration handled separately. This supersedes the compact connected-workbench visual direction below for the default screen.
 
 The default entry renders a controlled presentation view with a separate local demo adapter. It uses the open molecular background, prominent DNA and enzyme artwork, three stage headings without enclosing cards, glossy pathway particles, an unboxed metabolism ruler and a full-width petrol verdict band. The initial Sarah / fluoxetine / codeine fixture matches the reference state. Normal and inhibited motion is illustrative and pausable, with a static reduced-motion version.

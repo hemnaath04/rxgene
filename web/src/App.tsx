@@ -204,7 +204,7 @@ function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      {/* overflow-x-clip is a guard only (it keeps position: sticky working); the layout itself fits 390px. */}
+      {/* overflow-x-clip is a horizontal guard only; the layout itself fits 390px. */}
       <div className="app-bg overflow-x-clip text-ink">
         <header className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 pt-5 pb-3 sm:px-6">
           <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
@@ -296,7 +296,9 @@ function App() {
             </AnimatePresence>
           </div>
 
-          <div className="sticky bottom-4 z-20">
+          {/* In normal flow after the gauge and comparison strip (not sticky), so it never
+              covers the story's "Slow" result or the gauge on first load. */}
+          <div className="relative">
             <AnimatePresence mode="popLayout" initial={false}>
               {topVerdict ? (
                 <motion.div

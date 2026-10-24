@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight, Info } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { MismatchWarning, ViaBadge } from '@/components/AlertCard';
 import { LevelIcon } from '@/components/AlertLevel';
 import { Button } from '@/components/ui/button';
@@ -14,90 +14,60 @@ type VerdictBarProps = {
   explainDisabled: boolean;
 };
 
+/** Longest note line the slim bar shows; anything longer is truncated and lives in full in the sheet. */
+const NOTE_MAX = 120;
+
 /**
- * Dark verdict bar (DESIGN.md sections 1 and 3): icon + headline, the plain sentence and the
- * guideline line, then the actions. The source badge shows where the level came from.
- * App animates it in (after the comparison strip) and out.
+ * The one short note the slim bar carries: the inhibitor / de-escalation / weak note, or the
+ * reduced-confidence caveat, whichever comes first. Truncated to ~120 chars. The full text (this
+ * note, plus every other note, quote, label recommendation, CPIC role, genotype recommendation and
+ * source links) stays in the Evidence sheet.
+ */
+function shortNote(v: Verdict): string | null {
+  const note = v.notes[0];
+  if (!note) return null;
+  if (note.length <= NOTE_MAX) return note;
+  return `${note.slice(0, NOTE_MAX - 1).trimEnd()}…`;
+}
+
+/**
+ * Slim verdict bar (DESIGN.md sections 1 and 3). It sits in normal flow after the gauge and the
+ * comparison strip (not sticky), so it never covers the "Slow" result or the gauge on load.
+ * It shows only: the headline, one plain sentence, at most one short note line, the source line,
+ * the via badge and the two actions. Everything longer moves into the Evidence sheet, which the
+ * "Inspect evidence" button opens.
  */
 export function VerdictBar({ verdict: v, moreCount, onInspect, onMore, onExplain, explainDisabled }: VerdictBarProps) {
+  const note = shortNote(v);
   return (
     <section
       aria-labelledby="verdict-heading"
       className="rounded-2xl bg-verdict text-white shadow-[0_12px_40px_-12px_oklch(0.2_0.05_240/0.5)]"
     >
-      <div className="flex flex-col gap-6 p-5 sm:p-6 lg:flex-row lg:items-center lg:gap-8 lg:p-7">
-        <div className="flex min-w-0 items-start gap-4 lg:w-[34%] lg:shrink-0">
-          <LevelIcon level={v.level} className="mt-1 size-10 sm:size-12" strokeWidth={2} />
+      <div className="flex flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-center lg:gap-8 lg:p-7">
+        <div className="flex min-w-0 items-start gap-4 lg:w-[38%] lg:shrink-0">
+          <LevelIcon level={v.level} className="mt-1 size-9 sm:size-11" strokeWidth={2} />
           <div className="flex min-w-0 flex-col gap-1">
+            {/* Reverse case (DESIGN.md section 3): the alert is about the current med, not the one just added. */}
             {v.prefix && <p className="text-base text-verdict-muted">{v.prefix}</p>}
-            <p className="text-base text-verdict-muted">Prescription review</p>
+            {!v.prefix && <p className="text-base text-verdict-muted">Prescription review</p>}
             <h2
               id="verdict-heading"
-              className="text-[28px]/[32px] font-bold tracking-[-0.02em] text-balance break-words sm:text-[40px]/[44px]"
+              className="text-[26px]/[30px] font-bold tracking-[-0.02em] text-balance break-words sm:text-[34px]/[38px]"
             >
               {v.headline}
             </h2>
             {/* R31: GREEN is the genotype result only, not an overall medication clearance. */}
-            {v.qualifier && <p className="text-lg font-medium text-verdict-muted">{v.qualifier}</p>}
+            {v.qualifier && <p className="text-base font-medium text-verdict-muted">{v.qualifier}</p>}
           </div>
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-2 break-words lg:border-l lg:border-white/20 lg:pl-8">
           {v.mismatch && <MismatchWarning text={v.mismatch} className="rounded-lg bg-white/10 px-3 py-2 text-white" />}
-          {/* R17: FDA label recommendation applies directly; show it first. */}
-          {v.labelRecommendation && (
-            <div className="rounded-lg bg-white/10 px-3 py-2">
-              <p className="text-sm font-semibold text-white">FDA label (applies directly)</p>
-              <p className="text-base text-white/90">{v.labelRecommendation}</p>
-            </div>
-          )}
-          {/* R17: the two guidance contexts are not interchangeable. */}
-          {v.discrepancyFlag && (
-            <p className="rounded-lg border border-white/30 px-3 py-2 text-base text-white">{v.discrepancyFlag}</p>
-          )}
-          {/* R28: the label interaction text on the card itself, separate from the genotype result. */}
-          {v.labelNote && (
-            <p className="flex items-start gap-2 rounded-lg border border-white/40 bg-white/10 px-3 py-2 text-base font-medium text-white">
-              <Info aria-hidden="true" className="mt-0.5 size-5 shrink-0" strokeWidth={2} />
-              <span>{v.labelNote}</span>
-            </p>
-          )}
-          <p className="text-lg/7">{v.sentence}</p>
-          {v.quote && <blockquote className="border-l-2 border-white/30 pl-3 text-base text-white/90">{v.quote}</blockquote>}
-          {/* R17: CPIC is supporting genotype-based context only. */}
-          {v.cpicRole && <p className="text-sm text-verdict-muted">{v.cpicRole}</p>}
-          {/* R20: show the genotype (unconverted) recommendation alongside the converted one. */}
-          {v.genotypeRecommendation && (
-            <blockquote className="border-l-2 border-white/30 pl-3 text-base text-white/90">
-              <span className="font-semibold">Genotype recommendation: </span>
-              {v.genotypeRecommendation}
-            </blockquote>
-          )}
-          {v.notes.map(note => (
-            <p key={note} className="text-base text-white/90">
-              {note}
-            </p>
-          ))}
+          <p className="text-base/6">{v.sentence}</p>
+          {note && <p className="text-sm text-white/90">{note}</p>}
           {(v.source || v.population) && (
             <p className="text-sm text-verdict-muted">{[v.source, v.population].filter(Boolean).join(' · ')}</p>
-          )}
-          {/* R17: FDA label + CPIC source links and versions stay visible. */}
-          {v.sourceLinks.length > 0 && (
-            <ul className="flex flex-col gap-1 text-sm text-verdict-muted">
-              {v.sourceLinks.map(link => (
-                <li key={link.label}>
-                  {link.label}
-                  {link.url && (
-                    <>
-                      {': '}
-                      <a className="break-all text-white underline underline-offset-2" href={link.url} target="_blank" rel="noreferrer">
-                        {link.url}
-                      </a>
-                    </>
-                  )}
-                </li>
-              ))}
-            </ul>
           )}
         </div>
 
@@ -116,7 +86,7 @@ export function VerdictBar({ verdict: v, moreCount, onInspect, onMore, onExplain
             )}
           </div>
           <Button
-            className="press h-12 rounded-lg bg-[oklch(0.93_0.04_220)] pr-[18px]! pl-5! text-base font-semibold text-ink hover:bg-white"
+            className="press h-11 rounded-lg bg-[oklch(0.93_0.04_220)] pr-[18px]! pl-5! text-base font-semibold text-ink hover:bg-white"
             onClick={onInspect}
           >
             Inspect evidence
@@ -124,7 +94,7 @@ export function VerdictBar({ verdict: v, moreCount, onInspect, onMore, onExplain
           </Button>
           <Button
             variant="ghost"
-            className="press h-10 pr-1.5! pl-2! text-base font-semibold text-white underline underline-offset-4 hover:bg-white/10 hover:text-white"
+            className="press h-9 pr-1.5! pl-2! text-base font-semibold text-white underline underline-offset-4 hover:bg-white/10 hover:text-white"
             onClick={onExplain}
             disabled={explainDisabled}
           >

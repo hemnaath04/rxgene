@@ -63,7 +63,7 @@ workflow made the safety rules reviewable *before* any code existed:
 | Kiro feature | How we used it | Where |
 |---|---|---|
 | **Steering** | Product, tech stack, structure, clinical rules and git workflow, loaded into every Kiro session. Each clinical rule cites its source (CPIC opioids 2021, CPIC 2023, FDA inhibitor table). | [`.kiro/steering/`](.kiro/steering/) |
-| **Spec (requirements)** | 42 numbered EARS requirements (R1–R43; R23 was removed in science review), written by our genetics teammate before the engine was built. Every alert shows the requirement IDs that triggered it. | [`.kiro/specs/rxgene-engine/requirements.md`](.kiro/specs/rxgene-engine/requirements.md) |
+| **Spec (requirements)** | 55 active numbered EARS requirements (R1–R56; R23 was removed in science review), written by our genetics teammate before the engine was built. Every alert shows the requirement IDs that triggered it. | [`.kiro/specs/rxgene-engine/requirements.md`](.kiro/specs/rxgene-engine/requirements.md) |
 | **Agent hook** | Saving any engine file runs the expected-output test suite, so a broken rule shows up at once. | [`.kiro/hooks/engine-tests.kiro.hook`](.kiro/hooks/engine-tests.kiro.hook) |
 | **Task briefs** | Each feature was handed to Kiro as one scoped brief (files to touch, cases to pass, rules that apply), then reviewed against the fixtures before commit. | [`.kiro/briefs/`](.kiro/briefs/) |
 
@@ -80,7 +80,7 @@ web/              React + Vite + TS app (scaffold in Kiro); engine goes in web/s
 server/           small Node endpoint for LLM extraction/explanation
 data/cpic/        CPIC API snapshots: allele values, recommendations, guideline links
 data/             inhibitors.json, synthetic-reports/
-tests/fixtures/   expected outputs for 24 synthetic test patients
+tests/fixtures/   expected outputs for 25 synthetic test patients
 scripts/          fetch_cpic.py (refresh snapshots), make_expected.py (regenerate fixtures)
 docs/             TEAM-SPLIT (who does what), PLAN-v3 (strategy + pitch), verified answers
 .plans/           build spec (source of truth for what we build)
@@ -103,11 +103,11 @@ docs/             TEAM-SPLIT (who does what), PLAN-v3 (strategy + pitch), verifi
 
 ## Test patients
 
-24 synthetic cases cover genotype-only alerts, phenoconversion (strong, moderate and weak
+25 synthetic cases cover genotype-only alerts, phenoconversion (strong, moderate and weak
 inhibitors, plus the reverse case where adding an inhibitor re-alerts a drug already on the list), alert de-escalation (a patient who is
 already a poor metabolizer and also takes an inhibitor), threshold traps (`*1/*4`,
 `*1/*10`, `*41`), CYP2C19, unsupported alleles and missing data. Every recommendation is
-taken word for word from the CPIC API.
+taken word for word from the CPIC API, except atomoxetine at activity score 1.0 with a `*10` allele, which comes from the CPIC 2019 PDF because the API has only the other row, and the FDA label sentence shown for atomoxetine with a strong inhibitor.
 
 ## Sources
 

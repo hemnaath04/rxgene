@@ -61,6 +61,7 @@ off by Ananya.
 | The exact 0 and 0.5 factors in Borges et al. 2010 | Seen only through Cicali's description of Borges, not in Borges itself. |
 | CPIC thresholds as standardized by Caudle et al. 2020 | Not opened. We cite the 2021 opioid guideline's Table 1 instead. |
 | Supplementary Material S1 of the SSRI/SNRI guideline | Not opened. |
+| Weak CYP2D6 inhibitors get no adjustment (requirement R12) | Carried over from the repo's `data/inhibitors.json` note. The CPIC opioid guideline's text on weak inhibitors was not opened, so R12 is a design choice and not a quoted CPIC rule. |
 | The 5-FU (fluorouracil) label update for DPD deficiency | Not opened. Only the capecitabine (XELODA) label was checked. DPYD is not built today, so it only appears as "what's next". |
 | The Kiro team post of 2026-10-22 and its wording "AI proposes, deterministic code decides" | Searched the Kiro blog index and the web: not found. UNVERIFIED: do not quote it, and it is excluded from the pitch. Use the Kiro IDE page line above instead. |
 | Fixtures P01–P25 matching all of the above | All 25 approved by Ananya at the expected-output level. This is not independent verification of every source and not clinical validation. |

@@ -1,9 +1,11 @@
 """Smoke-test a deployed RxGene: CDS Hooks discovery, order-select cards, summary, exposure.
 
 Usage: python3 scripts/check_live.py [base_url]   (default https://rxgene.vercel.app)
-Exits non-zero if any check fails. Synthetic data only.
+For a protected preview, first open its Vercel share link with curl -c <jar>, then set
+RXGENE_COOKIE_JAR=<jar>. Exits non-zero if any check fails. Synthetic data only.
 """
 import json
+import os
 import subprocess
 import sys
 
@@ -13,6 +15,8 @@ BASE = (sys.argv[1] if len(sys.argv) > 1 else "https://rxgene.vercel.app").rstri
 def curl(method, path, body=None):
     # curl instead of urllib: python.org builds on macOS often lack root certs.
     cmd = ["curl", "-s", "-i", "-X", method, BASE + path, "-H", "Content-Type: application/json"]
+    if os.environ.get("RXGENE_COOKIE_JAR"):  # protected previews: cookie from a Vercel share link
+        cmd += ["-b", os.environ["RXGENE_COOKIE_JAR"]]
     if body is not None:
         cmd += ["--data", json.dumps(body)]
     raw = subprocess.run(cmd, capture_output=True, text=True, timeout=30).stdout

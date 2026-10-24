@@ -73,7 +73,7 @@ function recommendationTitle(a: DrugAssessment): string {
  * Shows matching drug+co-medication pairs from the snapshot, with disclaimers.
  * No matching pair -> no panel rendered.
  */
-function OpenFDAPanel({ drug, meds }: { drug: string; meds: string[] }) {
+export function OpenFDAPanel({ drug, meds }: { drug: string; meds: string[] }) {
   const reports = reportsFor(drug, meds);
 
   // No matching pairs: render nothing

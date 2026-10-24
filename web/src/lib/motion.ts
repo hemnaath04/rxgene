@@ -17,6 +17,17 @@ export const STEP = {
   stripStagger: 0.1,
 } as const;
 
+/**
+ * Particle playback timing for the molecule stage (DESIGN.md section 4). One loop is 2.4s
+ * linear, matching the `rx-flow` CSS keyframes. Travel is transform + opacity only.
+ */
+export const PARTICLE = {
+  /** Seconds for one dot to cross a track; keep in sync with .flow-dot in index.css. */
+  loopSeconds: 2.4,
+  /** Evenly spaced rest positions (as % of track) when paused or before a check. */
+  rest: ['8%', '28%', '48%', '68%', '88%'],
+} as const;
+
 type EnterExit = Pick<HTMLMotionProps<'div'>, 'initial' | 'animate' | 'exit'>;
 
 /**

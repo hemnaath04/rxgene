@@ -1,4 +1,28 @@
+# Exact-reference UI-only handoff (latest direction, 2026-10-24)
+
+Desktop completion adds the existing full-medication consult and FAERS evidence surfaces. The main verdict action emits `onReviewMedications`; Evidence stays in the header. The standalone adapter renders a clearly labelled local consult preview with cited trace steps and Copy note. It makes no agent requests. Backend integration supplies the real consult response to the existing `ConsultSheet`, which also supports loading, fallback reason and error/retry states. The verified FAERS panel is reused below guideline evidence, with its source/date and caveats unchanged. Mobile work is outside this completion pass at the user's request.
+
+The user supplied a final screenshot and explicitly requested only the UI, with backend integration handled separately. This supersedes the compact connected-workbench visual direction below for the default screen.
+
+The default entry renders a controlled presentation view with a separate local demo adapter. It uses the open molecular background, prominent DNA and enzyme artwork, three stage headings without enclosing cards, glossy pathway particles, an unboxed metabolism ruler and a full-width petrol verdict band. The initial Sarah / fluoxetine / codeine fixture matches the reference state. Normal and inhibited motion is illustrative and pausable, with a static reduced-motion version.
+
+Public integration types live in `web/src/ui/types.ts`; the presentation component accepts values/results and emits input/check/reset/evidence/explanation callbacks. It makes no network calls and computes no clinical decisions. The previous connected app remains in `web/src/ConnectedApp.tsx` as an unmounted reference. Existing engine, API and clinical data remain available for the backend team.
+
 # RxGene design spec
+
+## Implementation refresh — October 24, 2026
+
+Hemnaath authorized Codex to take ownership of the UI build after refining the design in chat. Product source is still authored through Kiro CLI for hackathon provenance. This refresh supersedes the original visual recipes below where they differ; the clinical engine, API behavior, evidence and synthetic-patient contracts are preserved.
+
+The current direction is an atmospheric molecular prescribing workbench: locally served Sora headings and Plus Jakarta Sans body, a quiet pale-blue molecular background, transparent sculptural DNA and enzyme artwork, marine controls, and coral clinical warning accents. Inputs come before the explanation. The main story is one connected canvas with Genetic baseline → Medication effect → Current response, followed by one qualitative ruler and a horizontal verdict strip. Comparison is available on demand instead of occupying permanent space.
+
+The DNA illustration communicates the inherited baseline and remains unchanged. Conceptual drug particles pass through the enzyme, never through DNA. Normal-flow green is an explanatory process motif, not a medication approval. Unknown, unsupported and uncomputed assessments stay neutral; per-drug engine support determines whether inhibition can be illustrated. The enzyme image is conceptual artwork, not an exact CYP2D6 structural reconstruction or a patient scan.
+
+Production artwork lives in `web/public/art/`; see its README for provenance. Keep the center of the background quiet and protect text with a subtle light scrim. Do not replace these assets with a screenshot of the whole interface. Preserve accessible Base UI controls/sheets, the full evidence and patient-summary flows, and CDS/local mode.
+
+Motion is user-controlled with a pathway playback control and respects reduced motion. Clinical results appear independently of playback. Patient/medication/result changes cancel prior playback; static labels always carry the assessment. Browser verification, not an image mockup, determines final spacing and contrast.
+
+The following sections document the original scaffold and its clinical-state requirements; original three-card layouts, Geist-only typography and CSS-only background instructions are historical rather than requirements for this refresh.
 
 Reference mockup (case 1, Sarah): [`docs/design/mockup-case1.webp`](design/mockup-case1.webp).
 Kiro implements this through `.kiro/briefs/mithuna-06-apply-design.md`. All values here are

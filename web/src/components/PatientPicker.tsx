@@ -31,7 +31,7 @@ export function PatientPicker({ patients, selectedId, onSelect }: PatientPickerP
       >
         <SelectTrigger
           aria-labelledby="patient-picker-label"
-          className="h-12! w-full min-w-52 rounded-lg border-ink/20 bg-panel-solid px-3 text-lg font-semibold text-ink"
+          className="h-11! w-full min-w-0 rounded-lg border-control-border bg-panel-solid px-3 text-base font-semibold text-ink focus-visible:ring-2 focus-visible:ring-marine/60"
         >
           <SelectValue />
         </SelectTrigger>

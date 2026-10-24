@@ -78,12 +78,12 @@ export function Gauge({ byGenes, now, level, reducedConfidence = false, nowNote 
       }.`;
 
   return (
-    <section aria-labelledby="gauge-heading" className="panel min-w-0 rounded-2xl px-5 pt-5 pb-5 sm:px-8">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-        <h2 id="gauge-heading" className="text-xl font-semibold text-ink">
+    <section aria-labelledby="gauge-heading" className="panel overflow-hidden rounded-2xl px-6 py-3 sm:px-8">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+        <h2 id="gauge-heading" className="text-base font-semibold text-ink">
           Clears this drug
         </h2>
-        <ul className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-ink-muted" aria-hidden="true">
+        <ul className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-ink-muted" aria-hidden="true">
           <li className="flex items-center gap-2">
             <span
               className={cn('inline-block size-3 rounded-full', reducedConfidence && 'border-2 border-dashed bg-transparent!')}
@@ -98,14 +98,14 @@ export function Gauge({ byGenes, now, level, reducedConfidence = false, nowNote 
         </ul>
       </div>
 
-      <div role="img" aria-label={description} className="mx-4 mt-6">
-        <div className={cn('relative h-8', empty && 'opacity-40')}>
-          <div className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 rounded-full bg-ink/30" />
-          {/* Plain ticks at every stop; only ● and ○ are dots (DESIGN.md section 5). */}
+      <div role="img" aria-label={description} className="mx-4 mt-3">
+        <div className={cn('relative h-7', empty && 'opacity-40')}>
+          <div className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 rounded-full bg-ink/25" />
+          {/* Plain ticks at every stop; only ● and ○ are dots (no decorative third marker). */}
           {STOPS.map(stop => (
             <span
               key={stop}
-              className="absolute top-1/2 h-3 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink/45"
+              className="absolute top-1/2 h-2.5 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink/35"
               style={{ left: POSITION[stop] }}
             />
           ))}
@@ -177,12 +177,12 @@ export function Gauge({ byGenes, now, level, reducedConfidence = false, nowNote 
           )}
         </div>
 
-        <div className={cn('relative mt-1 h-6', empty && 'opacity-40')} aria-hidden="true">
+        <div className={cn('relative mt-1 h-5', empty && 'opacity-40')} aria-hidden="true">
           {STOPS.map(stop => (
             <span
               key={stop}
               className={cn(
-                'absolute top-0 -translate-x-1/2 text-base text-ink-muted',
+                'absolute top-0 -translate-x-1/2 text-sm text-ink-muted',
                 (stop === byGenes || stop === now) && 'font-semibold text-ink'
               )}
               style={{ left: POSITION[stop] }}
@@ -193,8 +193,8 @@ export function Gauge({ byGenes, now, level, reducedConfidence = false, nowNote 
         </div>
       </div>
 
-      {empty && <p className="mt-2 text-center text-base font-medium text-ink-muted">No gene result we can read · Not assessed</p>}
-      {!empty && !now && nowNote && <p className="mt-2 text-center text-base text-ink-muted">{nowNote}</p>}
+      {empty && <p className="mt-1 text-center text-sm font-medium text-ink-muted">No gene result we can read · Not assessed</p>}
+      {!empty && !now && nowNote && <p className="mt-1 text-center text-sm text-ink-muted">{nowNote}</p>}
     </section>
   );
 }

@@ -5,6 +5,7 @@
   "cyp2c19": "",
   "current_meds": "fluoxetine",
   "new_drug": "codeine",
+  "alerted_drug": "codeine",
   "population": "adult",
   "genotype_AS": 2.0,
   "genotype_phenotype": "Normal Metabolizer",
@@ -17,7 +18,9 @@
   "cpic_strength": "Strong",
   "source": "CPIC opioids 2021 (phenoconversion rule stated in guideline)",
   "note": "Demo case 1: genotype says normal, fluoxetine makes them a poor metabolizer",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P02",
@@ -25,6 +28,7 @@
   "cyp2c19": "",
   "current_meds": "fluoxetine",
   "new_drug": "codeine",
+  "alerted_drug": "codeine",
   "population": "adult",
   "genotype_AS": 0.0,
   "genotype_phenotype": "Poor Metabolizer",
@@ -36,8 +40,10 @@
   "cpic_recommendation": "Avoid codeine use because of possibility of diminished analgesia. If opioid use is warranted, consider a non-tramadol opioid.",
   "cpic_strength": "Strong",
   "source": "CPIC opioids 2021 (phenoconversion rule stated in guideline)",
+  "inhibitor_note": "fluoxetine adds no further effect: already a poor metabolizer by genotype. The drug-level alert still applies.",
   "note": "Already PM by genotype; inhibitor adds no further change (alert de-escalation)",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard"
  },
  {
   "id": "P03",
@@ -45,6 +51,7 @@
   "cyp2c19": "",
   "current_meds": "",
   "new_drug": "codeine",
+  "alerted_drug": "codeine",
   "population": "adult",
   "genotype_AS": 2.0,
   "genotype_phenotype": "Normal Metabolizer",
@@ -57,7 +64,9 @@
   "cpic_strength": "Strong",
   "source": "CPIC opioids 2021 (phenoconversion rule stated in guideline)",
   "note": "Control: nothing to flag",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P04",
@@ -65,6 +74,7 @@
   "cyp2c19": "",
   "current_meds": "",
   "new_drug": "codeine",
+  "alerted_drug": "codeine",
   "population": "adult",
   "genotype_AS": 0.0,
   "genotype_phenotype": "Poor Metabolizer",
@@ -77,7 +87,9 @@
   "cpic_strength": "Strong",
   "source": "CPIC opioids 2021 (phenoconversion rule stated in guideline)",
   "note": "Genotype-only alert",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P05",
@@ -85,6 +97,7 @@
   "cyp2c19": "",
   "current_meds": "",
   "new_drug": "codeine",
+  "alerted_drug": "codeine",
   "population": "adult",
   "genotype_AS": 3.0,
   "genotype_phenotype": "Ultrarapid Metabolizer",
@@ -97,7 +110,9 @@
   "cpic_strength": "Strong",
   "source": "CPIC opioids 2021 (phenoconversion rule stated in guideline)",
   "note": "UM by duplication: toxicity risk",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P06",
@@ -105,6 +120,7 @@
   "cyp2c19": "",
   "current_meds": "paroxetine",
   "new_drug": "codeine",
+  "alerted_drug": "codeine",
   "population": "adult",
   "genotype_AS": 3.0,
   "genotype_phenotype": "Ultrarapid Metabolizer",
@@ -116,8 +132,10 @@
   "cpic_recommendation": "Avoid codeine use because of possibility of diminished analgesia. If opioid use is warranted, consider a non-tramadol opioid.",
   "cpic_strength": "Strong",
   "source": "CPIC opioids 2021 (phenoconversion rule stated in guideline)",
+  "confidence": "reduced (UMs may not fully phenoconvert, CPIC 2023)",
   "note": "UM + strong inhibitor: rule gives AS 0, but CPIC 2023 notes UMs may not phenoconvert with paroxetine; show caveat",
-  "extra_flag": ""
+  "extra_flag": "",
+  "inhibitor_note": ""
  },
  {
   "id": "P07",
@@ -125,6 +143,7 @@
   "cyp2c19": "",
   "current_meds": "duloxetine",
   "new_drug": "codeine",
+  "alerted_drug": "codeine",
   "population": "adult",
   "genotype_AS": 1.25,
   "genotype_phenotype": "Normal Metabolizer",
@@ -137,7 +156,9 @@
   "cpic_strength": "Moderate",
   "source": "CPIC opioids 2021 (phenoconversion rule stated in guideline)",
   "note": "NM (AS 1.25) + moderate inhibitor -> AS 0.625 IM: genotype alone says green",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P08",
@@ -145,6 +166,7 @@
   "cyp2c19": "",
   "current_meds": "",
   "new_drug": "codeine",
+  "alerted_drug": "codeine",
   "population": "adult",
   "genotype_AS": 1.0,
   "genotype_phenotype": "Intermediate Metabolizer",
@@ -157,7 +179,9 @@
   "cpic_strength": "Moderate",
   "source": "CPIC opioids 2021 (phenoconversion rule stated in guideline)",
   "note": "Threshold trap: AS 1.0 is IM under current CPIC (older guidelines called it NM)",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P09",
@@ -165,6 +189,7 @@
   "cyp2c19": "",
   "current_meds": "",
   "new_drug": "tramadol",
+  "alerted_drug": "tramadol",
   "population": "adult",
   "genotype_AS": 1.25,
   "genotype_phenotype": "Normal Metabolizer",
@@ -177,7 +202,9 @@
   "cpic_strength": "Strong",
   "source": "CPIC opioids 2021 (phenoconversion rule stated in guideline)",
   "note": "Threshold edge: AS 1.25 is NM",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P10",
@@ -185,6 +212,7 @@
   "cyp2c19": "",
   "current_meds": "",
   "new_drug": "tramadol",
+  "alerted_drug": "tramadol",
   "population": "adult",
   "genotype_AS": 0.25,
   "genotype_phenotype": "Intermediate Metabolizer",
@@ -197,7 +225,9 @@
   "cpic_strength": "Optional",
   "source": "CPIC opioids 2021 (phenoconversion rule stated in guideline)",
   "note": "IM (AS 0.25)",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P11",
@@ -205,6 +235,7 @@
   "cyp2c19": "",
   "current_meds": "bupropion",
   "new_drug": "tramadol",
+  "alerted_drug": "tramadol",
   "population": "adult",
   "genotype_AS": 2.0,
   "genotype_phenotype": "Normal Metabolizer",
@@ -217,27 +248,32 @@
   "cpic_strength": "Strong",
   "source": "CPIC opioids 2021 (phenoconversion rule stated in guideline)",
   "note": "Non-SSRI strong inhibitor",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P12",
   "cyp2d6": "*1/*1",
   "cyp2c19": "",
-  "current_meds": "fluoxetine (stopped 4 weeks ago)",
-  "new_drug": "tramadol",
+  "current_meds": "codeine",
+  "new_drug": "fluoxetine",
+  "alerted_drug": "codeine",
   "population": "adult",
   "genotype_AS": 2.0,
   "genotype_phenotype": "Normal Metabolizer",
-  "inhibitor": "fluoxetine (stopped 4 weeks ago) (strong)",
+  "inhibitor": "fluoxetine (strong)",
   "adjusted_AS": 0.0,
   "adjusted_phenotype": "Poor Metabolizer",
   "phenoconverted": "yes",
   "alert": "RED",
-  "cpic_recommendation": "Avoid tramadol use because of possibility of diminished analgesia. If opioid use is warranted, consider a non-codeine opioid.",
+  "cpic_recommendation": "Avoid codeine use because of possibility of diminished analgesia. If opioid use is warranted, consider a non-tramadol opioid.",
   "cpic_strength": "Strong",
   "source": "CPIC opioids 2021 (phenoconversion rule stated in guideline)",
-  "note": "Fluoxetine phenoconversion can last 2-3 months after stopping (CPIC atomoxetine 2019): treat as active",
-  "extra_flag": ""
+  "note": "Reverse case: adding the inhibitor re-alerts the codeine already on the list",
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P13",
@@ -245,6 +281,7 @@
   "cyp2c19": "",
   "current_meds": "fluoxetine",
   "new_drug": "atomoxetine",
+  "alerted_drug": "atomoxetine",
   "population": "adult",
   "genotype_AS": 2.0,
   "genotype_phenotype": "Normal Metabolizer",
@@ -257,7 +294,9 @@
   "cpic_strength": "Moderate",
   "source": "CPIC atomoxetine 2019 recs by AS; inhibitor handling per FDA label + CPIC atomoxetine narrative",
   "note": "Demo case 2: drug builds up. Use PM-equivalent rec; cite atomoxetine label + CPIC atomoxetine narrative",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P14",
@@ -265,6 +304,7 @@
   "cyp2c19": "",
   "current_meds": "",
   "new_drug": "atomoxetine",
+  "alerted_drug": "atomoxetine",
   "population": "adult",
   "genotype_AS": 0.0,
   "genotype_phenotype": "Poor Metabolizer",
@@ -277,7 +317,9 @@
   "cpic_strength": "Moderate",
   "source": "CPIC atomoxetine 2019 recs by AS; inhibitor handling per FDA label + CPIC atomoxetine narrative",
   "note": "PM by genotype: slower titration",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P15",
@@ -285,6 +327,7 @@
   "cyp2c19": "",
   "current_meds": "",
   "new_drug": "atomoxetine",
+  "alerted_drug": "atomoxetine",
   "population": "adult",
   "genotype_AS": 1.0,
   "genotype_phenotype": "Intermediate Metabolizer",
@@ -297,7 +340,9 @@
   "cpic_strength": "Moderate",
   "source": "CPIC atomoxetine 2019 recs by AS; inhibitor handling per FDA label + CPIC atomoxetine narrative",
   "note": "Trap: phenotype label IM but CPIC atomoxetine rec for AS 1.0 = standard titration. Key atomoxetine rules on AS",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P16",
@@ -305,6 +350,7 @@
   "cyp2c19": "",
   "current_meds": "duloxetine",
   "new_drug": "atomoxetine",
+  "alerted_drug": "atomoxetine",
   "population": "adult",
   "genotype_AS": 2.0,
   "genotype_phenotype": "Normal Metabolizer",
@@ -317,7 +363,9 @@
   "cpic_strength": "",
   "source": "CPIC atomoxetine 2019 (narrative only)",
   "note": "Moderate inhibitor: CPIC states no adjustment for atomoxetine -> pharmacist review, do not compute",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P17",
@@ -325,6 +373,7 @@
   "cyp2c19": "*2/*2",
   "current_meds": "",
   "new_drug": "clopidogrel",
+  "alerted_drug": "clopidogrel",
   "population": "ACS/PCI",
   "genotype_AS": "n/a (CYP2C19 has no activity score)",
   "genotype_phenotype": "Poor Metabolizer",
@@ -337,7 +386,9 @@
   "cpic_strength": "Strong",
   "source": "CPIC clopidogrel 2022 (ACS/PCI)",
   "note": "CYP2C19 PM (ACS/PCI)",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P18",
@@ -345,6 +396,7 @@
   "cyp2c19": "*1/*2",
   "current_meds": "",
   "new_drug": "clopidogrel",
+  "alerted_drug": "clopidogrel",
   "population": "ACS/PCI",
   "genotype_AS": "n/a (CYP2C19 has no activity score)",
   "genotype_phenotype": "Intermediate Metabolizer",
@@ -357,7 +409,9 @@
   "cpic_strength": "Strong",
   "source": "CPIC clopidogrel 2022 (ACS/PCI)",
   "note": "CYP2C19 IM (ACS/PCI)",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P19",
@@ -365,6 +419,7 @@
   "cyp2c19": "*1/*17",
   "current_meds": "omeprazole",
   "new_drug": "clopidogrel",
+  "alerted_drug": "clopidogrel",
   "population": "ACS/PCI",
   "genotype_AS": "n/a (CYP2C19 has no activity score)",
   "genotype_phenotype": "Rapid Metabolizer",
@@ -377,7 +432,9 @@
   "cpic_strength": "Strong",
   "source": "CPIC clopidogrel 2022 (ACS/PCI)",
   "extra_flag": "Label interaction: clopidogrel + omeprazole (verify against FDA label). Shown separately from genotype result.",
-  "note": "RM = standard dose; omeprazole is a label-level interaction (Layer 2), NOT a computed phenoconversion"
+  "note": "RM = standard dose; omeprazole is a label-level interaction (Layer 2), NOT a computed phenoconversion",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P20",
@@ -385,6 +442,7 @@
   "cyp2c19": "",
   "current_meds": "",
   "new_drug": "codeine",
+  "alerted_drug": "codeine",
   "population": "adult",
   "genotype_AS": "",
   "genotype_phenotype": "Indeterminate (allele '*999' has no CPIC activity value)",
@@ -397,7 +455,9 @@
   "cpic_strength": "",
   "source": "",
   "note": "Unsupported allele -> Indeterminate / not assessed",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
  },
  {
   "id": "P21",
@@ -405,6 +465,7 @@
   "cyp2c19": "",
   "current_meds": "",
   "new_drug": "codeine",
+  "alerted_drug": "codeine",
   "population": "adult",
   "genotype_AS": "",
   "genotype_phenotype": "Insufficient data (no CYP2D6 result)",
@@ -417,6 +478,31 @@
   "cpic_strength": "",
   "source": "",
   "note": "No CYP2D6 result -> insufficient data",
-  "extra_flag": ""
+  "extra_flag": "",
+  "confidence": "standard",
+  "inhibitor_note": ""
+ },
+ {
+  "id": "P22",
+  "cyp2d6": "*1/*1",
+  "cyp2c19": "",
+  "current_meds": "sertraline",
+  "new_drug": "codeine",
+  "alerted_drug": "codeine",
+  "population": "adult",
+  "genotype_AS": 2.0,
+  "genotype_phenotype": "Normal Metabolizer",
+  "inhibitor": "",
+  "adjusted_AS": 2.0,
+  "adjusted_phenotype": "Normal Metabolizer",
+  "phenoconverted": "no",
+  "alert": "GREEN",
+  "cpic_recommendation": "Use codeine label recommended age- or weight-specific dosing.",
+  "cpic_strength": "Strong",
+  "source": "CPIC opioids 2021 (phenoconversion rule stated in guideline)",
+  "inhibitor_note": "Weak CYP2D6 inhibitor present: no activity-score adjustment (CPIC adjusts strong and moderate only).",
+  "note": "Weak inhibitor (FDA): no activity-score adjustment",
+  "extra_flag": "",
+  "confidence": "standard"
  }
 ]

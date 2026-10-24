@@ -1,9 +1,11 @@
 {
-  "_note": "CYP2D6 inhibitor strength per FDA drug-interaction classification (strong = >=5-fold AUC increase of a sensitive substrate, moderate = 2 to <5-fold). Verify each entry against the FDA table before the demo.",
+  "_note": "CYP2D6 clinical inhibitors exactly as classified in the FDA table (strong = >=5-fold AUC increase of a sensitive substrate, moderate = 2 to <5-fold, weak = 1.25 to <2-fold). CPIC opioids 2021 adjusts the activity score for strong (x0) and moderate (x0.5) only; weak inhibitors get no adjustment.",
   "_source": "https://www.fda.gov/drugs/drug-interactions-labeling/healthcare-professionals-fdas-examples-drugs-interact-cyp-enzymes-and-transporter-systems",
-  "_persistence": "Fluoxetine phenoconversion may last up to 2-3 months after stopping (CPIC atomoxetine 2019). Treat recently stopped fluoxetine as active.",
+  "_verified": "2026-10-24",
+  "_design_choice": "If several inhibitors are listed, apply the strongest only (project choice, not a CPIC rule).",
   "CYP2D6": {
-    "strong": ["fluoxetine", "paroxetine", "bupropion", "quinidine", "terbinafine"],
-    "moderate": ["duloxetine"]
+    "strong": ["bupropion", "fluoxetine", "paroxetine", "quinidine", "terbinafine"],
+    "moderate": ["abiraterone", "cinacalcet", "duloxetine", "lorcaserin", "mirabegron", "rolapitant"],
+    "weak": ["amiodarone", "celecoxib", "clobazam", "cimetidine", "cobicistat", "escitalopram", "fluvoxamine", "labetalol", "sertraline", "vemurafenib"]
   }
 }

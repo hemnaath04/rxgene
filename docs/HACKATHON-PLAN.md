@@ -1,3 +1,5 @@
+> **Superseded.** This is the first-draft plan from Oct 23. Use [PLAN-v3.md](PLAN-v3.md) and the [build spec](../.plans/rxgene-build-spec.md).
+
 # Hackachusetts (Oct 24, 2026): Biotech & Healthcare track plan
 
 ## Verdict: GO, with changes

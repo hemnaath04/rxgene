@@ -11,6 +11,8 @@ but takes fluoxetine behaves like a poor metabolizer, so codeine won't relieve t
 > Built at Hackachusetts 2026 (Biotech & Healthcare track). Synthetic data only.
 > RxGene supports clinicians and pharmacists. It does not replace them.
 
+**Team docs:** [Who does what](docs/TEAM-SPLIT.md) · [Build spec](.plans/rxgene-build-spec.md) · [Plan v3](docs/PLAN-v3.md) · [Clinical rules](.kiro/steering/clinical-rules.md)
+
 ## The problem
 
 - 99.5% of 487,409 UK Biobank participants carry at least one variant that may change
@@ -61,9 +63,10 @@ web/              React + Vite + TS app (scaffold in Kiro); engine goes in web/s
 server/           small Node endpoint for LLM extraction/explanation
 data/cpic/        CPIC API snapshots: allele values, recommendations, guideline links
 data/             inhibitors.json, synthetic-reports/
-tests/fixtures/   expected outputs for 21 synthetic test patients
+tests/fixtures/   expected outputs for 22 synthetic test patients
 scripts/          fetch_cpic.py (refresh snapshots), make_expected.py (regenerate fixtures)
-docs/             hackathon plan, verified team answers
+docs/             TEAM-SPLIT (who does what), PLAN-v3 (strategy + pitch), verified answers
+.plans/           build spec (source of truth for what we build)
 ```
 
 ## Getting started
@@ -75,10 +78,16 @@ docs/             hackathon plan, verified team answers
 4. Refresh the data if needed: `python3 scripts/fetch_cpic.py`.
 5. Build the engine against `tests/fixtures/expected_outputs.json` first, then the UI.
 
+## Git workflow
+
+- Push straight to `dev`. `main` only changes through a PR from `dev`.
+- After cloning, run `git config core.hooksPath .githooks` once. The hook blocks direct pushes to `main`.
+- Merge `dev` into `main` (via PR) before submitting. Judges read `main`.
+
 ## Test patients
 
-21 synthetic cases cover genotype-only alerts, phenoconversion (strong and moderate
-inhibitors, fluoxetine that was recently stopped), alert de-escalation (a patient who is
+22 synthetic cases cover genotype-only alerts, phenoconversion (strong, moderate and weak
+inhibitors, plus the reverse case where adding an inhibitor re-alerts a drug already on the list), alert de-escalation (a patient who is
 already a poor metabolizer and also takes an inhibitor), threshold traps (`*1/*4`,
 `*1/*10`, `*41`), CYP2C19, unsupported alleles and missing data. Every recommendation is
 taken word for word from the CPIC API.

@@ -2,7 +2,7 @@
 
 The ElevenLabs voiceover reads the same text from `scripts/voiceover_sections.json` (with emotion tags). Keep the two in sync.
 
-**Target: about 2:40 spoken** (about 395 words at a calm 150 words per minute). The hard limit is
+**Target: about 2:50 spoken** (about 420 words at a calm 150 words per minute). The hard limit is
 3:00. Read the **bold section markers** silently. Leave a **one-second pause** where you see `//`
 between sections; the editor uses those pauses to cut the video to your voice.
 
@@ -21,43 +21,43 @@ between sections; the editor uses those pauses to cut the video to your voice.
 ---
 
 **[S1 HOOK]**
-Sarah takes fluoxetine, an antidepressant. Today, her doctor wants to prescribe codeine for her pain. Her DNA test says she processes painkillers normally. So the prescription looks fine. It isn't.
+So... Sarah takes fluoxetine. It's an antidepressant. And today, her doctor wants to give her codeine, for pain. Her DNA test? Says she processes painkillers... normally. So, the prescription looks fine. It's not.
 `//`
 
 **[S2 SARAH]**
-Your liver has a cleanup crew for medicines, and your DNA decides how fast that crew works. But some drugs jam the crew, and fluoxetine is one of them. So Sarah's genes still say normal, but right now, her body is slow. RxGene catches it: codeine likely won't relieve her pain, so her doctor should avoid it and consider an alternative.
+Here's the thing. Your liver has this, like, cleanup crew for medicines... and your DNA decides how fast that crew works. But some drugs jam the crew. Fluoxetine's one of them. So Sarah's genes still say normal... but right now? Her body's slow. And RxGene catches that. Codeine probably won't relieve her pain, so... her doctor should avoid it, and pick something else.
 `//`
 
 **[S3 SAME-GENES]**
-Same genes. Different response. Her genetic report on its own says normal. A typical interaction warning is the same for every patient. RxGene puts the two together, and gives the answer that's true for Sarah today.
+Same genes. Different response. Her gene report, on its own, says normal. And a regular interaction warning? It's the same for everybody. RxGene puts the two together... and tells you what's actually true for Sarah, today.
 `//`
 
 **[S4 EVIDENCE]**
-Every alert shows its work: the clinical guideline, how strong the evidence is, the activity score before and after, and the numbered rules that produced it. Real-world FDA reports are shown for context only, never as proof.
+And every alert shows its work. The guideline it comes from, how strong the evidence is, the score before and after... and the exact numbered rules behind it. The FDA reports down here? Those are just context. Never proof.
 `//`
 
 **[S5 MARCUS]**
-Marcus was already slow because of his genes. He still gets the codeine warning, and RxGene says plainly that fluoxetine adds no further effect: one precise alert, instead of two noisy ones.
+Now, Marcus. He was already slow, just from his genes. So he still gets the codeine warning... but RxGene tells you straight up: the fluoxetine doesn't change anything for him. One clear alert. Not two noisy ones.
 `//`
 
 **[S6 LENA-TOM]**
-It works in reverse, too. When Lena's doctor adds fluoxetine, RxGene re-checks the codeine she already takes. And when a gene result can't be read, like Tom's, it says so and points to a pharmacist, instead of guessing.
+It works the other way too. When Lena's doctor adds fluoxetine, RxGene goes back and re-checks the codeine she's already on. And if a gene result can't be read, like Tom's here... it just says so. Ask a pharmacist. No guessing.
 `//`
 
 **[S7 AGENT]**
-For pharmacists, an AI agent reviews the whole medication list. It calls our rule engine as a tool for every drug, then drafts a consult note where every sentence cites the step it came from. The AI never decides an alert. If a single citation doesn't check out, the note falls back to a fixed template.
+For pharmacists, there's an AI agent that reviews the whole medication list. It calls our rule engine for every single drug... then drafts a consult note, and every sentence points back to the step it came from. But the AI never decides an alert. If even one citation doesn't check out... it falls back to a plain template.
 `//`
 
 **[S8 PATIENT]**
-Patients get a plain-language explanation, in English, or in Spanish.
+And patients get a plain-language version. In English... or in Spanish.
 `//`
 
 **[S9 EHR]**
-And it plugs into hospital systems. RxGene is a real CDS Hooks service, the standard for decision support inside health records. Here, a public test EHR calls it while a doctor orders codeine.
+It also plugs right into hospital systems. RxGene is a real CDS Hooks service, that's the standard for decision support inside health records. So here, a public test EHR is calling it... while a doctor orders codeine.
 `//`
 
 **[S10 KIRO]**
-We built RxGene with Kiro, spec first. Our genetics teammate wrote more than fifty clinical rules before any code existed, and Kiro checked them for conflicts. Kiro's property-based tests then found two engine bugs our examples had missed. And Kiro hooks stop the coding agent from changing the clinical data it's tested against.
+We built all of this with Kiro, spec first. Our genetics teammate wrote over fifty clinical rules before there was any code... and Kiro checked them for conflicts. Then Kiro's property-based tests caught two engine bugs our examples completely missed. And Kiro hooks stop the coding agent from touching the clinical data it's tested against.
 `//`
 
 **[S11 CLOSE]**

@@ -1,60 +1,60 @@
 {
-  "_note": "Eleven v3 narration, one entry per video section (S1-S11, matching docs/NARRATION.md and docs/CODEX-RECORDING-PROMPT.md). Square-bracket tags are Eleven v3 audio tags (emotion/delivery) and are not spoken. No brand drug names; never the word 'safe'.",
+  "_note": "Eleven v3 narration, one entry per video section (S1-S11, matching docs/NARRATION.md and docs/CODEX-RECORDING-PROMPT.md). Written to be spoken: short sentences, contractions, ellipses and [pause]/[short pause] tags for natural breaks. Square-bracket tags are v3 audio tags and are not spoken. No brand drug names; never the word 'safe'.",
   "sections": [
     {
       "id": "S1",
       "name": "hook",
-      "text": "[warm] Sarah takes fluoxetine, an antidepressant. Today, her doctor wants to prescribe codeine for her pain. Her DNA test says she processes painkillers normally. [thoughtful] So the prescription looks fine... [serious] It isn't."
+      "text": "[conversational] So... Sarah takes fluoxetine. It's an antidepressant. [short pause] And today, her doctor wants to give her codeine, for pain. [pause] Her DNA test? Says she processes painkillers... normally. [short pause] So, the prescription looks fine. [pause] [serious] It's not."
     },
     {
       "id": "S2",
       "name": "sarah",
-      "text": "[curious] Your liver has a cleanup crew for medicines, and your DNA decides how fast that crew works. [concerned] But some drugs jam the crew, and fluoxetine is one of them. So Sarah's genes still say normal... but right now, her body is slow. [confident] RxGene catches it: codeine likely won't relieve her pain, so her doctor should avoid it and consider an alternative."
+      "text": "[thoughtful] Here's the thing. Your liver has this, like, cleanup crew for medicines... and your DNA decides how fast that crew works. [short pause] But some drugs jam the crew. [short pause] Fluoxetine's one of them. [pause] So Sarah's genes still say normal... [short pause] but right now? Her body's slow. [confident] And RxGene catches that. Codeine probably won't relieve her pain, so... her doctor should avoid it, and pick something else."
     },
     {
       "id": "S3",
       "name": "same-genes",
-      "text": "[matter-of-fact] Same genes. Different response. Her genetic report on its own says normal. A typical interaction warning is the same for every patient. [confident] RxGene puts the two together, and gives the answer that's true for Sarah today."
+      "text": "[matter-of-fact] Same genes. [short pause] Different response. [pause] Her gene report, on its own, says normal. And a regular interaction warning? It's the same for everybody. [short pause] RxGene puts the two together... and tells you what's actually true for Sarah, today."
     },
     {
       "id": "S4",
       "name": "evidence",
-      "text": "[calm] Every alert shows its work: the clinical guideline, how strong the evidence is, the activity score before and after, and the numbered rules that produced it. [careful] Real-world FDA reports are shown for context only, never as proof."
+      "text": "[calm] And every alert shows its work. [short pause] The guideline it comes from, how strong the evidence is, the score before and after... and the exact numbered rules behind it. [pause] The FDA reports down here? Those are just context. [short pause] Never proof."
     },
     {
       "id": "S5",
       "name": "marcus",
-      "text": "[calm] Marcus was already slow because of his genes. He still gets the codeine warning, and RxGene says plainly that fluoxetine adds no further effect... one precise alert, instead of two noisy ones."
+      "text": "[calm] Now, Marcus. [short pause] He was already slow, just from his genes. So he still gets the codeine warning... [short pause] but RxGene tells you straight up: the fluoxetine doesn't change anything for him. [short pause] One clear alert. Not two noisy ones."
     },
     {
       "id": "S6",
       "name": "lena-tom",
-      "text": "[curious] It works in reverse, too. When Lena's doctor adds fluoxetine, RxGene re-checks the codeine she already takes. [serious] And when a gene result can't be read, like Tom's, it says so and points to a pharmacist, instead of guessing."
+      "text": "[curious] It works the other way too. [short pause] When Lena's doctor adds fluoxetine, RxGene goes back and re-checks the codeine she's already on. [pause] [serious] And if a gene result can't be read, like Tom's here... it just says so. Ask a pharmacist. [short pause] No guessing."
     },
     {
       "id": "S7",
       "name": "agent",
-      "text": "[engaged] For pharmacists, an AI agent reviews the whole medication list. It calls our rule engine as a tool for every drug, then drafts a consult note where every sentence cites the step it came from. [serious] The AI never decides an alert. If a single citation doesn't check out, the note falls back to a fixed template."
+      "text": "[engaged] For pharmacists, there's an AI agent that reviews the whole medication list. [short pause] It calls our rule engine for every single drug... then drafts a consult note, and every sentence points back to the step it came from. [pause] [serious] But the AI never decides an alert. [short pause] If even one citation doesn't check out... it falls back to a plain template."
     },
     {
       "id": "S8",
       "name": "patient",
-      "text": "[warm] Patients get a plain-language explanation, in English, or in Spanish."
+      "text": "[warm] And patients get a plain-language version. [short pause] In English... or in Spanish."
     },
     {
       "id": "S9",
       "name": "ehr",
-      "text": "[confident] And it plugs into hospital systems. RxGene is a real CDS Hooks service, the standard for decision support inside health records. Here, a public test EHR calls it while a doctor orders codeine."
+      "text": "[confident] It also plugs right into hospital systems. [short pause] RxGene is a real CDS Hooks service, that's the standard for decision support inside health records. [short pause] So here, a public test EHR is calling it... while a doctor orders codeine."
     },
     {
       "id": "S10",
       "name": "kiro",
-      "text": "[proud] We built RxGene with Kiro, spec first. Our genetics teammate wrote more than fifty clinical rules before any code existed, and Kiro checked them for conflicts. [excited] Kiro's property-based tests then found two engine bugs our examples had missed. [confident] And Kiro hooks stop the coding agent from changing the clinical data it's tested against."
+      "text": "[proud] We built all of this with Kiro, spec first. [short pause] Our genetics teammate wrote over fifty clinical rules before there was any code... and Kiro checked them for conflicts. [short pause] [excited] Then Kiro's property-based tests caught two engine bugs our examples completely missed. [pause] [confident] And Kiro hooks stop the coding agent from touching the clinical data it's tested against."
     },
     {
       "id": "S11",
       "name": "close",
-      "text": "[warm] Your genes don't change. [short pause] Your prescriptions do. [confident] This is RxGene."
+      "text": "[warm] Your genes don't change. [pause] Your prescriptions do. [short pause] [confident] This is RxGene."
     }
   ]
 }

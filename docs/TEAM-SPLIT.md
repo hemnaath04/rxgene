@@ -124,6 +124,7 @@ checklist ticked.
 - Claude saved openFDA FAERS counts for 10 demo drug pairs to `data/openfda/pair_reports.json`.
 - **Mithuna:** brief 15 (Evidence-sheet panel) runs only if brief 12 is done before 6:00. Order: 13 → 14 → 12 → (15).
 - **Pitch / SundAI card:** challenge **H4** ("hard to translate"). We use the portal's FHIR guidance (standard shapes, not private JSON) and its openFDA API.
+- **openFDA in the pitch (Ananya's rule):** call FAERS *informational context from reports, not proof of cause*. **Don't compare numbers between drug pairs** (codeine + sertraline, a weak inhibitor, has more interaction reports than codeine + fluoxetine; codeine + paroxetine has only 4), and **don't use them to support the phenoconversion story**. RxGene's rules never read FAERS. If it appears at all, say "we also show real-world reports for context" and nothing more.
 
 ## Added at 3:25 PM: official rules and judging criteria (Rules & Project Submittal doc)
 

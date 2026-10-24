@@ -25,8 +25,8 @@ PAIRS = [
 ]
 # MedDRA preferred terms that match the harm RxGene warns about.
 REACTIONS = ["DRUG INTERACTION", "DRUG INEFFECTIVE"]
-CAVEAT = ("Reports submitted to FDA (FAERS) that list both medicines. A report is not proof "
-          "that either medicine caused the reaction, and FAERS is not a complete safety record.")
+CAVEAT = ("Reports submitted to FDA (FAERS) that list both medicines. A report does not establish "
+          "that either medicine caused an event, and FAERS is not a complete record of adverse events.")
 
 
 def get(params):

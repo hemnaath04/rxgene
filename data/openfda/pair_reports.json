@@ -1,7 +1,7 @@
 {
  "source": "openFDA drug adverse event API (FAERS), https://open.fda.gov/apis/drug/event/",
  "fetched": "2026-10-24",
- "caveat": "Reports submitted to FDA (FAERS) that list both medicines. A report is not proof that either medicine caused the reaction, and FAERS is not a complete safety record.",
+ "caveat": "Reports submitted to FDA (FAERS) that list both medicines. A report does not establish that either medicine caused an event, and FAERS is not a complete record of adverse events.",
  "pairs": [
   {
    "drug": "codeine",

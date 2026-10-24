@@ -1,4 +1,4 @@
-Model: auto. Read docs/DESIGN.md and look at the mockup image docs/design/mockup-case1.webp. DESIGN.md wins where the image and the doc differ (section 5 lists the deliberate fixes). Also read .plans/rxgene-build-spec.md section 7, and docs/PLAN-v3.md ("UI language" and the 60-90 s demo script).
+Model: auto. Order note: this brief runs BEFORE brief 04 (EHR mode). Read docs/DESIGN.md and look at the mockup image docs/design/mockup-case1.webp. DESIGN.md wins where the image and the doc differ (section 5 lists the deliberate fixes). Also read .plans/rxgene-build-spec.md section 7, and docs/PLAN-v3.md ("UI language" and the 60-90 s demo script).
 
 Task: apply the design to the existing components (App.tsx, PatientPicker, MedList, AlertCard) and add Gauge, StoryRow, ComparisonStrip, VerdictBar, EvidenceSheet and PatientExplanationSheet. Implement every state in DESIGN.md section 3 and the motion spec in section 4 exactly. Don't change the engine, the API or the data flow.
 
@@ -8,5 +8,7 @@ Task: apply the design to the existing components (App.tsx, PatientPicker, MedLi
 4. ComparisonStrip, shown for phenoconverted cards: "Gene report alone" / "Typical interaction warning (illustrative)" / "RxGene".
 5. Cards enter and leave with AnimatePresence.
 6. Check every beat of the 60-90 s demo script against the screen, and list anything the design doesn't cover.
+
+EHR mode isn't built yet: build the header ModeToggle (shadcn Switch, label "EHR mode (CDS Hooks)") and the verdict badge as presentational components that take `mode` and `source` props. For now, App passes mode="local" and source="local", and the switch is disabled with a tooltip "Coming next". Also add the "Check prescription" button behaviour from DESIGN.md section 1 (deep-link auto-run comes in brief 04).
 
 Never show the word "safe" except in "not the same as safe". Don't run git. List the files you changed.

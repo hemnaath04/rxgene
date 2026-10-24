@@ -44,6 +44,7 @@ Kiro models:
 - [ ] **All 22 fixtures pass.** Push to `dev`.
 
 ### 2:30–4:30: Layer 2
+- [ ] Order of briefs: 06 (design) → 04 (EHR mode + URL) → 05 (summary, once the LLM details arrive).
 - [ ] Apply the frontend design. Gauge with two markers, evidence drawer, comparison strip.
 - [ ] Reverse case (Lena), UM reduced confidence (Dev), atomoxetine (Jordan).
 - [ ] `POST /api/summary`: OpenAI-compatible call, the validator (spec §6), and the EN/ES

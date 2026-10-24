@@ -102,13 +102,15 @@ function assessDrug(
         drugLower,
         isInsufficient ? insufficientDataText('CYP2D6') : INDETERMINATE_TEXT
       );
-    } else if (drugLower === 'atomoxetine' && phenoResult.inhibitor?.strength === 'moderate') {
+    } else if (drugLower === 'atomoxetine' && phenoResult.inhibitor?.strength === 'moderate' && genotypeAS !== 0) {
       // R18: moderate inhibitor + atomoxetine -> GREY "Not assessed", not computed.
+      // Only applies when the genotype is NOT already a poor metabolizer (R21 handled in phenoconversion).
       recResult = greyFixedResult('atomoxetine', atomoxetineModerateNotAssessedText(phenoResult.inhibitor.drug));
-    } else if (drugLower === 'atomoxetine' && phenoResult.inhibitor?.strength === 'strong') {
+    } else if (drugLower === 'atomoxetine' && phenoResult.inhibitor?.strength === 'strong' && genotypeAS !== 0) {
       // R17: FDA label-based handling. The recommendation/alert come from the PM-equivalent
       // activity score (0), while the reported adjusted score is null ("n/a") and the adjusted
       // phenotype is the fixed FDA-label description (set in phenoconversion).
+      // Only applies when the genotype is NOT already a poor metabolizer (R21 handled in phenoconversion).
       recResult = lookupByActivityScore('atomoxetine', 0);
       labelFields.adjustedActivityScoreLabel = ATOMOXETINE_LABEL_ADJUSTED_AS;
       labelFields.labelRecommendation = ATOMOXETINE_LABEL_RECOMMENDATION;

@@ -53,7 +53,7 @@ function captionFor(a: DrugAssessment | null, checked: boolean, patientName: str
   if (inh?.strength === 'strong') return `${capitalize(inh.drug)} reduces ${gene} activity. ${patientName}'s genes are unchanged.`;
   if (inh?.strength === 'moderate') return `${capitalize(inh.drug)} partly reduces ${gene} activity. ${patientName}'s genes are unchanged.`;
   if (a.inhibitorNote?.startsWith('Weak')) return `A weak ${gene} inhibitor is on the list. It doesn't change the activity score.`;
-  if (gene === 'CYP2C19') return `RxGene doesn't model ${gene} inhibition.${a.labelNote ? ' See the label note below.' : ''}`;
+  if (gene === 'CYP2C19') return `RxGene doesn't model ${gene} inhibition.${a.labelNote ? ' The label interaction above is not computed.' : ''}`;
   return `No ${gene} inhibitor on the medication list.`;
 }
 
@@ -137,17 +137,19 @@ export function StoryRow({
   const isWord = value !== null && value === nowSpeed;
 
   const g = a ? formatScore(a.genotypeActivityScore) : null;
-  const adj = a ? formatScore(a.adjustedActivityScore) : null;
+  const adj = a ? (a.adjustedActivityScoreLabel ?? formatScore(a.adjustedActivityScore)) : null;
   const scoreChanged = g !== null && adj !== null && g !== adj;
 
   let scoreSub: string | null = null;
   if (a && a.gene === 'CYP2D6' && g !== null) {
-    if (a.phenoconverted) scoreSub = 'Rule-adjusted';
+    if (a.adjustedActivityScoreLabel) scoreSub = 'Label-based (FDA), no score computed';
+    else if (a.phenoconverted) scoreSub = 'Rule-adjusted';
     else if (alreadySlowInhibitor(a)) scoreSub = 'No further change';
     else if (a.adjustedPhenotype === 'not computed') scoreSub = 'Pharmacist review';
     else scoreSub = 'Same as genes';
   }
 
+  return (
   return (
     <section
       aria-label="How current medications change this assessment"
@@ -187,11 +189,12 @@ export function StoryRow({
             <StepLabel n="02" title="Medication effect" id="story-02-m" />
           </div>
 
+          {/* R28: when there's no inhibitor but a label interaction note, show its actual text. */}
           {!inhibitor && a?.labelNote && (
-            <div className="flex w-fit items-center gap-2 rounded-lg border border-ink/25 bg-panel-solid px-2.5 py-1 text-sm text-ink">
-              <Info aria-hidden="true" className="size-4 shrink-0" strokeWidth={1.5} />
-              Label interaction note (not computed)
-            </div>
+            <p className="flex w-fit items-start gap-2 rounded-lg border border-ink/25 bg-panel-solid px-2.5 py-1 text-sm font-medium text-ink">
+              <Info aria-hidden="true" className="mt-0.5 size-4 shrink-0" strokeWidth={1.5} />
+              <span>{a.labelNote}</span>
+            </p>
           )}
 
           <MoleculeStage

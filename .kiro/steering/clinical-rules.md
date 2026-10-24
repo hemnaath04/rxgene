@@ -24,7 +24,9 @@
 - Codeine and tramadol recommendations are keyed by **phenotype** (R24, R25): map the genotype or
   adjusted activity score to a phenotype first. Adjusted scores like 0.625 have no score row.
 - Atomoxetine stays keyed by **activity score** (R26), because its text differs inside the
-  intermediate range. (Atomoxetine at AS 1.0 = the NM recommendation.)
+  intermediate range. Atomoxetine at AS exactly 1.0 (R44): with a `*10` allele (`*10`, `*10xN`, or a
+  `*36` combination containing `*10`) use the `alert_levels.json` entry "1.0 (*10 present)", which
+  points to the 0.75 titration row (YELLOW); without `*10`, use the standard 1.0 row (GREEN).
 - Atomoxetine: use the `adults` population.
 - Clopidogrel: CYP2C19 diplotype -> phenotype directly (no activity score). Use the `CVI ACS PCI` population.
 - Omeprazole + clopidogrel is a separate label-level note. It is not a computed phenoconversion.

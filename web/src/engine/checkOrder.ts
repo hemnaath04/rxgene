@@ -2,19 +2,27 @@
 // Implements the algorithm from .plans/rxgene-build-spec.md section 4
 
 import type { Patient, DrugAssessment } from './types.js';
-import { getActivityScore } from './activityScore.js';
+import { getActivityScore, hasStar10Allele } from './activityScore.js';
 import { activityScoreToPhenotype, cyp2c19DiplotypeToPhenotype } from './phenotype.js';
 import { applyPhenoconversion } from './phenoconversion.js';
-import { lookupByActivityScore, lookupByPhenotype, greyFixedResult, type RecommendationResult } from './recommend.js';
+import {
+  lookupByActivityScore,
+  lookupByPhenotype,
+  lookupAtomoxetineStar10,
+  greyFixedResult,
+  type RecommendationResult
+} from './recommend.js';
 import { drugToGene } from './data.js';
 import {
   INDETERMINATE_TEXT,
   insufficientDataText,
-  ATOMOXETINE_MODERATE_NOT_ASSESSED_TEXT,
+  atomoxetineModerateNotAssessedText,
+  ATOMOXETINE_LABEL_ADJUSTED_AS,
   ATOMOXETINE_LABEL_RECOMMENDATION,
   ATOMOXETINE_CPIC_ROLE,
   ATOMOXETINE_DISCREPANCY_FLAG,
-  ATOMOXETINE_SOURCE_LINKS
+  ATOMOXETINE_SOURCE_LINKS,
+  OMEPRAZOLE_CLOPIDOGREL_LABEL_NOTE
 } from './fixedTexts.js';
 
 /**
@@ -96,12 +104,13 @@ function assessDrug(
       );
     } else if (drugLower === 'atomoxetine' && phenoResult.inhibitor?.strength === 'moderate') {
       // R18: moderate inhibitor + atomoxetine -> GREY "Not assessed", not computed.
-      recResult = greyFixedResult('atomoxetine', ATOMOXETINE_MODERATE_NOT_ASSESSED_TEXT);
+      recResult = greyFixedResult('atomoxetine', atomoxetineModerateNotAssessedText(phenoResult.inhibitor.drug));
     } else if (drugLower === 'atomoxetine' && phenoResult.inhibitor?.strength === 'strong') {
       // R17: FDA label-based handling. The recommendation/alert come from the PM-equivalent
       // activity score (0), while the reported adjusted score is null ("n/a") and the adjusted
       // phenotype is the fixed FDA-label description (set in phenoconversion).
       recResult = lookupByActivityScore('atomoxetine', 0);
+      labelFields.adjustedActivityScoreLabel = ATOMOXETINE_LABEL_ADJUSTED_AS;
       labelFields.labelRecommendation = ATOMOXETINE_LABEL_RECOMMENDATION;
       labelFields.cpicRole = ATOMOXETINE_CPIC_ROLE;
       labelFields.discrepancyFlag = ATOMOXETINE_DISCREPANCY_FLAG;
@@ -114,8 +123,13 @@ function assessDrug(
       if (phenoResult.confidence === 'reduced') {
         genotypeRecommendation = lookupByPhenotype(drugLower, genotypePhenotype).recommendation;
       }
+    } else if (drugLower === 'atomoxetine' && Math.abs(genotypeAS - 1) < 1e-9 && hasStar10Allele(genotype)) {
+      // R44: AS exactly 1.0 with a *10 allele -> CPIC row '1.0 (*10 allele present)' (YELLOW).
+      // Only reached with no inhibitor or a weak one, so the adjusted score equals the genotype score.
+      recResult = lookupAtomoxetineStar10();
     } else {
       // Atomoxetine with no inhibitor or a weak inhibitor: look up by activity score (R26).
+      // At AS 1.0 without a *10 allele this is the standard '1.0 (*10 allele not present)' row.
       recResult = lookupByActivityScore(drugLower, phenoResult.adjustedActivityScore);
     }
 
@@ -160,15 +174,16 @@ function assessDrug(
     const phenotype = cyp2c19DiplotypeToPhenotype(genotype);
     const recResult = lookupByPhenotype(drugLower, phenotype);
 
-    // Check for omeprazole label interaction
+    // R28: omeprazole + clopidogrel is a separate label-level note (fixed text), not a
+    // computed CYP2C19 phenoconversion (R42).
     let labelNote: string | undefined;
     if (drugLower === 'clopidogrel') {
       const hasOmeprazole = allMedications
         .map(m => m.toLowerCase())
         .includes('omeprazole');
-      
+
       if (hasOmeprazole) {
-        labelNote = 'Label interaction: clopidogrel + omeprazole (verify against FDA label). Shown separately from genotype result.';
+        labelNote = OMEPRAZOLE_CLOPIDOGREL_LABEL_NOTE;
       }
     }
 

@@ -36,8 +36,10 @@ type AlertCardProps = {
 };
 
 /** "Normal (activity score 2.0)" / "Not computed (pharmacist review)" */
-function phenotypeLine(phenotype: string, score: number | null): string {
+function phenotypeLine(phenotype: string, score: number | null, scoreLabel?: string): string {
   if (phenotype === 'not computed') return 'Not computed (pharmacist review)';
+  // R17: the FDA-label phenotype description, with "n/a" instead of a computed score.
+  if (scoreLabel) return `${phenotype} (activity score ${scoreLabel})`;
   const speed = speedOf(phenotype);
   const s = formatScore(score);
   const base = speed ?? 'Not assessed';
@@ -63,10 +65,16 @@ export function AlertCard({ verdict: v, selected, onSelect }: AlertCardProps) {
         <ViaBadge via={v.via} />
       </div>
       {v.prefix && <p className="text-sm text-ink-muted">{v.prefix}</p>}
-      <p className="text-base font-semibold text-ink">
-        {v.headline} {v.qualifier && <span className="font-normal">{v.qualifier}</span>}
-      </p>
+      <p className="text-base font-semibold break-words text-ink">{v.headline}</p>
+      {/* R31: GREEN is the genotype result only, not an overall medication clearance. */}
+      {v.qualifier && <p className="text-sm text-ink">{v.qualifier}</p>}
       {v.mismatch && <MismatchWarning text={v.mismatch} className="text-alert-red-text" />}
+      {/* R7/R8/R18: the fixed GREY text on the card itself. */}
+      {v.level === 'GREY' && <p className="text-sm text-ink">{v.sentence}</p>}
+      {/* R28: the label interaction text on the card itself. */}
+      {v.labelNote && (
+        <p className="rounded-lg border border-ink/25 bg-ink/5 px-3 py-2 text-sm font-medium text-ink">{v.labelNote}</p>
+      )}
 
       {a && (
         <dl className="grid grid-cols-2 gap-3 text-sm">
@@ -76,7 +84,9 @@ export function AlertCard({ verdict: v, selected, onSelect }: AlertCardProps) {
           </div>
           <div>
             <dt className="text-ink-muted">With current medications</dt>
-            <dd className="text-ink">{phenotypeLine(a.adjustedPhenotype, a.adjustedActivityScore)}</dd>
+            <dd className="text-ink">
+              {phenotypeLine(a.adjustedPhenotype, a.adjustedActivityScore, a.adjustedActivityScoreLabel)}
+            </dd>
           </div>
         </dl>
       )}

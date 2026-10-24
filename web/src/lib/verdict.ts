@@ -3,7 +3,8 @@
 // recommendation comes from the engine. Never says "safe" except in "not the same as safe".
 import type { CardVia } from '@/components/AlertCard';
 import { getActivityScore } from '@/engine/activityScore';
-import { drugToGene } from '@/engine/data';
+import { drugToGene, drugToPopulation } from '@/engine/data';
+import { GREEN_ALERT_TEXT, GREEN_SCOPE_TEXT } from '@/engine/fixedTexts';
 import { activityScoreToPhenotype, cyp2c19DiplotypeToPhenotype } from '@/engine/phenotype';
 import { clearsThisDrug, type ClearsSpeed } from '@/engine/templates';
 import type { Alert, DrugAssessment, Patient } from '@/engine/types';
@@ -82,6 +83,31 @@ export function sourceLine(a: DrugAssessment): string | null {
   return a.strength ? `${name} · ${a.strength}` : name;
 }
 
+/** R26/R27/R17: the CPIC population used, for drugs that have one (atomoxetine, clopidogrel). */
+export function populationLine(a: DrugAssessment): string | null {
+  const drug = a.drug.toLowerCase();
+  if (drug !== 'atomoxetine' && drug !== 'clopidogrel') return null;
+  const population = drugToPopulation[drug]?.trim();
+  return population ? `Population: ${population} (CPIC)` : null;
+}
+
+export type SourceLink = { label: string; url: string | null };
+
+/** Split the engine's "label: url | label: url" sourceLinks string; the text stays verbatim. */
+export function parseSourceLinks(sourceLinks: string | null | undefined): SourceLink[] {
+  if (!sourceLinks) return [];
+  return sourceLinks.split(' | ').map(part => {
+    const m = part.match(/^(.*?):\s*(https?:\/\/\S+)$/);
+    return m ? { label: m[1], url: m[2] } : { label: part, url: null };
+  });
+}
+
+/** First sentence of a CPIC recommendation, verbatim. */
+function firstSentence(text: string): string {
+  const m = text.match(/^.*?\.(?=\s|$)/);
+  return m ? m[0] : text;
+}
+
 /** Prefix of the engine's "already a poor metabolizer" note (phenoconversion.ts). */
 const ALREADY_PM_MARKER = ' adds no further effect';
 
@@ -100,7 +126,7 @@ export function actionWords(level: Alert, drug: string): string {
     case 'YELLOW':
       return drug === 'atomoxetine' ? `adjust ${drug} dosing` : `review ${drug} dosing`;
     case 'GREEN':
-      return 'no supported alert';
+      return GREEN_ALERT_TEXT.charAt(0).toLowerCase() + GREEN_ALERT_TEXT.slice(1);
     case 'GREY':
     default:
       return 'refer to pharmacist';
@@ -115,34 +141,48 @@ export type Verdict = {
   assessment: DrugAssessment | null;
   /** "Adding fluoxetine affects a current medication:" (reverse case) */
   prefix: string | null;
-  /** "Avoid codeine." only when RED. YELLOW never says Avoid. */
+  /** RED: "Avoid codeine." (clopidogrel: CPIC's own first sentence). GREEN: the exact R31 text. */
   headline: string;
-  /** "(not the same as safe)" for GREEN */
+  /** R31: for GREEN, "Genotype result only. This is not an overall medication clearance." */
   qualifier: string | null;
   sentence: string;
   /** CPIC text verbatim, shown in the bar when the plain sentence doesn't carry it. */
   quote: string | null;
   /** R17: FDA label recommendation, shown FIRST for atomoxetine + strong inhibitor. */
   labelRecommendation: string | null;
+  /** R17: role of the CPIC text (supporting genotype-based context only). */
+  cpicRole: string | null;
   /** R17: "Different guidance contexts" flag. */
   discrepancyFlag: string | null;
+  /** R17: FDA label + CPIC source links with versions. */
+  sourceLinks: SourceLink[];
+  /** R26/R27: "Population: adults (CPIC)". */
+  population: string | null;
   /** R20: the genotype (e.g. ultrarapid) recommendation, shown alongside the converted one. */
   genotypeRecommendation: string | null;
+  /** R28: the omeprazole label text, shown on the card itself (separate from the genotype result). */
+  labelNote: string | null;
   notes: string[];
   source: string | null;
   mismatch: string | null;
 };
 
-function headlineFor(level: Alert, drug: string): string {
+function headlineFor(level: Alert, drug: string, a: DrugAssessment | null = null): string {
   switch (level) {
     case 'RED':
+      // R38: clopidogrel PM and IM wording differ ("Avoid clopidogrel if possible." vs
+      // "Avoid standard dose (75 mg) clopidogrel if possible."); use CPIC's own sentence.
+      if (drug === 'clopidogrel' && a?.recommendation) return firstSentence(a.recommendation);
       return `Avoid ${drug}.`;
     case 'YELLOW':
       return drug === 'atomoxetine' ? 'Adjust atomoxetine dosing.' : `Review ${drug} dosing.`;
     case 'GREEN':
-      return 'No supported alert';
+      return GREEN_ALERT_TEXT;
     case 'GREY':
     default:
+      // R32: three distinct GREY states.
+      if (a?.genotypePhenotype.startsWith('Indeterminate')) return 'Indeterminate: ask a pharmacist';
+      if (a?.genotypePhenotype.startsWith('Insufficient')) return 'Insufficient data';
       return 'Not assessed: refer to pharmacist';
   }
 }
@@ -162,6 +202,10 @@ function sentenceFor(a: DrugAssessment): { sentence: string; quote: string | nul
       return { sentence: a.recommendation, quote: null };
     case 'YELLOW':
       if (a.drug === 'atomoxetine') {
+        // R17: the FDA label leads; the CPIC text is supporting genotype-based context only.
+        if (a.labelRecommendation) {
+          return { sentence: 'CPIC atomoxetine 2019 poor-metabolizer text (supporting context):', quote: a.recommendation };
+        }
         return { sentence: 'Atomoxetine may build up in this patient. CPIC gives a titration plan:', quote: a.recommendation };
       }
       if (a.drug === 'codeine' || a.drug === 'tramadol') {
@@ -170,27 +214,13 @@ function sentenceFor(a: DrugAssessment): { sentence: string; quote: string | nul
       return { sentence: 'CPIC gives a modified plan:', quote: a.recommendation };
     case 'GREEN':
       return {
-        sentence: `RxGene has no guideline-backed flag for ${a.drug} with this gene result and medication list.`,
-        quote: null,
+        sentence: `RxGene has no guideline-backed PGx flag for ${a.drug} with this gene result.`,
+        quote: a.recommendation || null,
       };
     case 'GREY':
     default: {
-      if (a.adjustedPhenotype === 'not computed') {
-        const inh = a.inhibitor ? capitalize(a.inhibitor.drug) : 'A moderate inhibitor';
-        return {
-          sentence: `${inh} is a moderate ${a.gene} inhibitor. Its effect on ${a.drug} isn't computed.`,
-          quote: null,
-        };
-      }
-      if (a.genotypePhenotype.startsWith('Insufficient')) {
-        return { sentence: `No ${a.gene} result on file, so ${a.drug} can't be checked.`, quote: null };
-      }
-      if (a.genotypePhenotype.startsWith('Indeterminate')) {
-        return { sentence: `No gene result we can read for ${a.drug}.`, quote: null };
-      }
-      if (rec.startsWith('no recommendation')) {
-        return { sentence: 'CPIC gives no recommendation for this gene result.', quote: null };
-      }
+      // R7/R8/R18: the engine's fixed GREY text is shown on the card verbatim.
+      if (a.recommendation) return { sentence: a.recommendation, quote: null };
       return { sentence: `${Drug} can't be checked against this gene result.`, quote: null };
     }
   }
@@ -207,7 +237,7 @@ function notesFor(a: DrugAssessment): string[] {
     notes.push(a.inhibitorNote);
   }
   if (a.confidence === 'reduced') notes.push('Ultrarapid metabolizers may not fully convert (CPIC 2023).');
-  if (a.labelNote) notes.push(a.labelNote);
+  // R28: the label note is its own field on the card (Verdict.labelNote), not a generic note.
   return notes;
 }
 
@@ -227,13 +257,17 @@ export function toVerdict(entry: CardEntry): Verdict {
       assessment: a,
       prefix: a.triggeredBy !== a.drug ? `Adding ${a.triggeredBy} affects a current medication:` : null,
       // On a mismatch the server's own summary is shown, with the warning.
-      headline: mismatch && entry.cdsSummary ? entry.cdsSummary : headlineFor(level, drug),
-      qualifier: level === 'GREEN' && !mismatch ? '(not the same as safe)' : null,
+      headline: mismatch && entry.cdsSummary ? entry.cdsSummary : headlineFor(level, drug, a),
+      qualifier: level === 'GREEN' && !mismatch ? GREEN_SCOPE_TEXT : null,
       sentence,
       quote,
       labelRecommendation: a.labelRecommendation ?? null,
+      cpicRole: a.cpicRole ?? null,
       discrepancyFlag: a.discrepancyFlag ?? null,
+      sourceLinks: parseSourceLinks(a.sourceLinks),
+      population: populationLine(a),
       genotypeRecommendation: a.genotypeRecommendation ?? null,
+      labelNote: a.labelNote ?? null,
       notes: notesFor(a),
       source: sourceLine(a),
       mismatch,
@@ -253,8 +287,12 @@ export function toVerdict(entry: CardEntry): Verdict {
       sentence: 'Returned by the CDS Hooks service only.',
       quote: null,
       labelRecommendation: null,
+      cpicRole: null,
       discrepancyFlag: null,
+      sourceLinks: [],
+      population: null,
       genotypeRecommendation: null,
+      labelNote: null,
       notes: [],
       source: entry.card.source.label ? `CPIC ${entry.card.source.label}` : null,
       mismatch: entry.mismatch,
@@ -273,8 +311,12 @@ export function toVerdict(entry: CardEntry): Verdict {
     sentence: `RxGene has no CPIC guideline for ${drug}.`,
     quote: null,
     labelRecommendation: null,
+    cpicRole: null,
     discrepancyFlag: null,
+    sourceLinks: [],
+    population: null,
     genotypeRecommendation: null,
+    labelNote: null,
     notes: [],
     source: null,
     mismatch: null,

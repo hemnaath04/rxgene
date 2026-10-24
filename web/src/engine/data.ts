@@ -112,13 +112,28 @@ export const drugToPopulation: Record<string, string> = {
 // Curated alert levels (R29, R30). Read the level from data/alert_levels.json for the
 // matched recommendation; never infer it from the recommendation text.
 // codeine/tramadol/clopidogrel are keyed by phenotype; atomoxetine is keyed by activity-score key.
-type CuratedAlertEntry = { alertLevel: string; recommendation_starts?: string; curatedNote?: string };
+export type CuratedAlertEntry = {
+  alertLevel: string;
+  recommendation_starts?: string;
+  curatedNote?: string;
+  /** R44: the entry has no CPIC API row of its own; reuse this activity-score key's text. */
+  useRecommendationKey?: string;
+};
 type CuratedAlertLevels = Record<string, Record<string, Record<string, CuratedAlertEntry>>>;
 
 // The JSON also holds "_note"/"_status"/"_levels" metadata keys; drug lookups by name skip them.
 const alertLevelsTyped = alertLevelsData as unknown as CuratedAlertLevels;
 
 const VALID_ALERTS = new Set<Alert>(['RED', 'YELLOW', 'GREEN', 'GREY']);
+
+/** The raw curated entry (including useRecommendationKey), or null when there is none. */
+export function curatedAlertEntry(drug: string, population: string, key: string): CuratedAlertEntry | null {
+  const byPopulation = alertLevelsTyped[drug.toLowerCase()];
+  if (!byPopulation) return null;
+  const byKey = byPopulation[population.trim()];
+  if (!byKey) return null;
+  return byKey[key] ?? null;
+}
 
 /**
  * Curated alert level for a matched recommendation, or null when there is no entry
@@ -128,11 +143,7 @@ const VALID_ALERTS = new Set<Alert>(['RED', 'YELLOW', 'GREEN', 'GREY']);
  * @param key        phenotype (codeine/tramadol/clopidogrel) or activity-score key (atomoxetine)
  */
 export function curatedAlertLevel(drug: string, population: string, key: string): Alert | null {
-  const byPopulation = alertLevelsTyped[drug.toLowerCase()];
-  if (!byPopulation) return null;
-  const byKey = byPopulation[population.trim()];
-  if (!byKey) return null;
-  const entry = byKey[key];
+  const entry = curatedAlertEntry(drug, population, key);
   if (!entry || !entry.alertLevel) return null;
   return VALID_ALERTS.has(entry.alertLevel as Alert) ? (entry.alertLevel as Alert) : null;
 }

@@ -18,7 +18,8 @@ import {
   recommendationsFetched,
   parseActivityValue,
   isAtLeastKey,
-  curatedAlertLevel
+  curatedAlertLevel,
+  curatedAlertEntry
 } from './data.js';
 import type { Alert, Recommendation } from './types.js';
 
@@ -177,6 +178,48 @@ export function lookupByActivityScore(
   const key = match.activityscore.CYP2D6;
   const { alert, dataError } = resolveAlert(drug, population, key);
 
+  return {
+    recommendation: match.drugrecommendation,
+    strength: match.classification,
+    alert,
+    ...(dataError ? { dataError } : {}),
+    source
+  };
+}
+
+/** R44: alert_levels.json key for CPIC's atomoxetine row '1.0 (*10 allele present)'. */
+export const ATOMOXETINE_STAR10_KEY = '1.0 (*10 present)';
+
+/**
+ * R44: atomoxetine at genotype activity score exactly 1.0 with a *10 allele. The alert level
+ * comes from the curated "1.0 (*10 present)" entry; the CPIC API has no row for it, so the
+ * recommendation text is the row named by that entry's useRecommendationKey ("0.75").
+ * A missing entry, key or row gives GREY plus a data error (R30), never GREEN.
+ */
+export function lookupAtomoxetineStar10(): RecommendationResult {
+  const drug = 'atomoxetine';
+  const source = getGuidelineInfo(drug, fetchedFor(drug));
+  const population = drugToPopulation[drug];
+  const entry = curatedAlertEntry(drug, population, ATOMOXETINE_STAR10_KEY);
+  const recKey = entry?.useRecommendationKey;
+
+  const match = recKey
+    ? getRecommendations(drug).find(
+        r => r.population.trim() === population.trim() && r.activityscore?.CYP2D6 === recKey
+      )
+    : undefined;
+
+  if (!match) {
+    return {
+      recommendation: '',
+      strength: '',
+      alert: 'GREY',
+      dataError: `No atomoxetine recommendation found for "${ATOMOXETINE_STAR10_KEY}" (useRecommendationKey ${recKey ?? 'missing'}).`,
+      source
+    };
+  }
+
+  const { alert, dataError } = resolveAlert(drug, population, ATOMOXETINE_STAR10_KEY);
   return {
     recommendation: match.drugrecommendation,
     strength: match.classification,

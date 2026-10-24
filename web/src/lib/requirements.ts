@@ -2,6 +2,7 @@
 // alert. The engine doesn't emit them, so they are derived here from the assessment's own
 // fields. Display only: nothing here changes a level or a recommendation.
 import inhibitors from '@/data/inhibitors.json';
+import { hasStar10Allele } from '@/engine/activityScore';
 import type { DrugAssessment } from '@/engine/types';
 
 /** Short titles for the evidence sheet. Wording follows requirements.md. */
@@ -21,8 +22,8 @@ export const REQUIREMENT_TITLES: Record<string, string> = {
   R14: 'Adjusted activity score re-mapped to a phenotype',
   R15: 'Codeine uses the inhibitor adjustment rules',
   R16: 'Tramadol uses the inhibitor adjustment rules',
-  R17: 'Atomoxetine + strong inhibitor → poor-metabolizer recommendation',
-  R18: 'Atomoxetine + moderate inhibitor → not computed, pharmacist review',
+  R17: 'Atomoxetine + strong inhibitor → FDA label leads; CPIC poor-metabolizer text as supporting context',
+  R18: 'Atomoxetine + moderate inhibitor → Not assessed (GREY), pharmacist review',
   R19: 'Genotype and adjusted phenotype shown side by side',
   R20: 'Ultrarapid + strong inhibitor → reduced confidence',
   R21: 'Already a poor metabolizer + inhibitor → alert stays, "adds no further effect"',
@@ -42,6 +43,7 @@ export const REQUIREMENT_TITLES: Record<string, string> = {
   R41: 'Computed phenoconversion only for codeine and tramadol (atomoxetine per R17)',
   R42: 'No CYP2C19 phenoconversion',
   R43: 'Steady state: inhibitor onset and washout not modeled',
+  R44: "Atomoxetine at activity score 1.0 with a *10 allele → CPIC '1.0 (*10 allele present)' titration row",
 };
 
 /** Prefix of the engine's "already a poor metabolizer" note (phenoconversion.ts). */
@@ -107,6 +109,17 @@ export function requirementsFor(a: DrugAssessment, meds: string[] = []): string[
       if (drug === 'atomoxetine') ids.add('R26');
     }
     if (drug === 'atomoxetine') ids.add('R40');
+    // R44: atomoxetine at genotype AS exactly 1.0 with a *10 allele (no strong/moderate inhibitor).
+    if (
+      drug === 'atomoxetine' &&
+      a.genotypeActivityScore !== null &&
+      Math.abs(a.genotypeActivityScore - 1) < 1e-9 &&
+      a.inhibitor?.strength !== 'strong' &&
+      a.inhibitor?.strength !== 'moderate' &&
+      hasStar10Allele(a.genotype)
+    ) {
+      ids.add('R44');
+    }
   } else {
     if (a.genotype) ids.add('R27');
     if (a.labelNote) ids.add('R28');

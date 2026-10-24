@@ -1,7 +1,9 @@
 // Fixed clinical strings that do NOT come from data/ (CPIC snapshots or alert_levels.json).
 // Every string here is quoted verbatim from .kiro/specs/rxgene-engine/requirements.md or from
-// tests/fixtures/expected_outputs.json, with its R-number noted. This is the ONE place these
-// strings may live: no other engine/UI file may contain them (they flow through from here).
+// tests/fixtures/expected_outputs.json, with its R-number noted (GREEN_SCOPE_TEXT and
+// ATOMOXETINE_AS1_CONTROVERSY_NOTE are display wording for R31/R44, not quotes). This is the ONE
+// place these strings may live: no other engine/UI file may contain them (they flow through from here).
+// GREY has exactly three fixed texts: R7 (Indeterminate), R8 (Insufficient data), R18 (Not assessed).
 
 /**
  * R7 — GREY, Indeterminate: one or more alleles have no activity value.
@@ -23,11 +25,37 @@ export function insufficientDataText(gene: string = 'CYP2D6'): string {
 export const INSUFFICIENT_DATA_TEXT = insufficientDataText('CYP2D6');
 
 /**
- * R18 / R32 — GREY, Not assessed: a moderate CYP2D6 inhibitor is present for atomoxetine and
- * CPIC states no adjustment, so RxGene does not compute it. Verbatim from requirements.md R18.
+ * R18 / R32 — GREY, Not assessed: atomoxetine with a moderate CYP2D6 inhibitor (and no strong
+ * one). RxGene has no validated adjustment, so nothing is computed. Verbatim template from
+ * requirements.md R18 / fixture P16, with {Inhibitor} = the moderate inhibitor's name, capitalized.
  */
-export const ATOMOXETINE_MODERATE_NOT_ASSESSED_TEXT =
-  'Not assessed: a moderate CYP2D6 inhibitor is present and CPIC states no adjustment for atomoxetine, so RxGene does not compute this. Pharmacist review needed.';
+export function atomoxetineModerateNotAssessedText(inhibitorDrug: string): string {
+  const inhibitor = inhibitorDrug.charAt(0).toUpperCase() + inhibitorDrug.slice(1);
+  return `Not assessed: ${inhibitor} is a moderate CYP2D6 inhibitor. RxGene does not have a validated phenoconversion adjustment for atomoxetine with moderate inhibitors. The genotype-based result remains available, but the medication-adjusted phenotype has not been determined. Pharmacist review recommended.`;
+}
+
+// ---- R31: GREEN ----
+
+/** R31/R33 — the fixed GREEN text. Never reword it or reuse its last word elsewhere. */
+export const GREEN_ALERT_TEXT = 'No supported PGx alert (not the same as safe)';
+
+/** R31 — GREEN is the genotype result only, never an overall medication clearance. */
+export const GREEN_SCOPE_TEXT = 'Genotype result only. This is not an overall medication clearance.';
+
+// ---- R28: omeprazole + clopidogrel (label-level, not a computed phenoconversion) ----
+
+/** R28 — verbatim from requirements.md R28 / fixture P19 extra_flag. */
+export const OMEPRAZOLE_CLOPIDOGREL_LABEL_NOTE =
+  'Label interaction: FDA PLAVIX label advises avoiding concomitant use of omeprazole or esomeprazole. Shown separately from the genotype result.';
+
+// ---- R44: atomoxetine at activity score 1.0 ----
+
+/**
+ * R44 — CPIC's "controversy remains" note for activity score 1.0, kept visible in the evidence
+ * drawer. Wording from the alert_levels.json curatedNote for "1.0 (*10 present)".
+ */
+export const ATOMOXETINE_AS1_CONTROVERSY_NOTE =
+  "CPIC atomoxetine 2019 rates the activity score 1.0 recommendation Moderate (controversy remains). The row depends on the *10 allele: '1.0 (*10 allele present)' uses the titration text; '1.0 (*10 allele not present)' uses the standard text.";
 
 // ---- R17: atomoxetine + strong CYP2D6 inhibitor (FDA label-based handling) ----
 

@@ -1,10 +1,11 @@
-// Fixtures test - all 22 synthetic test cases
+// Fixtures test - all 25 synthetic test cases
 // Compares engine output against expected_outputs.json
 
 import { describe, it, expect } from 'vitest';
 import { checkOrder } from './checkOrder';
 import { toCdsCard, GREEN_ALERT_TEXT } from './cdsCard';
 import type { Patient } from './types';
+import { requirementsFor } from '../lib/requirements';
 import expectedOutputs from '../../../tests/fixtures/expected_outputs.json';
 
 describe('RxGene Engine - Fixture Tests', () => {
@@ -41,8 +42,9 @@ describe('RxGene Engine - Fixture Tests', () => {
       // Test 4: CPIC recommendation (exact match)
       expect(assessment.recommendation).toBe(fixture.cpic_recommendation);
 
-      // New curated fields (exact match when the fixture provides them).
-      const fx = fixture as unknown as Record<string, string | undefined>;
+      // Optional curated columns: exact match whenever the fixture provides them.
+      const fx = fixture as unknown as Record<string, string | number | undefined>;
+      const meds = [...patient.meds, fixture.new_drug];
       if (fx.genotype_recommendation) {
         expect(assessment.genotypeRecommendation).toBe(fx.genotype_recommendation);
       }
@@ -55,11 +57,29 @@ describe('RxGene Engine - Fixture Tests', () => {
       if (fx.cpic_role) {
         expect(assessment.cpicRole).toBe(fx.cpic_role);
       }
+      if (fx.source_links) {
+        expect(assessment.sourceLinks).toBe(fx.source_links);
+      }
+      if (fx.triggered_by) {
+        expect(assessment.triggeredBy).toBe(fx.triggered_by);
+      }
+      if (typeof fx.tests_requirement === 'string' && fx.tests_requirement) {
+        // R39: every requirement ID the fixture names must be among the alert's triggering IDs.
+        const named = fx.tests_requirement.match(/\bR\d+\b/g) ?? [];
+        expect(named.length).toBeGreaterThan(0);
+        expect(requirementsFor(assessment, meds)).toEqual(expect.arrayContaining(named));
+      }
+      // R28 (P19): the label note is the exact fixed text.
+      if (fx.extra_flag) {
+        expect(assessment.labelNote).toBe(fx.extra_flag);
+      }
 
-      // R30/R32/R33: a GREY alert must never reuse the GREEN disclaimer wording.
+      // R30/R32/R33: a GREY alert must never reuse any GREEN wording, and R18 must never claim
+      // that CPIC states no adjustment.
       if (assessment.alert === 'GREY') {
         expect(assessment.recommendation).not.toBe(GREEN_ALERT_TEXT);
-        expect(assessment.recommendation).not.toContain('No supported PGx alert can be given');
+        expect(assessment.recommendation).not.toContain('No supported PGx alert');
+        expect(assessment.recommendation).not.toContain('CPIC states no adjustment');
       }
 
       // Test 5: Confidence
@@ -100,8 +120,20 @@ describe('RxGene Engine - Fixture Tests', () => {
         expect(assessment.adjustedActivityScore).toBeCloseTo(expectedAdjustedAS, 2);
       }
 
-      // R17: the label-based atomoxetine case reports a null adjusted score ("n/a").
-      if (typeof fixture.adjusted_AS === 'string' && fixture.adjusted_AS.startsWith('n/a (label-based')) {
+      // R17 (P13): a non-numeric adjusted_AS such as "n/a (label-based, no score computed)" is
+      // compared as a string against the engine's display label; no score is computed (null).
+      if (
+        typeof fixture.adjusted_AS === 'string' &&
+        fixture.adjusted_AS !== '' &&
+        fixture.adjusted_AS !== 'not computed' &&
+        Number.isNaN(parseFloat(fixture.adjusted_AS))
+      ) {
+        expect(assessment.adjustedActivityScoreLabel).toBe(fixture.adjusted_AS);
+        expect(assessment.adjustedActivityScore).toBeNull();
+      }
+
+      // R18 (P16): "not computed" means no adjusted score at all.
+      if (fixture.adjusted_AS === 'not computed') {
         expect(assessment.adjustedActivityScore).toBeNull();
       }
 

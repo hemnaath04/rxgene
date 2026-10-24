@@ -160,6 +160,8 @@ export function buildMessages(a: DrugAssessment, lang: SummaryLang): ChatMessage
     'Use plain words: the liver has a "cleanup crew" for medicines; say how fast it clears this drug (Slow, Reduced, Normal, Fast).',
     'Name the drug. Keep the action: for alert RED, say the drug should be avoided or is not recommended; for YELLOW, describe the dosing plan and never say avoid; for GREY, say it was not assessed and a pharmacist should review it.',
     `Never call any drug or result safe. For GREEN, say there is no supported alert and that this is "${NOT_SAME_AS_SAFE[lang]}".`,
+    'Do not use the words genotype, phenotype or metabolizer, and do not name the gene (for example CYP2D6 or CYP2C19); say "gene result" and use the cleanup-crew wording instead.',
+    'Do not mention alert colors (for example "red alert").',
     'Mention no drug and no number that is not in the input.',
     'Keep every dose and time from the recommendation exactly.',
     'Plain text only, no Markdown.',
@@ -249,6 +251,13 @@ const GREY_ACTION: Record<SummaryLang, RegExp> = {
 };
 const SAFE_WORD = /\bsafe(ly|ty)?\b|\bsegur(o|a|os|as|idad)\b/;
 
+/**
+ * Brief 05: the patient text must not use genotype / phenotype / metabolizer or a gene name
+ * (EN and ES forms; checked on normalized, lowercased text).
+ */
+const TECHNICAL_TERM =
+  /\bgenotyp|\bphenotyp|\bmetaboli[sz]er|\bgenotip|\bfenotip|\bmetabolizador|\bcyp\s?2\s?[cd]\s?\d+/;
+
 const NUMBER = /\d+(?:[.,]\d+)?/g;
 
 function numbersIn(s: string): number[] {
@@ -267,7 +276,8 @@ export type ValidationResult = { ok: true } | { ok: false; reason: string };
 /**
  * R35: the text names the drug, keeps the alert action, names no drug and no number that
  * is not in the input, and is 90 words or fewer. R33: no "safe"/"seguro" except in
- * "not the same as safe" / "no es lo mismo que seguro".
+ * "not the same as safe" / "no es lo mismo que seguro". Brief 05: no genotype / phenotype /
+ * metabolizer and no gene name.
  */
 export function validate(text: string, assessment: DrugAssessment, lang: SummaryLang): ValidationResult {
   const t = normalize(text);
@@ -276,6 +286,9 @@ export function validate(text: string, assessment: DrugAssessment, lang: Summary
   const words = text.trim().split(/\s+/).filter(Boolean);
   if (words.length === 0) return { ok: false, reason: 'empty' };
   if (words.length > MAX_WORDS) return { ok: false, reason: 'too long' };
+
+  // No technical terms (brief 05): genotype, phenotype, metabolizer, CYP2D6, CYP2C19.
+  if (TECHNICAL_TERM.test(t)) return { ok: false, reason: 'technical term' };
 
   // Drug name (EN, or its ES name)
   const drug = normalize(assessment.drug);

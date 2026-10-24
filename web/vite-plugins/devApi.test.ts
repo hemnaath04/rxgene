@@ -4,6 +4,7 @@ import { matchApiRoute } from './devApi.ts';
 describe('devApi matchApiRoute', () => {
   it('handles the real API routes, applying the /cds-services rewrite', () => {
     expect(matchApiRoute('/api/summary')).toBe('/api/summary');
+    expect(matchApiRoute('/api/consult')).toBe('/api/consult');
     expect(matchApiRoute('/api/cds-services')).toBe('/api/cds-services');
     expect(matchApiRoute('/api/cds-services/rxgene-order-select')).toBe('/api/cds-services/rxgene-order-select');
     expect(matchApiRoute('/cds-services')).toBe('/api/cds-services');

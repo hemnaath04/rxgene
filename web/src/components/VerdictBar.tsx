@@ -12,6 +12,7 @@ type VerdictBarProps = {
   onMore: () => void;
   onExplain: () => void;
   explainDisabled: boolean;
+  onReviewMeds: () => void;
 };
 
 /** Longest note line the slim bar shows; anything longer is truncated and lives in full in the sheet. */
@@ -37,7 +38,7 @@ function shortNote(v: Verdict): string | null {
  * the via badge and the two actions. Everything longer moves into the Evidence sheet, which the
  * "Inspect evidence" button opens.
  */
-export function VerdictBar({ verdict: v, moreCount, onInspect, onMore, onExplain, explainDisabled }: VerdictBarProps) {
+export function VerdictBar({ verdict: v, moreCount, onInspect, onMore, onExplain, explainDisabled, onReviewMeds }: VerdictBarProps) {
   const note = shortNote(v);
   return (
     <section
@@ -99,6 +100,14 @@ export function VerdictBar({ verdict: v, moreCount, onInspect, onMore, onExplain
             disabled={explainDisabled}
           >
             Patient explanation
+            <ArrowRight aria-hidden="true" className="size-5" strokeWidth={2} />
+          </Button>
+          <Button
+            variant="ghost"
+            className="press h-9 pr-1.5! pl-2! text-base font-semibold text-white underline underline-offset-4 hover:bg-white/10 hover:text-white"
+            onClick={onReviewMeds}
+          >
+            Review full medication list
             <ArrowRight aria-hidden="true" className="size-5" strokeWidth={2} />
           </Button>
         </div>

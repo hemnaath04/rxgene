@@ -34,6 +34,23 @@ export function atomoxetineModerateNotAssessedText(inhibitorDrug: string): strin
   return `Not assessed: ${inhibitor} is a moderate CYP2D6 inhibitor. RxGene does not have a validated phenoconversion adjustment for atomoxetine with moderate inhibitors. The genotype-based result remains available, but the medication-adjusted phenotype has not been determined. Pharmacist review recommended.`;
 }
 
+/**
+ * R55 (inhibitor-only drugs) — GREY, Not assessed: a drug on the medication list that is a
+ * CYP2D6 inhibitor but not a PGx substrate (no gene mapping in drugToGene). No independent
+ * pharmacogenomic check is done for these medications.
+ */
+export function inhibitorOnlyNotAssessedText(drug: string, inhibitorClass: string): string {
+  const drugName = drug.charAt(0).toUpperCase() + drug.slice(1);
+  return `${drugName} is a CYP2D6 inhibitor (${inhibitorClass} class, FDA). No independent pharmacogenomic assessment for this medication.`;
+}
+
+/**
+ * R55 (inhibitor-only drugs) — Inhibitor note explaining the drug affects other CYP2D6-metabolized drugs.
+ */
+export function inhibitorOnlyNote(inhibitorClass: string): string {
+  return `This medication is a ${inhibitorClass} CYP2D6 inhibitor and may affect other drugs metabolized by CYP2D6.`;
+}
+
 // ---- R31: GREEN ----
 
 /** R31/R33 — the fixed GREEN text. Never reword it or reuse its last word elsewhere. */

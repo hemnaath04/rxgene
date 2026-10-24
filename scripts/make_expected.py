@@ -1,4 +1,4 @@
-import json, csv, urllib.request, sys
+import json, csv, pathlib, sys
 API="https://api.cpicpgx.org/v1"
 import subprocess
 def get(q): return json.loads(subprocess.run(["curl","-s",API+q],capture_output=True,text=True).stdout)
@@ -13,7 +13,8 @@ def recs(drug,pop):
     return out
 R={'codeine':recs('codeine','general'),'tramadol':recs('tramadol','general'),
    'atomoxetine':recs('atomoxetine','adults'),'clopidogrel':recs('clopidogrel','CVI ACS PCI ')}
-STRONG={'fluoxetine','paroxetine','bupropion'}; MODERATE={'duloxetine'}
+_INH=json.loads((pathlib.Path(__file__).resolve().parent.parent/'data'/'inhibitors.json').read_text())['CYP2D6']
+STRONG=set(_INH['strong']); MODERATE=set(_INH['moderate']); WEAK=set(_INH['weak'])
 def allele_as(a):
     if 'x' in a:
         base,n=a.split('x'); return AV[base]*int(n)
@@ -57,7 +58,7 @@ cases=[
  ('P09','*1/*10',None,[],'tramadol','Threshold edge: AS 1.25 is NM'),
  ('P10','*4/*10',None,[],'tramadol','IM (AS 0.25)'),
  ('P11','*1/*1',None,['bupropion'],'tramadol','Non-SSRI strong inhibitor'),
- ('P12','*1/*1',None,['fluoxetine (stopped 4 weeks ago)'],'tramadol','Fluoxetine phenoconversion can last 2-3 months after stopping (CPIC atomoxetine 2019): treat as active'),
+ ('P12','*1/*1',None,['codeine'],'fluoxetine','Reverse case: adding the inhibitor re-alerts the codeine already on the list'),
  ('P13','*1/*1',None,['fluoxetine'],'atomoxetine','Demo case 2: drug builds up. Use PM-equivalent rec; cite atomoxetine label + CPIC atomoxetine narrative'),
  ('P14','*4/*4',None,[],'atomoxetine','PM by genotype: slower titration'),
  ('P15','*1/*4',None,[],'atomoxetine','Trap: phenotype label IM but CPIC atomoxetine rec for AS 1.0 = standard titration. Key atomoxetine rules on AS'),
@@ -67,10 +68,14 @@ cases=[
  ('P19',None,'*1/*17',['omeprazole'],'clopidogrel','RM = standard dose; omeprazole is a label-level interaction (Layer 2), NOT a computed phenoconversion'),
  ('P20','*1/*999',None,[],'codeine','Unsupported allele -> Indeterminate / not assessed'),
  ('P21',None,None,[],'codeine','No CYP2D6 result -> insufficient data'),
+ ('P22','*1/*1',None,['sertraline'],'codeine','Weak inhibitor (FDA): no activity-score adjustment'),
 ]
 rows=[]
 for pid,dip6,dip19,meds,drug,note in cases:
-    r=dict(id=pid,cyp2d6=dip6 or '',cyp2c19=dip19 or '',current_meds=';'.join(meds),new_drug=drug,population='adult' if drug!='clopidogrel' else 'ACS/PCI')
+    added=drug; orig_meds=list(meds)
+    if drug in STRONG|MODERATE and any(m in R for m in meds):
+        target=next(m for m in meds if m in R); meds=[m for m in meds if m!=target]+[drug]; drug=target
+    r=dict(id=pid,cyp2d6=dip6 or '',cyp2c19=dip19 or '',current_meds=';'.join(orig_meds),new_drug=added,alerted_drug=drug,population='adult' if drug!='clopidogrel' else 'ACS/PCI')
     if drug=='clopidogrel':
         f=[C19[a] for a in dip19.split('/')]
         p=C19P.get(tuple(f)) or C19P.get(tuple(f[::-1]))
@@ -95,9 +100,12 @@ for pid,dip6,dip19,meds,drug,note in cases:
                 ph,txt,cls=lookup_as(drug,adj)
                 src='CPIC opioids 2021 (phenoconversion rule stated in guideline)' if drug in('codeine','tramadol') else 'CPIC atomoxetine 2019 recs by AS; inhibitor handling per FDA label + CPIC atomoxetine narrative'
                 r.update(adjusted_AS=adj,adjusted_phenotype=pheno(adj),phenoconverted='yes' if pheno(adj)!=p else 'no',alert=level(txt),cpic_recommendation=txt,cpic_strength=cls,source=src)
-    r['note']=note; r.setdefault('extra_flag','')
+                if strength=='strong' and p=='Ultrarapid Metabolizer': r['confidence']='reduced (UMs may not fully phenoconvert, CPIC 2023)'
+                if inh and s==0: r['inhibitor_note']=f"{inh.split(' ')[0]} adds no further effect: already a poor metabolizer by genotype. The drug-level alert still applies."
+                if not strength and any(m in WEAK for m in meds): r['inhibitor_note']='Weak CYP2D6 inhibitor present: no activity-score adjustment (CPIC adjusts strong and moderate only).'
+    r['note']=note; r.setdefault('extra_flag',''); r.setdefault('confidence','standard'); r.setdefault('inhibitor_note','')
     rows.append(r)
-cols=list(rows[0].keys()); cols=[c for c in cols if c not in('note','extra_flag')]+['extra_flag','note']
+cols=list(dict.fromkeys(k for r in rows for k in r)); cols=[c for c in cols if c not in('note','extra_flag')]+['extra_flag','note']
 out=sys.argv[1]
 with open(out+'.csv','w',newline='') as f:
     w=csv.DictWriter(f,fieldnames=cols); w.writeheader(); w.writerows(rows)

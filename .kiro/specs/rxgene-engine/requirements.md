@@ -51,7 +51,7 @@ are deterministic rules that the AI component never modifies.
 
 **R18:** WHEN computing phenoconversion for atomoxetine AND a moderate CYP2D6 inhibitor is present (excluding atomoxetine itself) AND no strong inhibitor is present, THE SYSTEM SHALL assign the status "not computed" AND SHALL issue a GREY-level alert with the text "pharmacist review" AND SHALL NOT compute an adjusted activity score.
 
-**R19:** WHEN phenoconversion has been applied, THE SYSTEM SHALL display both the genotype phenotype and the adjusted phenotype side by side in the alert details.
+**R19:** WHEN assessing any CYP2D6 drug, THE SYSTEM SHALL ALWAYS emit both the genotype phenotype and the adjusted (converted) phenotype AND SHALL ALWAYS display them side by side in the alert details, even when no phenoconversion occurred (for example a patient who is already a poor metabolizer by genotype, or a patient with no inhibitor present); WHEN no inhibitor is present, the adjusted phenotype SHALL equal the genotype phenotype.
 
 ---
 

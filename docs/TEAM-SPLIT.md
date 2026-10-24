@@ -135,3 +135,8 @@ checklist ticked.
 - **Ananya:** `ananya-04-pbt-mcp-trademarks.md`: trademark cleanup, property-based tests in the **Kiro IDE**, one real MCP use.
 - **Claude:** KIRO.md, the submission text, README run instructions.
 
+## 3:35 PM: agent shipped, but it always falls back to the template
+
+- Brief 12 landed (88/88 tests). Live, the final note call times out (8 s limit vs 9.8 s needed) and is truncated (1,200 vs 1,238 tokens).
+- **Mithuna's order is now: 16 (agent fix, FIRST) → 13 → 14 → 15.**
+

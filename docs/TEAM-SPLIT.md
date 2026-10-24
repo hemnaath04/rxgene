@@ -119,3 +119,9 @@ checklist ticked.
 - **Mithuna:** brief 14 (`.kiroignore`, a PreToolUse guard on clinical data, a Stop hook that runs the tests). Order: 13 → 14 → 12.
 - **Ananya:** `ananya-03-analyze-and-agent-spec.md` (Analyze Requirements on R1–R56, plus the consult-agent design.md and tasks.md), by 3:45.
 
+## Added at 3:10 PM: openFDA (organizers' data portal)
+
+- Claude saved openFDA FAERS counts for 10 demo drug pairs to `data/openfda/pair_reports.json`.
+- **Mithuna:** brief 15 (Evidence-sheet panel) runs only if brief 12 is done before 5:00. Order: 13 → 14 → 12 → (15).
+- **Pitch / SundAI card:** challenge **H4** ("hard to translate"). We use the portal's FHIR guidance (standard shapes, not private JSON) and its openFDA API.
+

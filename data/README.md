@@ -8,6 +8,7 @@ Everything the rule engine reads. No patient data here is real.
 | `cpic/recommendations/*.json` | CPIC recommendation text per drug, by phenotype or activity score | same script |
 | `cpic/guidelines.json` | Guideline names and URLs for citations | same script |
 | `inhibitors.json` | CYP2D6 inhibitor strength (strong/moderate) | hand-curated; verify against FDA table |
+| `openfda/pair_reports.json` | openFDA FAERS report counts for demo drug pairs (context only; the engine never reads it) | `python3 scripts/fetch_openfda.py` |
 | `synthetic-reports/` | Fake lab reports for the upload/extraction demo | hand-written |
 
 Each snapshot file records its `source` query and `fetched` date. Show the date in the

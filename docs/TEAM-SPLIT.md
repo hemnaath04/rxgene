@@ -150,3 +150,8 @@ checklist ticked.
 - [ ] **Rotate the Manifest API key.** It was pasted in chat and read by Kiro before the secrets guard existed. Update `LLM_API_KEY` in Vercel (Production + Preview) and in every teammate's `web/.env`.
 - [ ] Rotate the X API keys (pasted in chat on Oct 23).
 
+## 4:00 PM: agent nearly live
+
+- Brief 16 verified live: the agent completes in ~15 s, but its citations fail R47 (the model can't copy opaque tool_call ids). Brief 18 adds short T-labels.
+- **Mithuna's order: 17 (R21 fixes) → 18 (citation labels) → 13 → 15.**
+

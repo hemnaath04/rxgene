@@ -79,6 +79,7 @@ cases=[
  ('P23','*10/*10',None,[],'atomoxetine','Discriminates the *10 value: current 0.25 gives AS 0.5 (titration row, YELLOW); the old 0.5 would give AS 1.0 (standard-titration row, GREEN). Phenotype label is IM either way'),
  ('P24','*1x2/*10',None,[],'codeine','Upper boundary: AS exactly 2.25 (2.0 + 0.25) is NM because the range is inclusive, not UM. Pairs with P09 (1.25, lower boundary)'),
  ('P25','*10x2/*17',None,[],'atomoxetine','CPIC adult table: AS 1.0 with a *10 allele present (*10x2 + *17 = 0.5 + 0.5) uses the titration row, not the standard 1.0 row. Contrast P15 (*1/*4, *10 not present)'),
+ ('P26','*4/*4',None,['duloxetine'],'atomoxetine','R18/R21 precedence: a genotype poor metabolizer on atomoxetine plus a moderate inhibitor keeps the poor-metabolizer alert (YELLOW) with the adds-no-further-effect note; R18 Not assessed applies only when the genotype is not already PM'),
 ]
 rows=[]
 for pid,dip6,dip19,meds,drug,note in cases:
@@ -91,7 +92,7 @@ for pid,dip6,dip19,meds,drug,note in cases:
         p=C19P.get(tuple(f)) or C19P.get(tuple(f[::-1]))
         ph,txt,cls=R['clopidogrel'][p]
         r.update(genotype_AS='n/a (CYP2C19 has no activity score)',genotype_phenotype=p,inhibitor='',adjusted_AS='',adjusted_phenotype=p,phenoconverted='no',alert=alert_for('clopidogrel','CVI ACS PCI ',p),cpic_recommendation=txt,cpic_strength=cls,source='CPIC clopidogrel 2022 (ACS/PCI)')
-        if 'omeprazole' in meds: r['extra_flag']='Label interaction: FDA PLAVIX label advises avoiding concomitant use of omeprazole or esomeprazole. Shown separately from the genotype result.'
+        if 'omeprazole' in meds: r['extra_flag']='Label interaction: FDA clopidogrel label advises avoiding concomitant use of omeprazole or esomeprazole. Shown separately from the genotype result.'
     else:
         s,p=d6(dip6)
         inh=next((m for m in meds if m.split(' ')[0] in STRONG|MODERATE),'')
@@ -103,9 +104,9 @@ for pid,dip6,dip19,meds,drug,note in cases:
             adj=s
             if strength=='strong': adj=0.0
             elif strength=='moderate': adj=s*0.5
-            if drug=='atomoxetine' and strength=='moderate':
+            if drug=='atomoxetine' and strength=='moderate' and s!=0:  # R18 applies only when the genotype is not already PM; a genotype PM follows R21 below
                 r.update(adjusted_AS='not computed',adjusted_phenotype='not computed',phenoconverted='unknown',alert='GREY',
-                    cpic_recommendation=GREY_TEXT['Not assessed'].format(inhibitor=inh.split(' ')[0].capitalize()),cpic_strength='',source='CPIC atomoxetine guideline 2019 and FDA STRATTERA label reviewed; no specific moderate CYP2D6 inhibitor adjustment identified in the sections checked (2026-10-24). Supplementary material not reviewed.')
+                    cpic_recommendation=GREY_TEXT['Not assessed'].format(inhibitor=inh.split(' ')[0].capitalize()),cpic_strength='',source='CPIC atomoxetine guideline 2019 and FDA atomoxetine label reviewed; no specific moderate CYP2D6 inhibitor adjustment identified in the sections checked (2026-10-24). Supplementary material not reviewed.')
             else:
                 if drug in('codeine','tramadol'):
                     ph,txt,cls=lookup_pheno(drug,pheno(adj)); akey=pheno(adj); pop='general'
@@ -125,15 +126,15 @@ for pid,dip6,dip19,meds,drug,note in cases:
                         r['genotype_recommendation']=lookup_pheno(drug,p)[1]
                         r['inhibitor_note']=f"Caveat: CPIC 2023 notes ultrarapid metabolizers may not phenoconvert with {inh.split(' ')[0]}. Both recommendations are shown (converted and genotype); both say avoid {drug}."
                 if drug=='atomoxetine' and strength=='strong':
-                    # Label-based handling, not the opioid x0 rule: FDA STRATTERA label section 2.5 treats a strong CYP2D6 inhibitor like a poor metabolizer (4-week titration interval).
+                    # Label-based handling, not the opioid x0 rule: FDA atomoxetine label section 2.5 treats a strong CYP2D6 inhibitor like a poor metabolizer (4-week titration interval).
                     r.update(adjusted_AS='n/a (label-based, no score computed)',adjusted_phenotype='Poor-metabolizer-equivalent dosing (FDA label)',phenoconverted='yes' if p!='Poor Metabolizer' else 'no',
-                             source='FDA STRATTERA label section 2.5 (strong CYP2D6 inhibitor handled like a poor metabolizer); CPIC atomoxetine 2019 poor-metabolizer text')
+                             source='FDA atomoxetine label section 2.5 (strong CYP2D6 inhibitor handled like a poor metabolizer); CPIC atomoxetine 2019 poor-metabolizer text')
                     # Lead with the FDA label (it directly addresses strong-inhibitor coadministration); CPIC 2019 PM text is supporting genotype-based context only.
-                    r['label_recommendation']='FDA STRATTERA label, section 2.5 (adult, concomitant strong CYP2D6 inhibitor): "a longer titration interval of 4 weeks is recommended", "if ADHD symptoms fail to improve and the initial STRATTERA dosage is well tolerated". Starting, target and maximum dosages are the same as the label\'s standard adult table (40 mg/day start, 80 mg/day target, 100 mg/day maximum).'
+                    r['label_recommendation']='FDA atomoxetine label, section 2.5 (adult, concomitant strong CYP2D6 inhibitor): "a longer titration interval of 4 weeks is recommended", "if ADHD symptoms fail to improve and the initial [atomoxetine] dosage is well tolerated". Starting, target and maximum dosages are the same as the label\'s standard adult table (40 mg/day start, 80 mg/day target, 100 mg/day maximum).'
                     r['cpic_role']='Supporting genotype-based context only (CPIC 2019 poor-metabolizer guidance); not an equally applicable dosing instruction for inhibitor-induced phenoconversion.'
                     r['discrepancy_flag']='Different guidance contexts: FDA labeling directly addresses strong CYP2D6 inhibitor coadministration and recommends a 4-week titration interval. CPIC 2019 provides genotype-based poor-metabolizer guidance with a 2-week response assessment. These recommendations should not be treated as interchangeable.'
-                    r['source_links']='FDA STRATTERA label, DailyMed set id 309de576-c318-404a-bc15-660c2b1876fb, version 69 (2026-07-23): https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=309de576-c318-404a-bc15-660c2b1876fb | CPIC atomoxetine guideline 2019 (Brown et al.): https://pmc.ncbi.nlm.nih.gov/articles/PMC6612570/'
-                if inh and s==0 and drug!='atomoxetine': r['inhibitor_note']=f"{inh.split(' ')[0]} adds no further effect: already a poor metabolizer by genotype. The drug-level alert still applies."
+                    r['source_links']='FDA atomoxetine label, DailyMed set id 309de576-c318-404a-bc15-660c2b1876fb, version 69 (2026-07-23): https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=309de576-c318-404a-bc15-660c2b1876fb | CPIC atomoxetine guideline 2019 (Brown et al.): https://pmc.ncbi.nlm.nih.gov/articles/PMC6612570/'
+                if inh and s==0 and not (drug=='atomoxetine' and strength=='strong'): r['inhibitor_note']=f"{inh.split(' ')[0]} adds no further effect: already a poor metabolizer by genotype. The drug-level alert still applies."
                 if not strength and any(m in WEAK for m in meds): r['inhibitor_note']='Weak CYP2D6 inhibitor present: no activity-score adjustment (CPIC adjusts strong and moderate only).'
     if drug in ('codeine','tramadol') and not orig_meds and r.get('genotype_AS')!='':
         # Genotype-only case (no medications, so no inhibitor): cite the phenotype recommendation, not the phenoconversion rule.
@@ -141,6 +142,7 @@ for pid,dip6,dip19,meds,drug,note in cases:
     if pid=='P15': r['source']="CPIC atomoxetine guideline 2019, adult-dose table, row '1.0 (*10 allele not present)' (adults)."
     if pid=='P22': r['source']='CPIC opioid guideline 2021, CYP2D6 normal-metabolizer codeine recommendation; FDA CYP2D6 inhibitor classification (sertraline: weak, no modeled adjustment).'
     if pid=='P23': r['source']='CPIC atomoxetine guideline 2019, adult-dose table, CYP2D6 intermediate-metabolizer row (activity score 0.5) (adults).'
+    if pid=='P26': r['source']='CPIC atomoxetine guideline 2019, CYP2D6 poor-metabolizer atomoxetine recommendation (adults); the genotype is already a poor metabolizer, so the moderate inhibitor adds no further effect (R21).'
     if pid=='P25': r['source']="CPIC atomoxetine guideline 2019, adult-dose table, row '1.0 (*10 allele present)' (adults)."
     if pid=='P14': r['source']='CPIC atomoxetine guideline 2019, CYP2D6 poor-metabolizer atomoxetine recommendation (adults).'  # no inhibitor on this row
     if pid=='P11': r['source']='CPIC opioid guideline 2021, CYP2D6 strong-inhibitor phenoconversion convention and tramadol poor-metabolizer recommendation; FDA CYP2D6 inhibitor classification.'

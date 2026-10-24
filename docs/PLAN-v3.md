@@ -209,7 +209,7 @@ Technical terms live in the evidence drawer.
 ### 30-second version (walk-up judges)
 
 1. "Sarah's DNA test says she processes painkillers normally."
-2. "She's on Prozac, which jams her liver's cleanup crew, so her body now acts 'slow.'"
+2. "She's on fluoxetine (an antidepressant), which jams her liver's cleanup crew, so her body now acts 'slow.'"
 3. "Her doctor adds codeine. Her genetic report says fine. The interaction checker gives a vague warning."
 4. "RxGene says codeine likely won't relieve her pain, and points to the guideline."
 5. "Your genes don't change. Your prescriptions do."
@@ -217,7 +217,7 @@ Technical terms live in the evidence drawer.
 ### 60–90 second demo script (video and tonight's judging)
 
 1. **0–10 s, hook:** Sarah's story in one sentence. No gene names.
-2. **10–20 s:** Open Sarah's chart. Gene result: Normal. Current medications include fluoxetine (Prozac).
+2. **10–20 s:** Open Sarah's chart. Gene result: Normal. Current medications include fluoxetine (an antidepressant).
 3. **20–40 s:** Click "Add medication," choose codeine. The gauge slides from Normal to Slow. Alert: "Codeine likely won't relieve pain for this patient; consider an alternative."
 4. **40–50 s:** Show the comparison: the genetic report alone says green, the interaction checker alone says vague. Only RxGene combines both.
 5. **50–60 s:** Open the evidence drawer: guideline, version, link. Flash the Kiro spec line behind the alert.

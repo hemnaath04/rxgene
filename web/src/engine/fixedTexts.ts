@@ -63,7 +63,7 @@ export const GREEN_SCOPE_TEXT = 'Genotype result only. This is not an overall me
 
 /** R28 — verbatim from requirements.md R28 / fixture P19 extra_flag. */
 export const OMEPRAZOLE_CLOPIDOGREL_LABEL_NOTE =
-  'Label interaction: FDA PLAVIX label advises avoiding concomitant use of omeprazole or esomeprazole. Shown separately from the genotype result.';
+  'Label interaction: FDA clopidogrel label advises avoiding concomitant use of omeprazole or esomeprazole. Shown separately from the genotype result.';
 
 // ---- R44: atomoxetine at activity score 1.0 ----
 
@@ -86,11 +86,11 @@ export const ATOMOXETINE_LABEL_ADJUSTED_PHENOTYPE = 'Poor-metabolizer-equivalent
 export const ATOMOXETINE_LABEL_ADJUSTED_AS = 'n/a (label-based, no score computed)';
 
 /**
- * R17 — the FDA STRATTERA label (section 2.5) recommendation, shown FIRST on the card.
+ * R17 — the FDA atomoxetine label (section 2.5) recommendation, shown FIRST on the card.
  * Verbatim from fixture P13 label_recommendation.
  */
 export const ATOMOXETINE_LABEL_RECOMMENDATION =
-  'FDA STRATTERA label, section 2.5 (adult, concomitant strong CYP2D6 inhibitor): "a longer titration interval of 4 weeks is recommended", "if ADHD symptoms fail to improve and the initial STRATTERA dosage is well tolerated". Starting, target and maximum dosages are the same as the label\'s standard adult table (40 mg/day start, 80 mg/day target, 100 mg/day maximum).';
+  'FDA atomoxetine label, section 2.5 (adult, concomitant strong CYP2D6 inhibitor): "a longer titration interval of 4 weeks is recommended", "if ADHD symptoms fail to improve and the initial [atomoxetine] dosage is well tolerated". Starting, target and maximum dosages are the same as the label\'s standard adult table (40 mg/day start, 80 mg/day target, 100 mg/day maximum).';
 
 /**
  * R17 — the role of the CPIC 2019 poor-metabolizer text: supporting genotype-based context only,
@@ -106,9 +106,9 @@ export const ATOMOXETINE_CPIC_ROLE =
 export const ATOMOXETINE_DISCREPANCY_FLAG =
   'Different guidance contexts: FDA labeling directly addresses strong CYP2D6 inhibitor coadministration and recommends a 4-week titration interval. CPIC 2019 provides genotype-based poor-metabolizer guidance with a 2-week response assessment. These recommendations should not be treated as interchangeable.';
 
-/** R17 — source links (FDA STRATTERA label + CPIC atomoxetine 2019). Verbatim from fixture P13 source_links. */
+/** R17 — source links (FDA atomoxetine label + CPIC atomoxetine 2019). Verbatim from fixture P13 source_links. */
 export const ATOMOXETINE_SOURCE_LINKS =
-  'FDA STRATTERA label, DailyMed set id 309de576-c318-404a-bc15-660c2b1876fb, version 69 (2026-07-23): https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=309de576-c318-404a-bc15-660c2b1876fb | CPIC atomoxetine guideline 2019 (Brown et al.): https://pmc.ncbi.nlm.nih.gov/articles/PMC6612570/';
+  'FDA atomoxetine label, DailyMed set id 309de576-c318-404a-bc15-660c2b1876fb, version 69 (2026-07-23): https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=309de576-c318-404a-bc15-660c2b1876fb | CPIC atomoxetine guideline 2019 (Brown et al.): https://pmc.ncbi.nlm.nih.gov/articles/PMC6612570/';
 
 // ---- R20: ultrarapid metabolizer + strong inhibitor on codeine/tramadol ----
 

@@ -100,6 +100,17 @@ taken word for word from the CPIC API.
 - CPIC API: <https://api.cpicpgx.org/v1/>
 - FDA CYP inhibitor examples: [fda.gov](https://www.fda.gov/drugs/drug-interactions-labeling/healthcare-professionals-fdas-examples-drugs-interact-cyp-enzymes-and-transporter-systems)
 
+## Limitations
+
+- **Synthetic data only.** No real patients, no real lab results.
+- **Steady-state model.** Inhibitor onset and washout are not modeled; a medication is either on the list or not.
+- **Phenoconversion is computed only where CPIC states the rule** (codeine and tramadol, CPIC opioids 2021). Atomoxetine with a strong inhibitor uses the poor-metabolizer recommendation (FDA label); with a moderate inhibitor it is flagged for pharmacist review, not computed.
+- **Several inhibitors on the list: the strongest one is applied.** This is a project design choice, not a CPIC rule.
+- **Ultrarapid metabolizers on a strong inhibitor are flagged "reduced confidence"**, because they may not phenoconvert to the same extent (CPIC 2023).
+- **CYP2C19 phenoconversion is not modeled.** Omeprazole with clopidogrel is shown as a label-level note only.
+- **"No supported alert" is not the same as safe.** It means RxGene has no guideline-backed flag for that combination.
+- **The AI summary never decides anything.** It rewrites the rule engine's output, is validated, and falls back to a fixed template.
+
 ## Disclaimer
 
 RxGene is a hackathon prototype. It is not a medical device and is not validated for

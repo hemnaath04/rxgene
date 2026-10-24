@@ -87,8 +87,7 @@ and [CYP2D6 PharmVar example](https://hl7.org/implement/standards/fhir/uv/genomi
 - `code`: LOINC `84413-4` (match on the code, not the display text, which differs between
   versions).
 - `component[]`: one with code LOINC `48018-6` (gene studied) and
-  `valueCodeableConcept.coding[].code` = `HGNC:2625` (CYP2D6) or `HGNC:2621` (CYP2C19).
-  **Verify the CYP2C19 HGNC ID before using it.**
+  `valueCodeableConcept.coding[].code` = `HGNC:2625` (CYP2D6) or `HGNC:2621` (CYP2C19). Both IDs verified against the HGNC REST API on 2026-10-24.
 - The diplotype is read from `valueCodeableConcept.text`, `valueString`, or the first
   `coding.display`. Strip any `CYP2D6` prefix and PharmVar suballele suffixes
   (`*1.001` → `*1`).

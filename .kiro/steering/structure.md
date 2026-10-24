@@ -1,16 +1,17 @@
-# Structure
+# Structure (full detail: .plans/rxgene-architecture-spec.md section 2)
 
 ```
-web/src/engine/     activityScore.ts, phenotype.ts, phenoconversion.ts, recommend.ts (pure, tested)
-web/src/components/ OrderScreen, AlertCard, EvidenceDrawer, ReportView, ConfirmExtraction
-web/src/data/       imports JSON from ../../data (or copies it at build time)
-server/             POST /extract (report text -> candidate genotypes), POST /explain
-data/               CPIC snapshots + inhibitors.json + synthetic reports
-tests/fixtures/     expected outputs for the 21 test patients
-scripts/            data snapshot + fixture generation (Python)
-docs/               plan, verified answers, sources
+web/api/                 cds-services.ts, cds-services/rxgene-order-select.ts, summary.ts, _lib/{fhir,llm}.ts
+web/src/engine/          activityScore, phenotype, phenoconversion, recommend, cdsCard, templates (+ tests)
+web/src/components/      PatientPicker, MedList, AlertCard, Gauge, EvidenceDrawer, ComparisonStrip, PatientSummary, ModeToggle
+web/src/components/ui/   shadcn generated; don't hand-edit unless restyling
+web/src/lib/             cdsClient.ts (builds CDS Hooks requests), url.ts (URL state)
+web/src/data/            generated copy of ../data, plus patients.ts (tracked)
+data/                    source-of-truth CPIC snapshots + inhibitors.json
+tests/fixtures/          22 expected outputs
 ```
 
-- Engine functions take plain objects and return plain objects. No React inside the engine.
-- Every alert object carries `source`, `guideline`, `strength` and `fetched` for the evidence drawer.
-- Name things after the clinical concept: `activityScore`, `adjustedPhenotype`, not `score2`.
+- Engine functions take plain objects and return plain objects.
+- Every alert carries `source`, `guideline`, `strength` and `fetched`.
+- Name things after the clinical concept: `activityScore`, `adjustedPhenotype`.
+- All app state lives in URL params (`?patient=&meds=&add=&mode=&lang=`).

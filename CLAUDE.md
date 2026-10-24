@@ -9,7 +9,7 @@ The event requires every line of AI-generated code to come from **Kiro**, so Cla
 never writes product code itself.
 
 Source of truth, in this order:
-1. `.plans/rxgene-build-spec.md` (what we build)
+1. `.plans/rxgene-build-spec.md` (what we build) and `.plans/rxgene-architecture-spec.md` (how: stack, layout, scaffold). On structure, the architecture spec wins.
 2. `docs/TEAM-SPLIT.md` (who does what, and the day's gates)
 3. `docs/PLAN-v3.md` (strategy, pitch)
 4. `.kiro/briefs/` (ready-made Kiro task briefs, numbered per owner)
@@ -21,9 +21,9 @@ section of `docs/TEAM-SPLIT.md` and their briefs in `.kiro/briefs/`.
 
 | Owner | Owns these paths | Must not edit |
 |---|---|---|
-| Mithuna | `web/`, `api/`, `vercel.json`, `package.json` | `.kiro/specs/`, `tests/fixtures/` |
-| Ananya | `.kiro/specs/`, `data/` (review), `tests/fixtures/` (review), `docs/SCIENCE.md` | `web/`, `api/` |
-| Hemnaath | `docs/DESIGN.md`, slides, submission | `web/`, `api/` |
+| Mithuna | `web/` (including `web/api/`) | `.kiro/specs/`, `tests/fixtures/` |
+| Ananya | `.kiro/specs/`, `data/` (review), `tests/fixtures/` (review), `docs/SCIENCE.md` | `web/` |
+| Hemnaath | `docs/DESIGN.md`, slides, submission | `web/` |
 
 ## What Claude may and may not do
 
@@ -33,7 +33,8 @@ section of `docs/TEAM-SPLIT.md` and their briefs in `.kiro/briefs/`.
   - Run commands: `npm` installs and scaffolding, `npx vitest run`,
     `python3 scripts/make_expected.py`, git.
   - Review diffs, then commit and push.
-- **Must not** create or edit code in `web/` or `api/` with its own Write/Edit tools.
+- **Scaffolding:** follow `.plans/rxgene-architecture-spec.md` section 7. It replaces "step 0" in any starter prompt.
+- **Must not** create or edit code in `web/` with its own Write/Edit tools.
   Every code change goes through Kiro. If Kiro gets something wrong, send it a follow-up
   brief; don't patch the code yourself.
 

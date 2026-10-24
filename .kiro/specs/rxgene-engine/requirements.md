@@ -63,9 +63,7 @@ are deterministic rules that the AI component never modifies.
 
 **R22:** WHEN an inhibitor drug is added to a patient's medication list, THE SYSTEM SHALL re-check every drug already on the medication list for CYP2D6-related alerts.
 
-**R23:** WHEN a medication list entry for fluoxetine carries a 'recently stopped' marker, THE SYSTEM SHALL treat it as an active strong CYP2D6 inhibitor.
-
-> **Note:** R23 requires a 'recently stopped' field on medication entries (for drugs stopped < 3 months ago). The build spec section 4 Patient type does not include this field yet; it will be added if time permits.
+**R23:** Removed. (Meds are active-only, steady-state, no washout, see R43.)
 
 ---
 
@@ -89,7 +87,7 @@ are deterministic rules that the AI component never modifies.
 
 **R32:** WHEN no CPIC recommendation is available for a given drug–phenotype combination, OR the phenotype is "Indeterminate (Not assessed)", OR the status is "Insufficient data", THE SYSTEM SHALL assign a GREY-level alert.
 
-**R33:** THE SYSTEM SHALL NOT display the word "Safe" or "seguro" anywhere in the UI, alerts, summaries or reports.
+**R33:** THE SYSTEM SHALL NOT describe any drug, result or alert as safe ('safe' or 'seguro'); the only permitted use of the word is the fixed disclaimer 'not the same as safe' in R31.
 
 ---
 

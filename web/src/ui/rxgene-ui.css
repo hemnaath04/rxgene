@@ -298,6 +298,7 @@
   .rx-v-kicker { position: absolute; left: calc(140 * var(--u)); top: calc(28 * var(--u)); font-size: calc(17 * var(--u)); color: #bcd9ec; }
   .rx-v-headline { position: absolute; left: calc(140 * var(--u)); top: calc(56 * var(--u)); font-size: calc(48 * var(--u)); font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
   .rx-v-headline[data-long='true'] { font-size: calc(32 * var(--u)); max-width: calc(350 * var(--u)); line-height: 1.05; }
+  .rx-v-headline[data-long='true'][data-qualified='true'] { font-size: calc(28 * var(--u)); max-width: none; white-space: nowrap; top: calc(64 * var(--u)); }
   .rx-v-qualifier { position: absolute; left: calc(140 * var(--u)); top: calc(109 * var(--u)); font-size: calc(16 * var(--u)); color: #bcd9ec; }
   .rx-v-divider { position: absolute; left: calc(507 * var(--u)); top: calc(30 * var(--u)); width: 1px; height: calc(92 * var(--u)); background: rgba(255, 255, 255, 0.25); }
   .rx-v-rationale { position: absolute; left: calc(535 * var(--u)); top: calc(28 * var(--u)); width: calc(620 * var(--u)); font-size: calc(21 * var(--u)); line-height: 1.3; }

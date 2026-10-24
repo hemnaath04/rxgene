@@ -151,7 +151,10 @@ function rationaleFor(a: DrugAssessment): string {
       if (rec.includes('toxicity')) return `${Drug} could cause serious side effects for this patient. Consider an alternative.`;
       return a.recommendation;
     case 'YELLOW':
-      if (a.drug === 'atomoxetine' && a.labelRecommendation) return a.labelRecommendation;
+      // The full FDA label text is too long for the verdict band; the Evidence sheet shows it verbatim.
+      if (a.drug === 'atomoxetine' && a.labelRecommendation) {
+        return 'Atomoxetine may build up in this patient. The FDA label advises a longer titration interval (4 weeks). Full label text in Evidence.';
+      }
       if (a.drug === 'atomoxetine') return `Atomoxetine may build up in this patient. CPIC: ${a.recommendation}`;
       if (a.drug === 'codeine' || a.drug === 'tramadol') return `${Drug} may relieve pain less well for this patient. CPIC: ${a.recommendation}`;
       return `CPIC gives a modified plan: ${a.recommendation}`;
@@ -226,8 +229,11 @@ export function toRxGeneResult(
   const headline = headlineFor(primary);
   const rationale = rationaleFor(primary);
   // Reverse case (Lena): adding fluoxetine re-alerts codeine already on the list.
+  // Only when the added drug is the inhibitor that changed this result; otherwise a GREY result for
+  // an unrelated current medication would wrongly read as caused by the added drug.
   const prefix = primary.triggeredBy.toLowerCase() !== primary.drug.toLowerCase()
-    ? `Adding ${primary.triggeredBy} affects a current medication:`
+    && primary.inhibitor?.drug.toLowerCase() === primary.triggeredBy.toLowerCase()
+    ?`Adding ${primary.triggeredBy} affects a current medication:`
     : null;
 
   const sourceLinks = sourceLinksFor(primary);

@@ -3,6 +3,9 @@
 
 import type { DrugAssessment, CdsCard } from './types';
 
+/** R31/R33: the fixed GREEN disclaimer. Never reword it or reuse its last word elsewhere. */
+export const GREEN_ALERT_TEXT = 'No supported PGx alert (not the same as safe)';
+
 /**
  * Create a plain-language summary (under 140 chars)
  */
@@ -24,7 +27,7 @@ function createSummary(assessment: DrugAssessment): string {
   }
 
   if (alert === 'GREEN') {
-    return `${drug}: No supported PGx alert (not the same as confirmed appropriate)`;
+    return `${drug}: ${GREEN_ALERT_TEXT}`;
   }
 
   // GREY - use assessment state to determine reason

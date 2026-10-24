@@ -88,7 +88,7 @@ function PlayControl({ playing, disabled, onToggle }: { playing: boolean; disabl
   );
 }
 
-function ParticleLayer({ flow, animate }: { flow: FlowState; animate: boolean }) {
+function ParticleLayer({ flow, animate, stall }: { flow: FlowState; animate: boolean; stall?: boolean }) {
   const isInhibited = flow === 'inhibited';
   const isNormal = flow === 'normal';
   const isReduced = flow === 'reduced';
@@ -98,9 +98,11 @@ function ParticleLayer({ flow, animate }: { flow: FlowState; animate: boolean })
   // left 0 and travel ≤280u so their right edge (≈306u with a 26u sphere) stops before the gate
   // at 312u. Normal/reduced travel fully across (680). Coral pile sits just before the gate;
   // blue output dots are static (diminished output, even when inhibited).
-  const greenCount = isNormal ? 8 : isReduced ? 5 : 6;
+  // stall: slow by genes (poor metabolizer) with no inhibitor effect. The enzyme itself barely
+  // works, so particles enter it and stop there instead of passing through.
+  const greenCount = isNormal ? 8 : stall ? 4 : isReduced ? 5 : 6;
   const greenSize = isReduced ? 20 : 26;
-  const greenTravel = isInhibited ? 280 : 680;
+  const greenTravel = isInhibited ? 280 : stall ? 400 : 680;
 
   return (
     <div className="rx-path rx-flow-clip" aria-hidden="true">
@@ -188,12 +190,12 @@ function Scene({
                 {gene} · {diplotype}
               </p>
               <p className="rx-baseline-phen">{baselineLabel}</p>
+              <p className="rx-baseline-lock">
+                <Lock aria-hidden="true" className="shrink-0" style={{ width: u(28), height: u(28) }} strokeWidth={1.75} />
+                <span>Genes unchanged</span>
+              </p>
             </div>
           </div>
-          <p className="rx-baseline-lock">
-            <Lock aria-hidden="true" className="shrink-0" style={{ width: u(28), height: u(28) }} strokeWidth={1.75} />
-            <span>Genes unchanged</span>
-          </p>
         </div>
 
         {/* 02 Medication effect */}
@@ -202,7 +204,7 @@ function Scene({
           <span className="rx-capability-arrow" aria-hidden="true" />
 
           {inhibitor && (
-            <div className="rx-inhibitor">
+            <div className="rx-inhibitor" data-noeffect={inhibitor.noEffect || undefined}>
               <div className="rx-inhibitor-badge">
                 <Pill aria-hidden="true" className="shrink-0 text-[var(--rx-coral)]" style={{ width: u(40), height: u(40) }} strokeWidth={2} />
                 <span className="flex flex-col">
@@ -235,7 +237,7 @@ function Scene({
           </div>
           <p className="rx-enzyme-label">{gene} enzyme</p>
 
-          <ParticleLayer flow={flow} animate={animate} />
+          <ParticleLayer flow={flow} animate={animate} stall={isReduced && result?.currentSpeed === 'Slow'} />
 
           <p className="rx-output">{result?.outputLabel ?? 'Check prescription to see the result'}</p>
         </div>
@@ -296,7 +298,7 @@ function Ruler({ result }: { result?: RxGeneResult }) {
           </span>
         )}
         {byGenes && now !== byGenes && (
-          <span className="absolute -translate-x-1/2 font-semibold text-[var(--rx-ink)]" style={{ left: SPEED_X[byGenes], fontSize: u(18) }}>
+          <span className="absolute -translate-x-1/2 whitespace-nowrap font-semibold text-[var(--rx-ink)]" style={{ left: SPEED_X[byGenes], fontSize: u(18) }}>
             By genes
           </span>
         )}
@@ -540,15 +542,17 @@ export function RxGeneUI({
             <p className="rx-v-kicker rx-v-row">{verdict?.kicker ?? 'Prescription review'}</p>
             <h2
               className="rx-v-headline rx-v-row"
-              data-long={(verdict?.headline?.length ?? 0) >= 18 || undefined}
+              data-long={(verdict?.headline ?? 'Choose a prescription').length >= 17 || undefined}
               data-qualified={verdict?.qualifier ? true : undefined}
             >
               {verdict?.headline ?? 'Choose a prescription'}
             </h2>
             {verdict?.qualifier && <p className="rx-v-qualifier rx-v-row">{verdict.qualifier}</p>}
             <span className="rx-v-divider" aria-hidden="true" />
-            <p className="rx-v-rationale rx-v-row">{verdict?.rationale ?? 'Press Check prescription to see the assessment.'}</p>
-            {verdict?.source && <p className="rx-v-source rx-v-row">{verdict.source}</p>}
+            <div className="rx-v-middle">
+              <p className="rx-v-rationale rx-v-row">{verdict?.rationale ?? 'Press Check prescription to see the assessment.'}</p>
+              {verdict?.source && <p className="rx-v-source rx-v-row">{verdict.source}</p>}
+            </div>
             <button
               type="button"
               onClick={onReviewMedications}

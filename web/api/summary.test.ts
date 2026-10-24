@@ -222,6 +222,39 @@ describe('model fallback list', () => {
     expect(await summarize(a)).toEqual({ text: renderTemplate(a, 'en'), source: 'template' });
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
+
+  it('rejects genotype, phenotype, metabolizer and gene names (EN and ES)', () => {
+    const a = redAssessment();
+    const rejected = [
+      `${VALID_RED} Your genotype is normal.`,
+      `${VALID_RED} Your phenotype changed.`,
+      `${VALID_RED} You act like a poor metabolizer.`,
+      `${VALID_RED} Fluoxetine blocks CYP2D6.`,
+      `${VALID_RED} This is about CYP2C19.`,
+    ];
+    for (const text of rejected) {
+      expect(validate(text, a, 'en')).toEqual({ ok: false, reason: 'technical term' });
+    }
+    expect(validate('No se recomienda codeína. Usted es un metabolizador lento.', a, 'es')).toEqual({
+      ok: false,
+      reason: 'technical term',
+    });
+    expect(validate(VALID_RED, a, 'en')).toEqual({ ok: true });
+  });
+
+  it('moves on to the next model when the text uses "metabolizer", then to the template', async () => {
+    const a = redAssessment();
+    const withTerm = `${VALID_RED} You act like a poor metabolizer.`;
+
+    const fetchMock = mockSequence(withTerm, VALID_RED);
+    expect(await summarize(a)).toEqual({ text: VALID_RED, source: 'ai' });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    resetLlmState();
+    const both = mockSequence(withTerm, `${VALID_RED} Fluoxetine blocks CYP2D6.`);
+    expect(await summarize(a)).toEqual({ text: renderTemplate(a, 'en'), source: 'template' });
+    expect(both).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('templates', () => {

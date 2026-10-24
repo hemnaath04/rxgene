@@ -204,16 +204,17 @@ function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="app-bg text-ink">
-        <header className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4 px-6 pt-5 pb-3">
-          <div className="flex items-center gap-4">
+      {/* overflow-x-clip is a guard only (it keeps position: sticky working); the layout itself fits 390px. */}
+      <div className="app-bg overflow-x-clip text-ink">
+        <header className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 pt-5 pb-3 sm:px-6">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
             <p className="text-[32px]/none font-bold tracking-[-0.02em] text-ink">
               RxGene<span className="text-alert-red">.</span>
             </p>
             <Divider />
             <p className="text-lg text-ink">Pharmacogenomics</p>
           </div>
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
             <p className="text-sm font-semibold tracking-[0.2em] text-ink-muted">SYNTHETIC DEMO</p>
             <Divider />
             <ModeToggle mode={mode} onChange={changeMode} />
@@ -237,17 +238,18 @@ function App() {
           </div>
         </header>
 
-        <main className="mx-auto flex max-w-[1400px] flex-col gap-5 px-6 pb-8">
-          {/* Control bar: panel rounded-2xl, inputs rounded-lg, padding above 24px */}
+        <main className="mx-auto flex max-w-[1400px] min-w-0 flex-col gap-5 px-4 pb-8 sm:px-6">
+          {/* Control bar: panel rounded-2xl, inputs rounded-lg, padding above 24px (20px on phones).
+              One column on phones, so every control wraps instead of pushing the page sideways. */}
           <section
             aria-label="Prescription check"
-            className="panel grid grid-cols-1 items-end gap-x-6 gap-y-4 rounded-2xl p-7 md:grid-cols-2 lg:grid-cols-[minmax(13rem,1fr)_minmax(16rem,1.5fr)_minmax(13rem,1.2fr)_auto]"
+            className="panel grid min-w-0 grid-cols-1 items-end gap-x-6 gap-y-4 rounded-2xl p-5 sm:p-7 md:grid-cols-2 lg:grid-cols-[minmax(13rem,1fr)_minmax(16rem,1.5fr)_minmax(13rem,1.2fr)_auto]"
           >
             <PatientPicker patients={patients} selectedId={patientId} onSelect={selectPatient} />
             <MedList meds={currentMeds} checking={added} onAdd={addCurrentMed} onRemove={removeCurrentMed} />
             <PrescriptionPicker value={prescription} onChange={setPrescription} />
             <Button
-              className="press h-12 rounded-lg pr-[18px]! pl-5! text-lg font-semibold"
+              className="press h-12 w-full rounded-lg pr-[18px]! pl-5! text-lg font-semibold md:w-auto"
               onClick={checkPrescription}
             >
               Check prescription
@@ -256,7 +258,7 @@ function App() {
           </section>
 
           <div className="flex flex-col gap-1 pt-2">
-            <h1 className="text-[40px]/[44px] font-bold tracking-[-0.02em] text-ink lg:text-[56px]/[60px]">
+            <h1 className="text-[32px]/[36px] font-bold tracking-[-0.02em] text-ink sm:text-[40px]/[44px] lg:text-[56px]/[60px]">
               Same genes. Different response.
             </h1>
             <p className="text-lg text-ink">See how current medications change this prescription assessment.</p>

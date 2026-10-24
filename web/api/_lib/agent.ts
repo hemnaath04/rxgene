@@ -14,7 +14,7 @@ import {
 
 const MAX_ROUNDS = 8;
 const MAX_TOTAL_MS = 25_000;
-const PER_CALL_TIMEOUT_MS = 8_000;
+const PER_CALL_TIMEOUT_MS = 15_000;
 
 export type ToolCall = {
   id: string;
@@ -32,6 +32,7 @@ export type TraceEntry = {
   args: Record<string, unknown>;
   summary: string;
   ms: number;
+  providerId?: string; // Optional: the real provider's tool call id for citation matching
 };
 
 export type NoteSentence = {
@@ -82,16 +83,27 @@ export type AgentDeps = {
   apiKey: string;
 };
 
+export function stripCodeFence(content: string): string {
+  const trimmed = content.trim();
+  // Check if content starts with ``` (optionally followed by language name like 'json')
+  const match = trimmed.match(/^```(?:json)?\n([\s\S]*)\n```$/);
+  if (match) {
+    return match[1].trim();
+  }
+  return content;
+}
+
 function buildSystemPrompt(): string {
   return [
     "You are drafting a pharmacogenomics consult note for a pharmacist to review.",
     "Call check_drug for every medication on the list and for the added drug if there is one.",
-    "Every sentence that states a recommendation, alert level, phenotype, activity score, inhibitor class or any other clinical fact must cite the tool_call ids it came from.",
+    "Every sentence that states a recommendation, alert level, phenotype, activity score, inhibitor class or any other clinical fact must cite the exact tool_call id string you received for that tool call, copied in full without shortening or abbreviation.",
     "State only what the tools returned. Keep each drug's action exactly (RED: avoid; YELLOW: the dose/titration plan; GREY: not assessed, pharmacist review; GREEN: no supported alert, not the same as safe).",
     "Never call anything safe.",
     "Do not add drugs, doses or numbers that are not in tool results.",
     "Keep every dose and time from the recommendation text.",
-    'Output only JSON in this format: { "sections": [ { "heading": string, "sentences": [ { "text": string, "cites": [tool_call_id, ...] } ] } ] }.',
+    "Be concise: one sentence per medication finding (plus required qualifiers), at most 2 sentences in other sections.",
+    'Output only JSON in this format: { "sections": [ { "heading": string, "sentences": [ { "text": string, "cites": [tool_call_id, ...] } ] } ] }. Do not wrap it in a markdown code fence or any other text.',
     'Suggested headings: "Pharmacogenomic summary", "Medication-specific findings", "Drug–drug–gene interactions", "Recommendations for prescriber".'
   ].join(' ');
 }
@@ -129,7 +141,7 @@ async function callLlmWithTools(
           messages,
           tools: TOOLS,
           tool_choice: 'auto',
-          max_tokens: 1200
+          max_tokens: 2500
         }),
         signal: controller.signal
       });
@@ -173,6 +185,7 @@ export async function runConsultAgent(ctx: ToolContext, deps: AgentDeps): Promis
 
   let modelIndex = 0;
   let model = deps.models[modelIndex];
+  let toolCallCounter = 0; // Counter for generating short sequential IDs (call_1, call_2, etc.)
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
     const elapsed = deps.now() - startMs;
@@ -180,9 +193,13 @@ export async function runConsultAgent(ctx: ToolContext, deps: AgentDeps): Promis
       return templateFallback(ctx, trace, 'max time exceeded', deps.now() - startMs);
     }
 
+    // Calculate budget-aware timeout: min(15s, remaining budget).
+    const remainingBudget = MAX_TOTAL_MS - elapsed;
+    const callTimeout = Math.min(PER_CALL_TIMEOUT_MS, remainingBudget);
+
     let completion: ChatCompletion;
     try {
-      completion = await callLlmWithTools(messages, model, deps, PER_CALL_TIMEOUT_MS);
+      completion = await callLlmWithTools(messages, model, deps, callTimeout);
     } catch (err) {
       console.warn(`[agent] model ${modelIndex + 1}: ${err instanceof Error ? err.message : 'unknown'}`);
       return templateFallback(ctx, trace, 'model call failed', deps.now() - startMs);
@@ -192,6 +209,19 @@ export async function runConsultAgent(ctx: ToolContext, deps: AgentDeps): Promis
     const assistantMessage = choice?.message;
     if (!assistantMessage?.role || assistantMessage.role !== 'assistant') {
       return templateFallback(ctx, trace, 'invalid response', deps.now() - startMs);
+    }
+
+    // Check for finish_reason 'length' (truncation).
+    if (choice?.finish_reason === 'length') {
+      console.warn(`[agent] model ${modelIndex + 1}: truncated`);
+      modelIndex++;
+      if (modelIndex >= deps.models.length) {
+        return templateFallback(ctx, trace, 'all models failed (truncated)', deps.now() - startMs);
+      }
+      model = deps.models[modelIndex];
+      // Reset messages and try again with the next model.
+      messages.length = 2;
+      continue;
     }
 
     // Check for gateway errors in the content.
@@ -212,7 +242,7 @@ export async function runConsultAgent(ctx: ToolContext, deps: AgentDeps): Promis
     if (!toolCalls || toolCalls.length === 0) {
       // Final answer: parse the JSON.
       try {
-        const note = JSON.parse(content) as ConsultNote;
+        const note = JSON.parse(stripCodeFence(content)) as ConsultNote;
         if (!isValidNoteStructure(note)) {
           return templateFallback(ctx, trace, 'invalid JSON structure', deps.now() - startMs);
         }
@@ -221,26 +251,39 @@ export async function runConsultAgent(ctx: ToolContext, deps: AgentDeps): Promis
         const validation = validateNote(note, trace, assessments);
         if (!validation.ok) {
           console.warn(`[agent] validation failed: ${validation.reason}`);
+          console.warn('[agent] trace ids:', trace.map(t => t.id));
           return templateFallback(ctx, trace, `validation: ${validation.reason}`, deps.now() - startMs);
         }
         return { note, source: 'ai', trace, model, ms: deps.now() - startMs };
-      } catch {
+      } catch (err) {
+        console.warn('[agent] JSON parse failed:', err instanceof Error ? err.message : err, 'content:', content.slice(0, 500));
         return templateFallback(ctx, trace, 'JSON parse failed', deps.now() - startMs);
       }
     }
 
     // Tool calls: execute them.
+    // Map provider IDs to our short sequential IDs so the model sees and must cite the short ones.
+    const providerIdToShortId = new Map<string, string>();
+    const shortToolCalls = toolCalls.map(tc => {
+      toolCallCounter++;
+      const shortId = `call_${toolCallCounter}`;
+      providerIdToShortId.set(tc.id ?? '', shortId);
+      return {
+        id: shortId,
+        type: 'function',
+        function: { name: tc.function?.name ?? '', arguments: tc.function?.arguments ?? '{}' }
+      };
+    });
+
     messages.push({
       role: 'assistant',
       content: content || '',
-      tool_calls: toolCalls.map(tc => ({
-        id: tc.id ?? '',
-        type: 'function',
-        function: { name: tc.function?.name ?? '', arguments: tc.function?.arguments ?? '{}' }
-      }))
+      tool_calls: shortToolCalls
     });
 
-    for (const tc of toolCalls) {
+    for (let i = 0; i < toolCalls.length; i++) {
+      const tc = toolCalls[i];
+      const shortId = providerIdToShortId.get(tc.id ?? '') ?? `call_${i + 1}`;
       const callStart = deps.now();
       const toolName = tc.function?.name ?? '';
       let args: Record<string, unknown> = {};
@@ -255,28 +298,30 @@ export async function runConsultAgent(ctx: ToolContext, deps: AgentDeps): Promis
 
       if (result.ok) {
         trace.push({
-          id: tc.id ?? '',
+          id: shortId,
           tool: toolName,
           args,
           summary: makeTraceSummary(toolName, args, result.result),
-          ms: callMs
+          ms: callMs,
+          providerId: tc.id
         });
         messages.push({
           role: 'tool',
-          tool_call_id: tc.id ?? '',
+          tool_call_id: shortId,
           content: JSON.stringify(result.result)
         });
       } else {
         trace.push({
-          id: tc.id ?? '',
+          id: shortId,
           tool: toolName,
           args,
           summary: `${toolName}(${JSON.stringify(args)}) → error: ${result.error}`,
-          ms: callMs
+          ms: callMs,
+          providerId: tc.id
         });
         messages.push({
           role: 'tool',
-          tool_call_id: tc.id ?? '',
+          tool_call_id: shortId,
           content: JSON.stringify({ error: result.error })
         });
       }
@@ -328,7 +373,14 @@ function containsSubstring(text: string, substr: string): boolean {
 }
 
 export function validateNote(note: ConsultNote, trace: TraceEntry[], assessments: DrugAssessment[]): ValidationResult {
-  const traceIds = new Set(trace.map(t => t.id));
+  // Build set of valid citation IDs: both short ids and provider ids (if present)
+  const traceIds = new Set<string>();
+  for (const t of trace) {
+    traceIds.add(t.id);
+    if (t.providerId) {
+      traceIds.add(t.providerId);
+    }
+  }
   const noteText = JSON.stringify(note);
   const normalizedNote = normalize(noteText);
 
@@ -503,11 +555,19 @@ function templateFallback(ctx: ToolContext, trace: TraceEntry[], reason: string,
   // R55: every medication must be in the note. Use buildFullAssessments to ensure complete coverage,
   // not ctx.assessments which may be incomplete if the LLM failed mid-run.
   const assessments = buildFullAssessments(ctx.patient, ctx.allMeds);
-  const note = templateConsultNote(assessments);
+  const note = templateConsultNote(assessments, trace);
   return { note, source: 'template', reason, trace, ms };
 }
 
-export function templateConsultNote(assessments: DrugAssessment[]): ConsultNote {
+export function templateConsultNote(assessments: DrugAssessment[], trace: TraceEntry[] = []): ConsultNote {
+  // Build a map from drug name to check_drug trace ID for citations.
+  const drugToTraceId = new Map<string, string>();
+  for (const t of trace) {
+    if (t.tool === 'check_drug' && typeof t.args.drug === 'string') {
+      drugToTraceId.set(t.args.drug.toLowerCase(), t.id);
+    }
+  }
+
   const sections: NoteSection[] = [];
 
   // Summary section.
@@ -528,7 +588,9 @@ export function templateConsultNote(assessments: DrugAssessment[]): ConsultNote 
     } else {
       text += a.recommendation;
     }
-    findings.push({ text, cites: [] });
+    // Map this sentence to the check_drug trace ID if available.
+    const cites = drugToTraceId.get(a.drug.toLowerCase()) ? [drugToTraceId.get(a.drug.toLowerCase())!] : [];
+    findings.push({ text, cites });
   }
   if (findings.length > 0) {
     sections.push({ heading: 'Medication-specific findings', sentences: findings });

@@ -444,4 +444,329 @@ describe('POST /api/consult', () => {
     // Deep equality: the engine's output must not have changed.
     expect(afterAgent).toEqual(beforeAgent);
   });
+
+  it('10s call succeeds (mocked clock) with 15s per-call timeout', async () => {
+    let callCount = 0;
+    const mockFetch = async (url: string, init?: RequestInit) => {
+      callCount++;
+      const body = JSON.parse(init?.body as string);
+
+      if (callCount === 1) {
+        // First call: model asks for tools.
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  role: 'assistant',
+                  content: null,
+                  tool_calls: [
+                    {
+                      id: 'call_1',
+                      type: 'function',
+                      function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
+                    }
+                  ]
+                },
+                finish_reason: 'tool_calls'
+              }
+            ]
+          })
+        );
+      } else {
+        // Second call: simulate a 10s call by returning valid JSON.
+        // The timeout is 15s, so this should succeed.
+        const note = {
+          sections: [
+            {
+              heading: 'Pharmacogenomic summary',
+              sentences: [{ text: 'Reviewed codeine against patient pharmacogenomic results.', cites: ['call_1'] }]
+            },
+            {
+              heading: 'Medication-specific findings',
+              sentences: [
+                {
+                  text: 'Codeine: RED alert. Avoid codeine. Intermediate Metabolizer by genotype, phenoconverted to Poor Metabolizer due to a strong CYP2D6 inhibitor.',
+                  cites: ['call_1']
+                }
+              ]
+            }
+          ]
+        };
+        return new Response(
+          JSON.stringify({
+            choices: [
+              { message: { role: 'assistant', content: JSON.stringify(note) }, finish_reason: 'stop' }
+            ]
+          })
+        );
+      }
+    };
+
+    // Mock the time function to simulate a 10s call on the second invocation.
+    let currentTime = 0;
+    const mockNow = () => {
+      const time = currentTime;
+      currentTime += 5000; // Simulate 5s per call
+      return time;
+    };
+
+    const deps = {
+      fetch: mockFetch as typeof fetch,
+      now: mockNow,
+      models: ['model1'],
+      baseUrl: 'https://example.com/v1',
+      apiKey: 'test-key'
+    };
+
+    global.fetch = mockFetch as typeof fetch;
+
+    const request = new Request('http://localhost/api/consult', {
+      method: 'POST',
+      body: JSON.stringify({ patient })
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const data = (await response.json()) as AgentResult;
+    expect(data.source).toBe('ai'); // Should succeed, not fall back to template
+    expect(callCount).toBe(2); // Two LLM calls
+  });
+
+  it('finish_reason "length" goes to next model', async () => {
+    let callCount = 0;
+    const mockFetch = async (url: string, init?: RequestInit) => {
+      callCount++;
+      const body = JSON.parse(init?.body as string);
+
+      if (callCount === 1) {
+        // First call: tool calls.
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  role: 'assistant',
+                  content: null,
+                  tool_calls: [
+                    {
+                      id: 'call_1',
+                      type: 'function',
+                      function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
+                    }
+                  ]
+                },
+                finish_reason: 'tool_calls'
+              }
+            ]
+          })
+        );
+      } else if (callCount === 2) {
+        // Second call (model 1): return truncated with finish_reason "length".
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  role: 'assistant',
+                  content: '{"sections": ['
+                },
+                finish_reason: 'length'
+              }
+            ]
+          })
+        );
+      } else {
+        // Third call (model 2): reset and tool calls again.
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  role: 'assistant',
+                  content: null,
+                  tool_calls: [
+                    {
+                      id: 'call_2',
+                      type: 'function',
+                      function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
+                    }
+                  ]
+                },
+                finish_reason: 'tool_calls'
+              }
+            ]
+          })
+        );
+      }
+    };
+
+    global.fetch = mockFetch as typeof fetch;
+
+    const request = new Request('http://localhost/api/consult', {
+      method: 'POST',
+      body: JSON.stringify({
+        patient: { ...patient, meds: [] } // No existing meds to simplify
+      })
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const data = (await response.json()) as AgentResult;
+    expect(callCount).toBeGreaterThanOrEqual(3); // At least tool call, truncation, then tool call on model 2
+  });
+
+  it('template sentences have non-empty cites that resolve in trace', async () => {
+    // Force a validation failure to trigger template fallback.
+    let callCount = 0;
+    const mockFetch = async () => {
+      callCount++;
+      if (callCount === 1) {
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  role: 'assistant',
+                  content: null,
+                  tool_calls: [
+                    {
+                      id: 'call_1',
+                      type: 'function',
+                      function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
+                    },
+                    {
+                      id: 'call_2',
+                      type: 'function',
+                      function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'fluoxetine' }) }
+                    }
+                  ]
+                },
+                finish_reason: 'tool_calls'
+              }
+            ]
+          })
+        );
+      } else {
+        // Return invalid JSON to trigger template fallback.
+        return new Response(
+          JSON.stringify({
+            choices: [{ message: { role: 'assistant', content: 'invalid json' }, finish_reason: 'stop' }]
+          })
+        );
+      }
+    };
+
+    global.fetch = mockFetch as typeof fetch;
+
+    const request = new Request('http://localhost/api/consult', {
+      method: 'POST',
+      body: JSON.stringify({ patient })
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const data = (await response.json()) as AgentResult;
+    expect(data.source).toBe('template'); // Fallback due to invalid JSON
+
+    // Verify template sentences have cites that resolve in trace.
+    const traceIds = new Set(data.trace.map(t => t.id));
+    for (const section of data.note.sections) {
+      for (const sentence of section.sentences) {
+        // If the sentence mentions a drug (RED/YELLOW), it should have cites.
+        if (/\b(codeine|fluoxetine|RED|YELLOW|GREY|GREEN|alert)\b/i.test(sentence.text)) {
+          // Medication-specific findings should have cites.
+          if (section.heading === 'Medication-specific findings') {
+            expect(sentence.cites.length).toBeGreaterThan(0);
+            // Every cite should resolve to a trace entry.
+            for (const cite of sentence.cites) {
+              expect(traceIds.has(cite)).toBe(true);
+            }
+          }
+        }
+      }
+    }
+  });
+
+  it('markdown code fence wrapped JSON is parsed successfully', async () => {
+    let callCount = 0;
+    const mockFetch = async (url: string, init?: RequestInit) => {
+      callCount++;
+      const body = JSON.parse(init?.body as string);
+
+      if (callCount === 1) {
+        // First call: tool calls.
+        return new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  role: 'assistant',
+                  content: null,
+                  tool_calls: [
+                    {
+                      id: 'call_1',
+                      type: 'function',
+                      function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'codeine' }) }
+                    },
+                    {
+                      id: 'call_2',
+                      type: 'function',
+                      function: { name: 'check_drug', arguments: JSON.stringify({ drug: 'fluoxetine' }) }
+                    }
+                  ]
+                },
+                finish_reason: 'tool_calls'
+              }
+            ]
+          })
+        );
+      } else {
+        // Second call: return JSON wrapped in markdown code fence.
+        const note = {
+          sections: [
+            {
+              heading: 'Pharmacogenomic summary',
+              sentences: [
+                {
+                  text: 'Reviewed both medications against patient pharmacogenomic results.',
+                  cites: ['call_1', 'call_2']
+                }
+              ]
+            },
+            {
+              heading: 'Medication-specific findings',
+              sentences: [
+                {
+                  text: 'Codeine: RED alert. Avoid codeine. Intermediate Metabolizer by genotype, phenoconverted to Poor Metabolizer due to fluoxetine (strong CYP2D6 inhibitor).',
+                  cites: ['call_1']
+                },
+                {
+                  text: 'Fluoxetine: GREY alert. Fluoxetine is a CYP2D6 inhibitor (strong class, FDA). No independent pharmacogenomic assessment for this medication. This medication is a strong CYP2D6 inhibitor and may affect other drugs metabolized by CYP2D6.',
+                  cites: ['call_2']
+                }
+              ]
+            }
+          ]
+        };
+        // Wrap in markdown code fence
+        const wrappedJson = `\`\`\`json\n${JSON.stringify(note)}\n\`\`\``;
+        return new Response(
+          JSON.stringify({
+            choices: [{ message: { role: 'assistant', content: wrappedJson }, finish_reason: 'stop' }]
+          })
+        );
+      }
+    };
+
+    global.fetch = mockFetch as typeof fetch;
+
+    const request = new Request('http://localhost/api/consult', {
+      method: 'POST',
+      body: JSON.stringify({ patient })
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    const data = (await response.json()) as AgentResult;
+    expect(data.source).toBe('ai'); // Should parse successfully despite code fence
+    expect(data.trace).toHaveLength(2);
+    expect(data.note.sections).toHaveLength(2);
+  });
 });
